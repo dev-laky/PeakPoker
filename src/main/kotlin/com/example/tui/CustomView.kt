@@ -1,8 +1,8 @@
 // In View.kt
 package com.example.tui
 
-interface View {
+interface CustomView {
     fun render()
-    fun handleInput(input: Char)
+    fun handleInput(input: String)
 }
 

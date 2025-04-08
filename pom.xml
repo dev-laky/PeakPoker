@@ -65,6 +65,11 @@
       <artifactId>clikt</artifactId>
       <version>5.0.3</version>
     </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlinx</groupId>
+      <artifactId>kotlinx-coroutines-core</artifactId>
+      <version>1.10.1</version>
+    </dependency>
   </dependencies>
 
 
@@ -111,6 +116,14 @@
         <configuration>
 <!--          <mainClass>hwr.oop.KotlinExample</mainClass>-->
           <mainClass>hwr.oop.KotlinExampleKt</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>6</source>
+          <target>6</target>
         </configuration>
       </plugin>
     </plugins>

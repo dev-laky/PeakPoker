@@ -1,36 +1,58 @@
 import kotlinx.coroutines.*
-import com.example.tui.TerminalApp
-
-fun main() = runBlocking {
-    val job = launch {
-        TerminalApp.listenToInput()
-    }
-
-    job.invokeOnCompletion { println("\nExiting...") }
-}
+import com.example.tui.Screen
+import com.example.tui.Menu
+import com.example.tui.Label
 
 object TerminalApp {
-    private val screen = Screen(listOf(
-        Label("Welcome to the TUI App"),
-        Menu(listOf("Option 1", "Option 2", "Quit"))
-    ))
+    private val screen = Screen(
+        listOf(
+            Label("Welcome to the TUI App"),
+            Menu(listOf("Option 1", "Option 2", "Quit"))
+        )
+    )
 
-    fun listenToInput() = runBlocking {
+    // Main application loop
+    fun run() = runBlocking {
         while (true) {
-            screen.render()
-            val input = readKey()
-            if (input == 'q') break
-            screen.update(input)
-            delay(100) // Adjust delay as needed for responsiveness
+            screen.render()  // Render the TUI
+            val input = readKey()  // Capture user input
+            if (input == "q") break  // Exit condition
+            screen.update(input)  // Update the screen based on input
+            delay(100)  // Delay for responsiveness, can be adjusted
         }
     }
-}
 
-// Simple function to read a single character from standard input
-fun readKey(): Char {
-    return try {
-        System.`in`.read().toChar()
-    } catch (e: IOException) {
-        'q' // Fall back by quitting on exception
+    // Function to read a single character from standard input
+    fun readKey(): String {
+        return try {
+//            System.`in`.read().toChar()
+            val console = System.console() ?: throw RuntimeException("Console is not available")
+            val reader = console.reader()
+            var first = reader.read()
+            return when (first) {
+                27 -> {
+                    // Escape sequence for arrow keys
+                    val second = reader.read()
+                    val third = reader.read()
+                    when (second) { // Rebinding of keys
+                        91 -> when (third) {
+                            65 -> "w"  // Up arrow
+                            66 -> "s"  // Down arrow
+                            else -> ""  // Fallback to quitting on unknown escape sequence
+                        }
+                        else -> ""  // Fallback to quitting on unknown escape sequence
+                    }
+                }
+                else -> when (first.toChar().toString()) {
+                    "j" -> "s"
+                    "k" -> "w"
+                    "h" -> "a"
+                    "l" -> "d"
+                    else -> first.toChar().toString()  // Regular character input
+                } // Regular character input
+            }
+        } catch (e: Exception) {
+            "q"  // Fallback to quitting on exception
+        }
     }
 }

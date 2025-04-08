@@ -1,6 +1,6 @@
 package com.example.tui
 
-class Menu(private val options: List<String>) : View {
+class Menu(private val options: List<String>) : CustomView {
     private var selectedIndex = 0
 
     override fun render() {
@@ -13,10 +13,10 @@ class Menu(private val options: List<String>) : View {
         }
     }
 
-    override fun handleInput(input: Char) {
+    override fun handleInput(input: String) {
         when (input) {
-            'w' -> selectedIndex = (selectedIndex - 1 + options.size) % options.size // Up arrow equivalent
-            's' -> selectedIndex = (selectedIndex + 1) % options.size // Down arrow equivalent
+            "w" -> selectedIndex = (selectedIndex - 1 + options.size) % options.size // Up arrow equivalent
+            "s" -> selectedIndex = (selectedIndex + 1) % options.size // Down arrow equivalent
         }
     }
 }
