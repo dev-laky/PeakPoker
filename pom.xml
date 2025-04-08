@@ -58,7 +58,19 @@
       <version>${assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
+<!--Add dependency for Clikt Library-->
+    <dependency>
+      <groupId>com.github.ajalt.clikt</groupId>
+      <artifactId>clikt</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlinx</groupId>
+      <artifactId>kotlinx-coroutines-core</artifactId>
+      <version>1.10.1</version>
+    </dependency>
   </dependencies>
+
 
   <build>
     <sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -118,6 +130,23 @@
             <kotest.framework.classpath.scanning.autoscan.disable>true
             </kotest.framework.classpath.scanning.autoscan.disable>
           </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+<!--          <mainClass>hwr.oop.KotlinExample</mainClass>-->
+          <mainClass>hwr.oop.KotlinExampleKt</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>6</source>
+          <target>6</target>
         </configuration>
       </plugin>
     </plugins>
