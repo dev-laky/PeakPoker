@@ -37,9 +37,14 @@ val tempList = suits.flatMap { suit ->
 
 
 
-    fun deckShuffle(): Boolean {
+    fun shuffle() {
         val beforeShuffle = cards.toList()
         cards.shuffle()
-        return beforeShuffle != cards
+
+        // Check if shuffle was successful
+        val differentPositions = beforeShuffle.zip(cards).count { (before, after) -> before != after }
+        if (differentPositions == 0) {
+            shuffle()
+        }
     }
 }
