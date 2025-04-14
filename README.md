@@ -5,64 +5,6 @@
 
 # Peak Poker - Up to Everest!
 
-### Start a Game
-| Command | Description |
-|:---------------------------|:----------------------|
-| `$ poker play [ID]` | Join existing game |
-| `$ poker play start` | Start new game |
-| `$ poker join Alice, 1000` | One new player joins game with 1000 coins |
-
-### Pre-Flop Phase
-| Command | Description |
-|:-----------------------------|:-----------------------------|
-| `$ poker bet Alice call` | Alice calls Big Blind |
-| `$ poker bet Bob raise 100` | Bob raises to 100 |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### Flop Phase
-| Command | Description |
-|:-------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 150` | Bob bets 150 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Bob` | Show Bob’s hand |
-
-### Turn Phase
-| Command | Description |
-|:------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 200` | Bob bets 200 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### River Phase
-| Command | Description |
-|:-------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 250` | Bob bets 250 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### Showdown
-| Command | Description |
-|:---------------------------|:-----------------------------|
-| `$ poker showdown` | Compare cards and declare winner |
-| `$ poker score board` | Show current chip standings |
-| `$ poker next hand` | Start a new hand |
-
-### Quit Game
-| Command | Description |
-|:--------------------|:------------------|
-| `$ poker quit` | Save and quit game |
-
-
-
-[TODO]: # (Change README.md Headline to better fit to your project!)
-
 This repository contains a student project created for an ongoing lecture on object-oriented
 programming with Kotlin at HWR Berlin (summer term 2025).
 
@@ -104,7 +46,6 @@ just build
 
 [TODO]: # (Write a short description of your project.)
 [TODO]: # (State most important features.)
-[TODO]: # (State the most interesting problems you encountered during the project.)
 
 ### Project Description
 
@@ -115,6 +56,7 @@ Start with free 10$ and try to climb up the wealth ladder.
 
 ### Challenges
 
+[TODO]: # (State the most interesting problems you encountered during the project.)
 tbd
 
 ### Features
@@ -142,57 +84,68 @@ tbd
 |--------|-----------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 1      | clikt           | Command Line Interface for Kotlin | Clikt is necessary for this project because it provides a simple and intuitive way to create command-line interfaces in Kotlin. This is especially important for team collaboration as it ensures that all team members can easily understand and modify the command-line interface code. Additionally, Clikt helps in maintaining consistency and reducing boilerplate code, which improves the overall development efficiency and code quality. Lastly it provides command documentation by default. |
 
-## Instructions
+## Game Commands
 
-[TODO]: # (Remove these instructions once you finished your fork's setup.)
+#### Start a Game
 
-Use a fork of this repository to do implement your project.
+| Command                    | Description                               |
+|:---------------------------|:------------------------------------------|
+| `$ poker play [ID]`        | Join existing game                        |
+| `$ poker play start`       | Start new game                            |
+| `$ poker join Alice, 1000` | One new player joins game with 1000 coins |
 
-Remember to add this repository as a second remote repository (upstream) and pull from the correct
-remotes.
-This is necessary, because we might apply changes to this template during the next month.
+#### Pre-Flop Phase
 
-The following section describes how to add multiple remote repositories to your local repository,
-which is cloned from the fork.
+| Command                     | Description           |
+|:----------------------------|:----------------------|
+| `$ poker bet Alice call`    | Alice calls Big Blind |
+| `$ poker bet Bob raise 100` | Bob raises to 100     |
+| `$ poker fold Charlie`      | Charlie folds         |
+| `$ poker hand Alice`        | Show Alice’s hand     |
 
-### Multiple remote repositories
+#### Flop Phase
 
-Your local repository should have a reference to both the fork (your own remote repository)
-and the original remote repository.
-To configure your git remote repositories, use the `git remote` command set.
+| Command                   | Description     |
+|:--------------------------|:----------------|
+| `$ poker bet Alice check` | Alice checks    |
+| `$ poker bet Bob bet 150` | Bob bets 150    |
+| `$ poker bet Alice call`  | Alice calls     |
+| `$ poker fold Charlie`    | Charlie folds   |
+| `$ poker hand Bob`        | Show Bob’s hand |
 
-1. Clone your fork and go enter the repository.
+#### Turn Phase
 
-```
-git clone <fork-url>
-cd <created-folder>
-```
+| Command                   | Description       |
+|:--------------------------|:------------------|
+| `$ poker bet Alice check` | Alice checks      |
+| `$ poker bet Bob bet 200` | Bob bets 200      |
+| `$ poker bet Alice call`  | Alice calls       |
+| `$ poker fold Charlie`    | Charlie folds     |
+| `$ poker hand Alice`      | Show Alice’s hand |
 
-2. Now your fork is configured as primary remote repository (origin).
-   Next to origin, you should add the original repository as a second remote repository (upstream).
+#### River Phase
 
-```
-git remote add upstream <repository-url>
-```
+| Command                   | Description       |
+|:--------------------------|:------------------|
+| `$ poker bet Alice check` | Alice checks      |
+| `$ poker bet Bob bet 250` | Bob bets 250      |
+| `$ poker bet Alice call`  | Alice calls       |
+| `$ poker fold Charlie`    | Charlie folds     |
+| `$ poker hand Alice`      | Show Alice’s hand |
 
-3. Verify that both remotes are configured correctly.
-   The following command should list both remotes: origin and upstream.
+#### Showdown
 
-```
-git remote -v
-```
+| Command               | Description                      |
+|:----------------------|:---------------------------------|
+| `$ poker showdown`    | Compare cards and declare winner |
+| `$ poker score board` | Show current chip standings      |
+| `$ poker next hand`   | Start a new hand                 |
 
-4. To fetch changes from all remote repositories, use:
+#### Quit Game
 
-```
-git fetch --all
-```
-
-5. If there are interesting changes (in e.g. the `main` branch) to merge into your branch, use:
-
-```
-git pull upstream main
-```
+| Command        | Description        |
+|:---------------|:-------------------|
+| `$ poker quit` | Save and quit game |
 
 [maven]: https://maven.apache.org/
 [just]: https://github.com/casey/just
