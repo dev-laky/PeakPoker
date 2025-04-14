@@ -27,7 +27,8 @@ val tempList = suits.flatMap { suit ->
 
 
 
-    fun peak2 (): List<Card> {
+    fun peak (): List<Card> {
+
         return cards
     }
 
