@@ -1,5 +1,6 @@
 package hwr.oop
 
+import hwr.oop.core.Deck
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 

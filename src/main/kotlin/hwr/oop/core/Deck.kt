@@ -1,6 +1,4 @@
-package hwr.oop
-
-import hwr.oop.Card
+package hwr.oop.core
 
 class Deck {
 
