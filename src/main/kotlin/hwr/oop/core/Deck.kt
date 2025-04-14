@@ -12,9 +12,7 @@ class Deck {
 
 
     init {
-        val tempList = mutableListOf<Card>()
-
-val tempList = suits.flatMap { suit ->
+        val tempList = suits.flatMap { suit ->
             ranks.map { rank ->
                 Card(suit, rank)
             }
@@ -22,20 +20,11 @@ val tempList = suits.flatMap { suit ->
 
         originalOrder = tempList
         cards = tempList.toMutableList()
-
-
-        originalOrder = tempList.toList()
-        cards = tempList.toMutableList()
     }
 
-
-
-    fun peak (): List<Card> {
-
-        return cards
+    fun peak(): List<Card> {
+        return cards.toList()
     }
-
-
 
     fun shuffle() {
         val beforeShuffle = cards.toList()
