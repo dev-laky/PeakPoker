@@ -6,7 +6,10 @@ class Deck {
     private val ranks = listOf("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
 
     private val originalOrder: List<Card>
-    private val cards: MutableList<Card>
+
+    // TODO: Evaluate if this needs to be mutable
+    private var cards: MutableList<Card>
+
 
     init {
         val tempList = mutableListOf<Card>()
