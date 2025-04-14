@@ -5,6 +5,64 @@
 
 # Peak Poker - Up to Everest!
 
+### Start a Game
+| Command | Description |
+|:---------------------------|:----------------------|
+| `$ poker play [ID]` | Join existing game |
+| `$ poker play start` | Start new game |
+| `$ poker join Alice, 1000` | Join game as Player |
+
+### Pre-Flop Phase
+| Command | Description |
+|:-----------------------------|:-----------------------------|
+| `$ poker deal preflop` | Deal cards to players |
+| `$ poker post blinds` | Post Small and Big Blinds |
+| `$ poker bet Alice call` | Alice calls Big Blind |
+| `$ poker bet Bob raise 100` | Bob raises to 100 |
+| `$ poker bet Charlie fold` | Charlie folds |
+| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+
+### Flop Phase
+| Command | Description |
+|:-------------------------------|:----------------------|
+| `$ poker deal flop` | Reveal three community cards |
+| `$ poker bet Alice check` | Alice checks |
+| `$ poker bet Bob bet 150` | Bob bets 150 |
+| `$ poker bet Alice call` | Alice calls |
+| `$ poker hand Bob` | Show Bob’s hand (optional/debug) |
+
+### Turn Phase
+| Command | Description |
+|:------------------------------|:----------------------|
+| `$ poker deal turn` | Reveal fourth community card |
+| `$ poker bet Alice check` | Alice checks |
+| `$ poker bet Bob bet 200` | Bob bets 200 |
+| `$ poker bet Alice call` | Alice calls |
+| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+
+### River Phase
+| Command | Description |
+|:-------------------------------|:----------------------|
+| `$ poker deal river` | Reveal fifth community card |
+| `$ poker bet Alice check` | Alice checks |
+| `$ poker bet Bob bet 250` | Bob bets 250 |
+| `$ poker bet Alice call` | Alice calls |
+| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+
+### Showdown
+| Command | Description |
+|:---------------------------|:-----------------------------|
+| `$ poker showdown` | Compare cards and declare winner |
+| `$ poker score board` | Show current chip standings |
+| `$ poker next hand` | Start a new hand |
+
+### Quit Game
+| Command | Description |
+|:--------------------|:------------------|
+| `$ poker quit` | Save and quit game |
+
+
+
 [TODO]: # (Change README.md Headline to better fit to your project!)
 
 This repository contains a student project created for an ongoing lecture on object-oriented
