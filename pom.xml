@@ -60,7 +60,7 @@
     </dependency>
     <dependency>
       <groupId>com.github.ajalt.clikt</groupId>
-      <artifactId>clikt</artifactId>
+      <artifactId>clikt-jvm</artifactId>
       <version>5.0.3</version>
     </dependency>
   </dependencies>
