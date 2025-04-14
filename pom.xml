@@ -8,7 +8,7 @@
 
   <artifactId>peakpoker</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 
   <name>PeakPoker</name>
   <description>Have you ever wanted to reach the peak of poker? This project aims to create a poker game that allows players to experience the thrill of climbing to the top of the poker world - up to the poker everest! You can play virtual poker games via the CLI against other players or a computer opponent. Start with free 10$ and try to climb up the wealth ladder.</description>
@@ -58,6 +58,11 @@
       <version>${assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.github.ajalt.clikt</groupId>
+      <artifactId>clikt-jvm</artifactId>
+      <version>5.0.3</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -87,15 +92,27 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.7.1</version>
         <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
           <archive>
             <manifest>
               <mainClass>hwr.oop.MainKt</mainClass>
             </manifest>
           </archive>
         </configuration>
+        <executions>
+          <execution>
+            <id>assemble-all</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
