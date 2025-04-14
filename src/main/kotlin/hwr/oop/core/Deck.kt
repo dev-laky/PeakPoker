@@ -22,13 +22,6 @@ class Deck {
         cards = tempList.toMutableList()
     }
 
-    /*fun peak (): String {
-        for (card in cards) {
-            val cardTitle = (card.rank + " " + card.suit + "\n")
-
-        }
-        return cardTitle
-    }*/
 
 
     fun peak2 (): List<Card> {
