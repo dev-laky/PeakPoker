@@ -14,13 +14,18 @@ class DeckTest : AnnotationSpec() {
     } */
 
     @Test
-    fun `Deck is shuffled` () {
+    fun `shuffled deck is not repeated twice` () {
+        // given
         val deck = Deck()
-        //val before = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        val before = deck.peak2()
-        val afterShuffled = before.shuffled()
 
-        assertThat(afterShuffled).doesNotContainSequence(before)
+        //when
+        val deckBefore = deck.peak()
+        deck.shuffle()
+        val deckAfter = deck.peak()
+
+        // then
+        val differentPositions = deckBefore.zip(deckAfter).count { (before, after) -> before != after }
+        assertThat(differentPositions).isGreaterThan(0)
     }
 }
 
