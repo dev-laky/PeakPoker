@@ -5,62 +5,6 @@
 
 # Peak Poker - Up to Everest!
 
-### Start a Game
-| Command | Description |
-|:---------------------------|:----------------------|
-| `$ poker play [ID]` | Join existing game |
-| `$ poker play start` | Start new game |
-| `$ poker join Alice, 1000` | One new player joins game with 1000 coins |
-
-### Pre-Flop Phase
-| Command | Description |
-|:-----------------------------|:-----------------------------|
-| `$ poker bet Alice call` | Alice calls Big Blind |
-| `$ poker bet Bob raise 100` | Bob raises to 100 |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### Flop Phase
-| Command | Description |
-|:-------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 150` | Bob bets 150 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Bob` | Show Bob’s hand |
-
-### Turn Phase
-| Command | Description |
-|:------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 200` | Bob bets 200 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### River Phase
-| Command | Description |
-|:-------------------------------|:----------------------|
-| `$ poker bet Alice check` | Alice checks |
-| `$ poker bet Bob bet 250` | Bob bets 250 |
-| `$ poker bet Alice call` | Alice calls |
-| `$ poker fold Charlie` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand |
-
-### Showdown
-| Command | Description |
-|:---------------------------|:-----------------------------|
-| `$ poker showdown` | Compare cards and declare winner |
-| `$ poker score board` | Show current chip standings |
-| `$ poker next hand` | Start a new hand |
-
-### Quit Game
-| Command | Description |
-|:--------------------|:------------------|
-| `$ poker quit` | Save and quit game |
-
-
-
 [TODO]: # (Change README.md Headline to better fit to your project!)
 
 This repository contains a student project created for an ongoing lecture on object-oriented
