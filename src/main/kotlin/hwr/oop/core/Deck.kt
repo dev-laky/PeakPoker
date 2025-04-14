@@ -11,12 +11,15 @@ class Deck {
     init {
         val tempList = mutableListOf<Card>()
 
-        for (suit in suits) {
-            for (rank in ranks) {
-                val card = Card(suit, rank)
-                tempList.add(card)
+val tempList = suits.flatMap { suit ->
+            ranks.map { rank ->
+                Card(suit, rank)
             }
         }
+
+        originalOrder = tempList
+        cards = tempList.toMutableList()
+
 
         originalOrder = tempList.toList()
         cards = tempList.toMutableList()
