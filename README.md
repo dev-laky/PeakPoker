@@ -10,44 +10,42 @@
 |:---------------------------|:----------------------|
 | `$ poker play [ID]` | Join existing game |
 | `$ poker play start` | Start new game |
-| `$ poker join Alice, 1000` | Join game as Player |
+| `$ poker join Alice, 1000` | One new player joins game with 1000 coins |
 
 ### Pre-Flop Phase
 | Command | Description |
 |:-----------------------------|:-----------------------------|
-| `$ poker deal preflop` | Deal cards to players |
-| `$ poker post blinds` | Post Small and Big Blinds |
 | `$ poker bet Alice call` | Alice calls Big Blind |
 | `$ poker bet Bob raise 100` | Bob raises to 100 |
-| `$ poker bet Charlie fold` | Charlie folds |
-| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+| `$ poker fold Charlie` | Charlie folds |
+| `$ poker hand Alice` | Show Alice’s hand |
 
 ### Flop Phase
 | Command | Description |
 |:-------------------------------|:----------------------|
-| `$ poker deal flop` | Reveal three community cards |
 | `$ poker bet Alice check` | Alice checks |
 | `$ poker bet Bob bet 150` | Bob bets 150 |
 | `$ poker bet Alice call` | Alice calls |
-| `$ poker hand Bob` | Show Bob’s hand (optional/debug) |
+| `$ poker fold Charlie` | Charlie folds |
+| `$ poker hand Bob` | Show Bob’s hand |
 
 ### Turn Phase
 | Command | Description |
 |:------------------------------|:----------------------|
-| `$ poker deal turn` | Reveal fourth community card |
 | `$ poker bet Alice check` | Alice checks |
 | `$ poker bet Bob bet 200` | Bob bets 200 |
 | `$ poker bet Alice call` | Alice calls |
-| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+| `$ poker fold Charlie` | Charlie folds |
+| `$ poker hand Alice` | Show Alice’s hand |
 
 ### River Phase
 | Command | Description |
 |:-------------------------------|:----------------------|
-| `$ poker deal river` | Reveal fifth community card |
 | `$ poker bet Alice check` | Alice checks |
 | `$ poker bet Bob bet 250` | Bob bets 250 |
 | `$ poker bet Alice call` | Alice calls |
-| `$ poker hand Alice` | Show Alice’s hand (optional/debug) |
+| `$ poker fold Charlie` | Charlie folds |
+| `$ poker hand Alice` | Show Alice’s hand |
 
 ### Showdown
 | Command | Description |
