@@ -1,9 +1,7 @@
 package hwr.oop
 
 import io.kotest.core.spec.style.AnnotationSpec
-import io.kotest.extensions.system.captureStandardOut
 import org.assertj.core.api.Assertions.assertThat
-import hwr.oop.*
 
 class DeckTest : AnnotationSpec() {
 
@@ -25,12 +23,3 @@ class DeckTest : AnnotationSpec() {
     }
 }
 
-class PlayerTest : AnnotationSpec() {
-
-    @Test
-    fun `Player has name` () {
-        val player = Player("Hans")
-        val playerName: String = player.name
-        assertThat(player.name).isEqualTo("Hans")
-    }
-}

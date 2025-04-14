@@ -1,4 +1,7 @@
 package hwr.oop
 
-class Player {
+class Player(
+    val name: String,
+){
+
 }
