@@ -25,6 +25,8 @@
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+    <clikt.version>5.0.3</clikt.version>
+    <sqlite-jdbc>3.49.1.0</sqlite-jdbc>
   </properties>
 
   <repositories>
@@ -61,7 +63,12 @@
     <dependency>
       <groupId>com.github.ajalt.clikt</groupId>
       <artifactId>clikt-jvm</artifactId>
-      <version>5.0.3</version>
+      <version>${clikt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${sqlite-jdbc}</version>
     </dependency>
   </dependencies>
 
@@ -123,6 +130,15 @@
             <kotest.framework.classpath.scanning.autoscan.disable>true
             </kotest.framework.classpath.scanning.autoscan.disable>
           </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <configuration>
+          <buildArgs>
+            <buildArg>-Dorg.sqlite.lib.exportPath=${project.build.directory}</buildArg>
+          </buildArgs>
         </configuration>
       </plugin>
     </plugins>
