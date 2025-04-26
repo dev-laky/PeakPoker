@@ -9,53 +9,79 @@
 | Command                    | Description                        |
 |:---------------------------|:-----------------------------------|
 | `$ poker play [ID]`        | Join existing game                 |
-| `$ poker play start`       | Initialize new game                |
+| `$ poker init`             | Initialize new game                |
 | `$ poker join Alice, 1000` | Join new game as player with money |
-| `$ poker ready`            | Start initialized game             |
+| `$ poker play start`       | Start initialized game             |
+| `$ poker ID`               | Get current game ID                |
+[NOTE]: # (`$ poker init` starts "joining phase" in the CLI that ends with `$ poker play start`)
 
 ### Pre-Flop Phase
 | Command                     | Description                      |
 |:----------------------------|:---------------------------------|
 | `$ poker deal preflop`      | Deal cards to players            |
 | `$ poker post blinds`       | Post Small and Big Blinds        |
-| `$ poker bet Alice call`    | Alice calls Big Blind            |
+| `$ poker bet Sblind 10`     | Set and bet the Small Blind      |
+| `$ poker bet Bblind 25`     | Set and bet the Big Blind        |
 | `$ poker bet Bob raise 100` | Bob raises to 100                |
-| `$ poker bet Charlie fold`  | Charlie folds                    |
-| `$ poker hand Alice`        | Show Alice’s hand for 10 seconds |
+| `$ poker fold Charlie`      | Charlie folds                    |
+| `$ poker bet Alice all-in`  | Alice is all-in                  |
+| `$ poker hand Alice`        | Show Alice’s hand for 10 seconds | 
+| `$ poker pot`               | Show Pot                         |
+| `$ poker ID`                | Get current game ID              |
+| `$ poker stack Bob`         | Show Bob's current balance       |
+[NOTE]: # (only let players see their hand after all bets are placed)
 
 ### Flop Phase
-| Command                   | Description                      |
-|:--------------------------|:---------------------------------|
-| `$ poker deal flop`       | Reveal three community cards     |
-| `$ poker bet Alice check` | Alice checks                     |
-| `$ poker bet Bob bet 150` | Bob bets 150                     |
-| `$ poker bet Alice call`  | Alice calls                      |
-| `$ poker hand Bob`        | Show Bob’s hand (optional/debug) |
+| Command                     | Description                      |
+|:----------------------------|:---------------------------------|
+| `$ poker deal flop`         | Reveal three community cards     |
+| `$ poker bet Alice check`   | Alice checks                     |
+| `$ poker bet Bob raise 150` | Bob raises with 150              |
+| `$ poker bet Alice call`    | Alice calls                      |
+| `$ poker bet Alice all-in`  | Alice is all-in                  |
+| `$ poker hand Bob`          | Show Bob’s hand (optional/debug) |
+| `$ poker pot`               | Show Pot                         |
+| `$ poker ID`                | Get current game ID              |
+| `$ poker board`             | Show community Cards             |
+| `$ poker stack Alice`       | Show Alice's current balance     |
 
 ### Turn Phase
-| Command                   | Description                        |
-|:--------------------------|:-----------------------------------|
-| `$ poker deal turn`       | Reveal fourth community card       |
-| `$ poker bet Alice check` | Alice checks                       |
-| `$ poker bet Bob bet 200` | Bob bets 200                       |
-| `$ poker bet Alice call`  | Alice calls                        |
-| `$ poker hand Alice`      | Show Alice’s hand (optional/debug) |
+| Command                     | Description                        |
+|:----------------------------|:-----------------------------------|
+| `$ poker deal turn`         | Reveal fourth community card       |
+| `$ poker bet Alice check`   | Alice checks                       |
+| `$ poker bet Bob raise 200` | Bob bets 200                       |
+| `$ poker bet Alice call`    | Alice calls                        |
+| `$ poker bet Alice all-in`  | Alice is all-in                    |
+| `$ poker hand Alice`        | Show Alice’s hand (optional/debug) |
+| `$ poker pot`               | Show Pot                           |
+| `$ poker ID`                | Get current game ID                |
+| `$ poker board`             | Show community Cards               |
+| `$ poker stack Bob`         | Show Bob's current balance         |
 
 ### River Phase
-| Command                   | Description                        |
-|:--------------------------|:-----------------------------------|
-| `$ poker deal river`      | Reveal fifth community card        |
-| `$ poker bet Alice check` | Alice checks                       |
-| `$ poker bet Bob bet 250` | Bob bets 250                       |
-| `$ poker bet Alice call`  | Alice calls                        |
-| `$ poker hand Alice`      | Show Alice’s hand (optional/debug) |
+| Command                     | Description                        |
+|:----------------------------|:-----------------------------------|
+| `$ poker deal river`        | Reveal fifth community card        |
+| `$ poker bet Alice check`   | Alice checks                       |
+| `$ poker bet Bob raise 250` | Bob bets 250                       |
+| `$ poker bet Alice call`    | Alice calls                        |
+| `$ poker bet Bob all-in`    | Bob is all-in                      |
+| `$ poker hand Alice`        | Show Alice’s hand (optional/debug) |
+| `$ poker pot`               | Show Pot                           |
+| `$ poker ID`                | Get current game ID                |
+| `$ poker board`             | Show community Cards               |
+| `$ poker stack Bob`         | Show Bob's current balance         |
 
 ### Showdown
-| Command               | Description                      |
-|:----------------------|:---------------------------------|
-| `$ poker showdown`    | Compare cards and declare winner |
-| `$ poker score board` | Show current chip standings      |
-| `$ poker next hand`   | Start a new hand                 |
+| Command                    | Description                      |
+|:---------------------------|:---------------------------------|
+| `$ poker board`            | Show community Cards             |
+| `$ poker showdown`         | Compare cards and declare winner |
+| `$ poker score board`      | Show current chip standings      |
+| `$ poker stack Bob`        | Show Bob's current balance       |
+| `$ poker next hand`        | Start a new hand                 |
+| `$ poker ID`               | Get current game ID              |
 
 ### Quit Game
 | Command         | Description        |
