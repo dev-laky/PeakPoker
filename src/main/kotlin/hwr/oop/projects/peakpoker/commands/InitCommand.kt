@@ -1,4 +1,4 @@
-package hwr.oop.commands
+package hwr.oop.projects.peakpoker.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context

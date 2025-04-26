@@ -100,7 +100,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>hwr.oop.MainKt</mainClass>
+              <mainClass>hwr.oop.projects.peakpoker.MainKt</mainClass>
             </manifest>
           </archive>
         </configuration>
