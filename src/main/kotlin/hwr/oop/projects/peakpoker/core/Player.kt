@@ -2,12 +2,15 @@ package hwr.oop.projects.peakpoker.core
 
 class Player(
     val name: String,
-){
-    private var chips: Int = 0
-    private var hand: List<Card> = emptyList()
-    private var bet: Int = 0
-    private var isFolded: Boolean = false
+    private var chips: Int = 0,
+    private var hand: List<Card> = emptyList(),
+    private var bet: Int = 0,
+    private var isFolded: Boolean = false,
     private var isAllIn: Boolean = false
+){
+    val currentBet: Int get() = bet
+    val currentChips: Int get() = chips
+    val currentHand: List<Card> get() = hand.toList()
 
     fun raise_bet(amount: Int) {
         if (amount < 0) {
@@ -19,10 +22,6 @@ class Player(
         }
         bet += amount
         chips -= amount
-    }
-
-    fun get_bet(): Int {
-        return bet
     }
 
     fun fold() {
@@ -41,5 +40,5 @@ class Player(
         return isAllIn
     }
 
-//    TODO: Implement the hand functionality and think about it's logic
+    // TODO: Implement the hand functionality and think about it's logic
 }
