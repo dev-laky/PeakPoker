@@ -1,7 +1,11 @@
 package hwr.oop.projects.peakpoker.db
 
 
-import hwr.oop.projects.peakpoker.db.tables.*
+import hwr.oop.projects.peakpoker.db.tables.Players
+import hwr.oop.projects.peakpoker.db.tables.Games
+import hwr.oop.projects.peakpoker.db.tables.GamePlayers
+import hwr.oop.projects.peakpoker.db.tables.Decks
+import hwr.oop.projects.peakpoker.db.tables.Bets
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
