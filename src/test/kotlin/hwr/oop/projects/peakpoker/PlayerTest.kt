@@ -11,7 +11,7 @@ class PlayerTest : AnnotationSpec() {
     fun `Player has name` () {
         val player = Player("Hans")
         val playerName: String = player.name
-        assertThat(player.name).isEqualTo("Hans")
+        assertThat(playerName).isEqualTo("Hans")
     }
 
     @Test
