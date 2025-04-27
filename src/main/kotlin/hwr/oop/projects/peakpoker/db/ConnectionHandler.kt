@@ -12,24 +12,18 @@ object ConnectionHandler {
 
     fun connect() {
         Database.connect(
-            "jdbc:sqlite:${dbFile.absolutePath}",
-            "org.sqlite.JDBC"
+            "jdbc:sqlite:${dbFile.absolutePath}", "org.sqlite.JDBC"
         )
     }
 
     fun init() {
         Database.connect(
-            "jdbc:sqlite:${dbFile.absolutePath}",
-            "org.sqlite.JDBC"
+            "jdbc:sqlite:${dbFile.absolutePath}", "org.sqlite.JDBC"
         )
 
         transaction {
             SchemaUtils.create(
-                Players,
-                Games,
-                GamePlayers,
-                Decks,
-                Bets
+                Players, Games, GamePlayers, Decks, Bets
             )
         }
     }
