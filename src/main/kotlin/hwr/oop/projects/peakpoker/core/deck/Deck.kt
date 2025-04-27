@@ -1,4 +1,6 @@
-package hwr.oop.projects.peakpoker.core
+package hwr.oop.projects.peakpoker.core.deck
+
+import hwr.oop.projects.peakpoker.core.card.Card
 
 class Deck {
 

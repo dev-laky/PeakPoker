@@ -1,6 +1,6 @@
 package hwr.oop.projects.peakpoker
 
-import hwr.oop.projects.peakpoker.core.Deck
+import hwr.oop.projects.peakpoker.core.deck.Deck
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
