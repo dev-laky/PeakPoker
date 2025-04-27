@@ -1,5 +1,6 @@
 package hwr.oop.projects.peakpoker.db
 
+
 import hwr.oop.projects.peakpoker.db.tables.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -12,24 +13,18 @@ object ConnectionHandler {
 
     fun connect() {
         Database.connect(
-            "jdbc:sqlite:${dbFile.absolutePath}",
-            "org.sqlite.JDBC"
+            "jdbc:sqlite:${dbFile.absolutePath}", "org.sqlite.JDBC"
         )
     }
 
     fun init() {
         Database.connect(
-            "jdbc:sqlite:${dbFile.absolutePath}",
-            "org.sqlite.JDBC"
+            "jdbc:sqlite:${dbFile.absolutePath}", "org.sqlite.JDBC"
         )
 
         transaction {
             SchemaUtils.create(
-                Players,
-                Games,
-                GamePlayers,
-                Decks,
-                Bets
+                Players, Games, GamePlayers, Decks, Bets
             )
         }
     }
