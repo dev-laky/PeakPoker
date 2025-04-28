@@ -6,16 +6,14 @@
 
     <groupId>hwr.oop.projects</groupId>
 
-    <artifactId>peakpoker</artifactId>
+    <!-- TODO Change name and description according to your project -->
+    <artifactId>project</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0</version>
+    <version>0.1.0-SNAPSHOT</version>
 
-    <name>PeakPoker</name>
-    <description>Have you ever wanted to reach the peak of poker? This project aims to create a poker game that allows
-        players to experience the thrill of climbing to the top of the poker world - up to the poker everest! You can
-        play virtual poker games via the CLI against other players or a computer opponent. Start with free 10$ and try
-        to climb up the wealth ladder.
-    </description>
+    <!-- TODO Change name and description according to your project -->
+    <name>project</name>
+    <description>project-description</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,6 +27,9 @@
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
+        <pitest.version>1.19.1</pitest.version>
+        <kotest-extensions-pitest.version>1.2.0</kotest-extensions-pitest.version>
         <clikt.version>5.0.3</clikt.version>
         <sqlite-jdbc>3.49.1.0</sqlite-jdbc>
         <exposed.version>0.61.0</exposed.version>
@@ -61,70 +62,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.kotest.extensions</groupId>
+            <artifactId>kotest-extensions-pitest</artifactId>
+            <version>${kotest-extensions-pitest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj-core.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ajalt.clikt</groupId>
-            <artifactId>clikt-jvm</artifactId>
-            <version>${clikt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlite-jdbc}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-core</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-dao</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-java-time</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jdbc</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jodatime</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-json</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-kotlin-datetime</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-money</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-spring-boot-starter</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
         </dependency>
     </dependencies>
 
@@ -156,14 +103,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>hwr.oop.projects.peakpoker.MainKt</mainClass>
+                            <mainClass>hwr.oop.MainKt</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -189,13 +136,27 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
                 <configuration>
-                    <buildArgs>
-                        <buildArg>-Dorg.sqlite.lib.exportPath=${project.build.directory}</buildArg>
-                    </buildArgs>
+                    <targetClasses>
+                        <param>hwr.oop.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>hwr.oop.*</param>
+                    </targetTests>
+                    <testPlugin>kotest</testPlugin>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>mutation-testing</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
