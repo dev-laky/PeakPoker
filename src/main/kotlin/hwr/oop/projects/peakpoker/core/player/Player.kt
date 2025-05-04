@@ -4,14 +4,16 @@ import hwr.oop.projects.peakpoker.core.card.Card
 
 class Player(
     val name: String,
-    private var chips: Int = 0,
+    var stack: Int = 0,
     private var hand: List<Card> = emptyList(),
-    private var bet: Int = 0,
-    private var isFolded: Boolean = false,
-    private var isAllIn: Boolean = false
+    var bet: Int = 0,
+    var totalBet: Int = 0,
+    var status: PlayerStatus = PlayerStatus.ACTIVE,
+    var isFolded: Boolean = false,
+    var isAllIn: Boolean = false
 ) {
     val currentBet: Int get() = bet
-    val currentChips: Int get() = chips
+    val currentStack: Int get() = stack
     val currentHand: List<Card> get() = hand.toList()
 
     fun raiseBet(amount: Int) {
@@ -21,7 +23,7 @@ class Player(
             isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
         }
         bet += amount
-        chips -= amount
+        stack -= amount
     }
 
     fun getBet(): Int {
@@ -45,4 +47,8 @@ class Player(
     }
 
     // TODO: Implement the hand functionality and think about it's logic
+}
+
+enum class PlayerStatus {
+    ACTIVE, FOLDED, ALL_IN
 }
