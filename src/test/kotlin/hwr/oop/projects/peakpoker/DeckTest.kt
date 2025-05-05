@@ -21,7 +21,7 @@ class DeckTest : AnnotationSpec() {
     }
 
     @Test
-    fun `peak returns a copy of the cards`() {
+    fun `show returns a copy of the cards`() {
         // given
         val deck = Deck()
 
