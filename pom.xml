@@ -33,9 +33,6 @@
         <sqlite-jdbc>3.49.1.0</sqlite-jdbc>
         <exposed.version>0.61.0</exposed.version>
         <postgresql.version>42.7.2</postgresql.version>
-        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
-        <pitest.version>1.19.1</pitest.version>
-        <kotest-extensions-pitest.version>1.2.0</kotest-extensions-pitest.version>
     </properties>
 
     <repositories>
@@ -129,12 +126,6 @@
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.kotest.extensions</groupId>
-            <artifactId>kotest-extensions-pitest</artifactId>
-            <version>${kotest-extensions-pitest.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -165,7 +156,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>${maven-assembly-plugin.version}</version>
+                <version>3.7.1</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -205,28 +196,6 @@
                         <buildArg>-Dorg.sqlite.lib.exportPath=${project.build.directory}</buildArg>
                     </buildArgs>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>${pitest.version}</version>
-                <configuration>
-                    <targetClasses>
-                        <param>hwr.oop.*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>hwr.oop.*</param>
-                    </targetTests>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>mutation-testing</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>mutationCoverage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

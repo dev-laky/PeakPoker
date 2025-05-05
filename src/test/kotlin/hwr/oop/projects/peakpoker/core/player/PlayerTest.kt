@@ -1,5 +1,6 @@
-package hwr.oop.projects.peakpoker.core.player
+package hwr.oop.projects.peakpoker
 
+import hwr.oop.projects.peakpoker.core.player.Player
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -17,7 +18,7 @@ class PlayerTest : AnnotationSpec() {
     fun `Player's bet can be raised`() {
         val player = Player("Hans")
         player.raiseBet(10)
-        assertThat(player.getBet).isEqualTo(10)
+        assertThat(player.currentBet).isEqualTo(10)
     }
 
     @Test
