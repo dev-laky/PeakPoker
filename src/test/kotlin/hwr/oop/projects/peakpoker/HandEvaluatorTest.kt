@@ -4,7 +4,7 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
-import hwr.oop.projects.peakpoker.core.hand.HandRanking
+import hwr.oop.projects.peakpoker.core.hand.HandRank
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -24,7 +24,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
 
         val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRanking.FLUSH)
+        assertThat(ranking).isEqualTo(HandRank.FLUSH)
     }
 
     @Test
@@ -39,7 +39,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
 
         val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRanking.STRAIGHT)
+        assertThat(ranking).isEqualTo(HandRank.STRAIGHT)
     }
 
     @Test
@@ -54,7 +54,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
 
         val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRanking.FOUR_OF_A_KIND)
+        assertThat(ranking).isEqualTo(HandRank.FOUR_OF_A_KIND)
     }
 
     @Test
@@ -69,7 +69,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
 
         val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRanking.FULL_HOUSE)
+        assertThat(ranking).isEqualTo(HandRank.FULL_HOUSE)
     }
 
     @Test
@@ -83,7 +83,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
 
         val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRanking.HIGH_CARD)
+        assertThat(ranking).isEqualTo(HandRank.HIGH_CARD)
     }
 
     @Test

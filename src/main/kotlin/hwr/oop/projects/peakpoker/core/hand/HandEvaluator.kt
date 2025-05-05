@@ -10,9 +10,9 @@ object HandEvaluator {
     /**
      * Determines the ranking of the given list of five cards.
      * @param list of five cards representing the hand
-     * @return the corresponding HandRanking
+     * @return the corresponding HandRank
      */
-    fun evaluate(cards: List<Card>): HandRanking {
+    fun evaluate(cards: List<Card>): HandRank {
         // Hand must contain exactly five cards and all must be unique
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.toSet().size == 5) { "Hand must contain 5 unique cards" }
@@ -32,31 +32,16 @@ object HandEvaluator {
         || ranks == listOf(0, 1, 2, 3, Rank.ACE.ordinal)
 
         return when {
-            isStraight && isFlush && ranks.maxOrNull() == Rank.ACE.ordinal   -> HandRanking.ROYAL_FLUSH
-            isStraight && isFlush                                            -> HandRanking.STRAIGHT_FLUSH
-            rankCounts.first() == 4                                          -> HandRanking.FOUR_OF_A_KIND
-            rankCounts.first() == 3 && rankCounts[1] == 2                    -> HandRanking.FULL_HOUSE
-            isFlush                                                          -> HandRanking.FLUSH
-            isStraight                                                       -> HandRanking.STRAIGHT
-            rankCounts.first() == 3                                          -> HandRanking.THREE_OF_A_KIND
-            rankCounts.first() == 2 && rankCounts[1] == 2                    -> HandRanking.TWO_PAIR
-            rankCounts.first() == 2                                          -> HandRanking.ONE_PAIR
-            else                                                             -> HandRanking.HIGH_CARD
+            isStraight && isFlush && ranks.maxOrNull() == Rank.ACE.ordinal -> HandRank.ROYAL_FLUSH
+            isStraight && isFlush -> HandRank.STRAIGHT_FLUSH
+            rankCounts.first() == 4 -> HandRank.FOUR_OF_A_KIND
+            rankCounts.first() == 3 && rankCounts[1] == 2 -> HandRank.FULL_HOUSE
+            isFlush -> HandRank.FLUSH
+            isStraight -> HandRank.STRAIGHT
+            rankCounts.first() == 3 -> HandRank.THREE_OF_A_KIND
+            rankCounts.first() == 2 && rankCounts[1] == 2 -> HandRank.TWO_PAIR
+            rankCounts.first() == 2 -> HandRank.ONE_PAIR
+            else -> HandRank.HIGH_CARD
         }
     }
-}
-
-
-
-enum class HandRanking {
-    HIGH_CARD,
-    ONE_PAIR,
-    TWO_PAIR,
-    THREE_OF_A_KIND,
-    STRAIGHT,
-    FLUSH,
-    FULL_HOUSE,
-    FOUR_OF_A_KIND,
-    STRAIGHT_FLUSH,
-    ROYAL_FLUSH
 }
