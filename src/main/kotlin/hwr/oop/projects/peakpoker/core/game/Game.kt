@@ -6,13 +6,13 @@ import hwr.oop.projects.peakpoker.core.player.PlayerStatus
 class Game (
     // TODO: GameManager should automatically generate GameID
     val ID: Int,
-    val smallBlindAmount: Int,
-    val bigBlindAmount: Int,
-    val currentBetAmount: Int = 0
-    val betHistory: MutableList<String> = mutableListOf<String>()
+    val smallBlindAmount: Int = 10,
+    val bigBlindAmount: Int = 20,
+    var currentBetAmount: Int = 0,
 ) {
     val playersOnTable: MutableList<Player> = mutableListOf()
     var pot: Int = 0
+    val betHistory: MutableList<String> = mutableListOf<String>()
 
     val communityCards: List<Card> = emptyList()
     val smallBlindIndex: Int = 0 // Variable to track the index of the small blind player within PlayersOnTable
@@ -62,7 +62,7 @@ class Game (
             println("${player.name} cannot place bet - status: ${player.status}.")
             return
         }
-        private fun applyBet(player: Player, amount: Int) {
+        fun applyBet(player: Player, amount: Int) {
             player.stack -= amount
             player.bet += amount
             player.totalBet += amount
@@ -85,7 +85,7 @@ class Game (
             "call" -> {
                 val toCall = currentBetAmount - player.currentBet
                 if (toCall <= 0) {
-                    println("${player.name} already has the highest bet.")
+                    println("${player.name} already bet the necessary amount.")
                     return
                 }
 
@@ -131,4 +131,5 @@ class Game (
         }
         betHistory.add("${player.name} $action ${if (amount > 0) "($amount)" else ""}".trim())
     }
+    // TODO setBlinds() Method + Phasemanagement (Preflop, ...) + sidePot for allIn
 }

@@ -2,11 +2,17 @@ package hwr.oop.projects.peakpoker
 
 import hwr.oop.projects.peakpoker.core.game.Game
 import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PlayerStatus
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class GameTest : AnnotationSpec() {
+
+    lateinit var game: Game
+    lateinit var alice: Player
+    lateinit var bob: Player
+
     @Test
     fun `test add player to game` () {
         // given
@@ -86,4 +92,20 @@ class GameTest : AnnotationSpec() {
 //        // then
 //        assertThat(testGame.getHighestBet()).isEqualTo(20)
 //    }
+    @BeforeEach
+    fun setup() {
+        // given
+        game = Game(1)
+        alice = Player(name = "Alice", 1000 )
+        bob = Player(name = "Bob", 1000)
+        game.playersOnTable.addAll(listOf(alice, bob))
+    }
+
+    @Test
+    fun`player can fold`() {
+        // when
+        game.bet(alice, "fold")
+        // then
+        assertThat(alice.status).isEqualTo(PlayerStatus.FOLDED)
+    }
 }

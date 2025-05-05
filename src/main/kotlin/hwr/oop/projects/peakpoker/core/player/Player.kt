@@ -4,7 +4,7 @@ import hwr.oop.projects.peakpoker.core.card.Card
 
 class Player(
     val name: String,
-    var stack: Int = 0,
+    var stack: Int,
     private var hand: List<Card> = emptyList(),
     var bet: Int = 0,
     var totalBet: Int = 0,
