@@ -11,6 +11,65 @@ import org.assertj.core.api.Assertions.assertThat
 class HandEvaluatorTest : AnnotationSpec() {
 
     @Test
+    fun `three of a kind is recognized`() {
+        // Three cards of the same rank + two other cards
+        val cards = listOf(
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.DIAMONDS, Rank.ACE),
+            Card(Suit.CLUBS, Rank.ACE),
+            Card(Suit.SPADES, Rank.KING),
+            Card(Suit.HEARTS, Rank.THREE)
+        )
+
+        val ranking = HandEvaluator.evaluate(cards)
+        assertThat(ranking).isEqualTo(HandRank.THREE_OF_A_KIND)
+    }
+
+    @Test
+    fun `one pair is recognized`() {
+        val cards = listOf(
+            Card(Suit.HEARTS, Rank.TWO),
+            Card(Suit.DIAMONDS, Rank.TWO),
+            Card(Suit.CLUBS, Rank.FIVE),
+            Card(Suit.SPADES, Rank.SEVEN),
+            Card(Suit.HEARTS, Rank.NINE)
+        )
+
+        val ranking = HandEvaluator.evaluate(cards)
+        assertThat(ranking).isEqualTo(HandRank.ONE_PAIR)
+    }
+
+    @Test
+    fun `two pair is recognized`() {
+        // Two pairs of cards + any fifth card
+        val cards = listOf(
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.DIAMONDS, Rank.ACE),
+            Card(Suit.CLUBS, Rank.KING),
+            Card(Suit.SPADES, Rank.KING),
+            Card(Suit.HEARTS, Rank.THREE)
+        )
+
+        val ranking = HandEvaluator.evaluate(cards)
+        assertThat(ranking).isEqualTo(HandRank.TWO_PAIR)
+    }
+
+    @Test
+    fun `royal flush is recognized`() {
+        // Ten, Jack, Queen, King, Ace of the same suit
+        val cards = listOf(
+            Card(Suit.HEARTS, Rank.TEN),
+            Card(Suit.HEARTS, Rank.JACK),
+            Card(Suit.HEARTS, Rank.QUEEN),
+            Card(Suit.HEARTS, Rank.KING),
+            Card(Suit.HEARTS, Rank.ACE)
+        )
+
+        val ranking = HandEvaluator.evaluate(cards)
+        assertThat(ranking).isEqualTo(HandRank.ROYAL_FLUSH)
+    }
+
+    @Test
     fun `flush is recognized`() {
         // Five cards of the same suit, but not in sequence
         val cards = listOf(
@@ -38,6 +97,21 @@ class HandEvaluatorTest : AnnotationSpec() {
 
         val ranking = HandEvaluator.evaluate(cards)
         assertThat(ranking).isEqualTo(HandRank.STRAIGHT)
+    }
+
+    @Test
+    fun `straight flush is recognized`() {
+        // Five consecutive values of the same suit
+        val cards = listOf(
+            Card(Suit.HEARTS, Rank.FOUR),
+            Card(Suit.HEARTS, Rank.FIVE),
+            Card(Suit.HEARTS, Rank.SIX),
+            Card(Suit.HEARTS, Rank.SEVEN),
+            Card(Suit.HEARTS, Rank.EIGHT)
+        )
+
+        val ranking = HandEvaluator.evaluate(cards)
+        assertThat(ranking).isEqualTo(HandRank.STRAIGHT_FLUSH)
     }
 
     @Test
@@ -91,6 +165,21 @@ class HandEvaluatorTest : AnnotationSpec() {
         val hand = listOf(
             duplicateCard,
             duplicateCard,
+            Card(Suit.DIAMONDS, Rank.KING),
+            Card(Suit.CLUBS, Rank.QUEEN),
+            Card(Suit.SPADES, Rank.JACK)
+        )
+
+        shouldThrow<IllegalArgumentException> {
+            HandEvaluator.evaluate(hand)
+        }
+    }
+
+    @Test
+    fun `evaluate throws IllegalArgumentException for less than five cards`() {
+        // Four cards
+        val hand = listOf(
+            Card(Suit.HEARTS, Rank.ACE),
             Card(Suit.DIAMONDS, Rank.KING),
             Card(Suit.CLUBS, Rank.QUEEN),
             Card(Suit.SPADES, Rank.JACK)
