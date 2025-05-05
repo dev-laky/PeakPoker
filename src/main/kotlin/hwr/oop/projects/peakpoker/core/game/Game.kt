@@ -3,46 +3,57 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game (
-    // TODO: GameManager should automatically generate GameID
-    val ID: Int,
+    val ID: Int, // GameManager automatically generates GameID and passes it on Game-creation
+    // Both values are set by GameManager and passed on Game-creation
     val smallBlindAmount: Int,
     val bigBlindAmount: Int
 ) {
+    init {
+        require(smallBlindAmount > 0) { "Small blind amount must be positive" }
+        require(bigBlindAmount > 0) { "Big blind amount must be positive" }
+        require(bigBlindAmount >= smallBlindAmount) { "Big blind amount must be greater than or equal to small blind amount" }
+    }
     val PlayersOnTable: MutableList<Player> = mutableListOf()
     val pot: Int = 0
 
     val communityCards: List<Card> = emptyList()
-    val smallBlindIndex: Int = 0 // Variable to track the index of the small blind player within PlayersOnTable
+    // Variable to track the index of the small blind player within PlayersOnTable
+    val smallBlindIndex: Int = 0 // Changed by GameManager when a round is over (possibly makeTurn() function)
 
     // TODO: Implement makeTurn function in order to increase/modify currentPlayerIndex
     var currentPlayerIndex : Int = 0
 
     fun checkPlayerValidity(player: Player): Boolean {
-//        println("Player valid?: " + PlayersOnTable.none { it.name == player.name })
         return PlayersOnTable.none { it.name == player.name }
     }
 
     fun addPlayer(player: Player) {
         if (!checkPlayerValidity(player)) {
-//            println("Player invalid!")
             throw IllegalArgumentException("Player with name ${player.name} already exists.")
         } else {
-//            println("Adding successful? " + PlayersOnTable.add(player))
             PlayersOnTable.add(player)
-//            println("Successfully added player ${player.name} to the game.")
-//            println("New player list: " + PlayersOnTable.joinToString (", ") { it.name })
-//            PlayersOnTable.joinToString (", ") { it.name }
         }
     }
 
     fun removePlayer(player: Player) {
         if (PlayersOnTable.contains(player)) {
             PlayersOnTable.remove(player)
-//            println("Successfully removed player ${player.name} from the game.")
         } else {
-//            println("Player ${player.name} not found in the game.")
             throw IllegalArgumentException("Player ${player.name} does not exist.")
         }
+    }
+
+    fun getSmallBlind(): Int {
+        return smallBlindAmount
+    }
+
+    fun getBigBlind(): Int {
+        return bigBlindAmount
+    }
+
+    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
+    fun getCurrentPlayer(): Player {
+        return PlayersOnTable[currentPlayerIndex]
     }
 
     fun playersListAsString(): String {
