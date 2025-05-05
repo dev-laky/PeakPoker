@@ -5,6 +5,8 @@ import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 
 class Deck(
+
+    // Create list of all possible cards and shuffle it right away
     private val cards: MutableList<Card> = Suit.values().flatMap { suit ->
         Rank.values().map { rank ->
             Card(suit, rank)
