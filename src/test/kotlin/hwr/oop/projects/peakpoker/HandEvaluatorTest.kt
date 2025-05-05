@@ -3,13 +3,11 @@ package hwr.oop.projects.peakpoker
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
 import hwr.oop.projects.peakpoker.core.hand.HandRanking
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
-
 
 
 class HandEvaluatorTest : AnnotationSpec() {
@@ -18,11 +16,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     fun `flush is recognized`() {
         // Five cards of the same suit, but not in sequence
         val cards = listOf(
-            Card(Suit.HEARTS.name, Rank.TWO.name),
-            Card(Suit.HEARTS.name, Rank.FIVE.name),
-            Card(Suit.HEARTS.name, Rank.NINE.name),
-            Card(Suit.HEARTS.name, Rank.JACK.name),
-            Card(Suit.HEARTS.name, Rank.KING.name)
+            Card(Suit.HEARTS, Rank.TWO),
+            Card(Suit.HEARTS, Rank.FIVE),
+            Card(Suit.HEARTS, Rank.NINE),
+            Card(Suit.HEARTS, Rank.JACK),
+            Card(Suit.HEARTS, Rank.KING)
         )
 
         val ranking = HandEvaluator.evaluate(cards)
@@ -33,11 +31,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     fun `straight is recognized`() {
         // Five consecutive values, different suits
         val cards = listOf(
-            Card(Suit.CLUBS.name, Rank.FOUR.name),
-            Card(Suit.HEARTS.name, Rank.FIVE.name),
-            Card(Suit.DIAMONDS.name, Rank.SIX.name),
-            Card(Suit.SPADES.name, Rank.SEVEN.name),
-            Card(Suit.CLUBS.name, Rank.EIGHT.name)
+            Card(Suit.CLUBS, Rank.FOUR),
+            Card(Suit.HEARTS, Rank.FIVE),
+            Card(Suit.DIAMONDS, Rank.SIX),
+            Card(Suit.SPADES, Rank.SEVEN),
+            Card(Suit.CLUBS, Rank.EIGHT)
         )
 
         val ranking = HandEvaluator.evaluate(cards)
@@ -48,11 +46,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     fun `four of a kind is recognized`() {
         // Four cards of the same rank + any fifth card
         val cards = listOf(
-            Card(Suit.HEARTS.name, Rank.ACE.name),
-            Card(Suit.DIAMONDS.name, Rank.ACE.name),
-            Card(Suit.CLUBS.name, Rank.ACE.name),
-            Card(Suit.SPADES.name, Rank.ACE.name),
-            Card(Suit.HEARTS.name, Rank.THREE.name)
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.DIAMONDS, Rank.ACE),
+            Card(Suit.CLUBS, Rank.ACE),
+            Card(Suit.SPADES, Rank.ACE),
+            Card(Suit.HEARTS, Rank.THREE)
         )
 
         val ranking = HandEvaluator.evaluate(cards)
@@ -63,11 +61,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     fun `full house is recognized`() {
         // Three of a kind + a pair
         val cards = listOf(
-            Card(Suit.HEARTS.name, Rank.KING.name),
-            Card(Suit.DIAMONDS.name, Rank.KING.name),
-            Card(Suit.CLUBS.name, Rank.KING.name),
-            Card(Suit.HEARTS.name, Rank.QUEEN.name),
-            Card(Suit.SPADES.name, Rank.QUEEN.name)
+            Card(Suit.HEARTS, Rank.KING),
+            Card(Suit.DIAMONDS, Rank.KING),
+            Card(Suit.CLUBS, Rank.KING),
+            Card(Suit.HEARTS, Rank.QUEEN),
+            Card(Suit.SPADES, Rank.QUEEN)
         )
 
         val ranking = HandEvaluator.evaluate(cards)
@@ -77,11 +75,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     @Test
     fun `high card is recognized when nothing else fits`() {
         val cards = listOf(
-            Card(Suit.HEARTS.name, Rank.TWO.name),
-            Card(Suit.DIAMONDS.name, Rank.FIVE.name),
-            Card(Suit.CLUBS.name, Rank.NINE.name),
-            Card(Suit.SPADES.name, Rank.JACK.name),
-            Card(Suit.HEARTS.name, Rank.KING.name)
+            Card(Suit.HEARTS, Rank.TWO),
+            Card(Suit.DIAMONDS, Rank.FIVE),
+            Card(Suit.CLUBS, Rank.NINE),
+            Card(Suit.SPADES, Rank.JACK),
+            Card(Suit.HEARTS, Rank.KING)
         )
 
         val ranking = HandEvaluator.evaluate(cards)
@@ -91,13 +89,13 @@ class HandEvaluatorTest : AnnotationSpec() {
     @Test
     fun `evaluate throws IllegalArgumentException for duplicates`() {
         // Five cards, two are identical
-        val duplicateCard = Card(Suit.HEARTS.name, Rank.ACE.name)
+        val duplicateCard = Card(Suit.HEARTS, Rank.ACE)
         val hand = listOf(
             duplicateCard,
             duplicateCard,
-            Card(Suit.DIAMONDS.name, Rank.KING.name),
-            Card(Suit.CLUBS.name, Rank.QUEEN.name),
-            Card(Suit.SPADES.name, Rank.JACK.name)
+            Card(Suit.DIAMONDS, Rank.KING),
+            Card(Suit.CLUBS, Rank.QUEEN),
+            Card(Suit.SPADES, Rank.JACK)
         )
 
         shouldThrow<IllegalArgumentException> {

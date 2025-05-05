@@ -18,7 +18,7 @@ object HandEvaluator {
         require(cards.toSet().size == 5) { "Hand must contain 5 unique cards" }
 
         // Map card ranks to their ordinal values for easier comparison
-        val ranks = cards.map { Rank.valueOf(it.rank).ordinal }.sorted()
+        val ranks = cards.map { it.rank.ordinal }.sorted()
         val suits = cards.map { it.suit }
 
         // Count occurrences of each rank
