@@ -24,10 +24,6 @@ class Player(
         chips -= amount
     }
 
-    fun getBet(): Int {
-        return currentBet
-    }
-
     fun fold() {
         isFolded = true
     }

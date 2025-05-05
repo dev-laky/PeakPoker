@@ -62,6 +62,6 @@ class Game (
 
     // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
     fun getHighestBet(): Int {
-        return PlayersOnTable[currentPlayerIndex-1].getBet()
+        return PlayersOnTable[currentPlayerIndex-1].getBet
     }
 }
