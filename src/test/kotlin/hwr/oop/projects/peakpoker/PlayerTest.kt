@@ -18,7 +18,7 @@ class PlayerTest : AnnotationSpec() {
     fun `Player's bet can be raised`() {
         val player = Player("Hans")
         player.raiseBet(10)
-        assertThat(player.currentBet).isEqualTo(10)
+        assertThat(player.getBet).isEqualTo(10)
     }
 
     @Test
