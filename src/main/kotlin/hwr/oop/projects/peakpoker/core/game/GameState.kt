@@ -1,5 +1,5 @@
 package hwr.oop.projects.peakpoker.core.game
 
-enum class GameStates {
+enum class GameState {
     PRE_FLOP, FLOP, TURN, RIVER, SHOWDOWN
 }

@@ -1,7 +1,7 @@
 package hwr.oop.projects.peakpoker.db.entities
 
 import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.player.PlayerRoles
+import hwr.oop.projects.peakpoker.core.player.PlayerRole
 import hwr.oop.projects.peakpoker.db.config.DEFAULT_TTL_DURATION
 import hwr.oop.projects.peakpoker.db.tables.GamePlayers
 import kotlinx.datetime.Clock.System.now
@@ -29,7 +29,7 @@ class GamePlayerEntity(id: EntityID<CompositeID>) : CompositeEntity(id) {
         fun create(
             gameId: EntityID<Int>,
             playerId: EntityID<Int>,
-            role: PlayerRoles,
+            role: PlayerRole,
             ttlDuration: Duration? = DEFAULT_TTL_DURATION
         ): GamePlayerEntity = transaction {
 
