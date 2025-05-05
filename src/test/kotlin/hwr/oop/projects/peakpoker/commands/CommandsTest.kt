@@ -1,7 +1,6 @@
-package hwr.oop.projects.peakpoker
+package hwr.oop.projects.peakpoker.commands
 
 import com.github.ajalt.clikt.testing.test
-import hwr.oop.projects.peakpoker.commands.PokerCommand
 import hwr.oop.projects.peakpoker.commands.db.DbCommand
 import hwr.oop.projects.peakpoker.commands.db.DbConnect
 import hwr.oop.projects.peakpoker.commands.db.DbInit
@@ -42,10 +41,15 @@ class CommandsTest : AnnotationSpec() {
 
         // when
         val result = command.test()
+        val resultHelp = command.test("--help")
 
         // then
+        assertThat(result.output).contains("Creating Schema and connecting to database at:")
         assertThat(command.commandName).isEqualTo("init")
         assertThat(result.statusCode).isEqualTo(0)
+
+        assertThat(resultHelp.output).contains("Initialize connection to the database.")
+        assertThat(resultHelp.statusCode).isEqualTo(0)
     }
 
     @Test
