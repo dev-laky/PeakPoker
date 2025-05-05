@@ -1,7 +1,7 @@
 package hwr.oop.projects.peakpoker.db.entities
 
-import hwr.oop.projects.peakpoker.core.game.GameActions
-import hwr.oop.projects.peakpoker.core.game.GameStates
+import hwr.oop.projects.peakpoker.core.game.GameAction
+import hwr.oop.projects.peakpoker.core.game.GameState
 import hwr.oop.projects.peakpoker.db.config.DEFAULT_TTL_DURATION
 import hwr.oop.projects.peakpoker.db.tables.Bets
 import hwr.oop.projects.peakpoker.db.tables.Games
@@ -30,8 +30,8 @@ class BetEntity(id: EntityID<Int>) : IntEntity(id) {
             gameId: EntityID<Int>,
             playerId: EntityID<Int>,
             amount: Int,
-            action: GameActions,
-            gameState: GameStates,
+            action: GameAction,
+            gameState: GameState,
             ttlDuration: Duration? = DEFAULT_TTL_DURATION
         ): BetEntity = transaction {
             new {

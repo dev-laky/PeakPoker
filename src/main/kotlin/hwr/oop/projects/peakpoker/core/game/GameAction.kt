@@ -1,5 +1,5 @@
 package hwr.oop.projects.peakpoker.core.game
 
-enum class GameActions {
+enum class GameAction {
     CHECK, BET, CALL, RAISE, FOLD, ALL_IN
 }

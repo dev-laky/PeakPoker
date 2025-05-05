@@ -1,7 +1,7 @@
 package hwr.oop.projects.peakpoker.db.tables
 
 import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.player.PlayerRoles
+import hwr.oop.projects.peakpoker.core.player.PlayerRole
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.sql.Column
@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 object GamePlayers : CompositeIdTable("GamePlayers") {
     val gameId = reference("game_id", Games).entityId()
     val playerId = reference("player_id", Players).entityId()
-    val playerGameRole = enumeration("player_game_role", PlayerRoles::class)
+    val playerGameRole = enumeration("player_game_role", PlayerRole::class)
     val hasFolded = bool("has_folded")
     val hand: Column<List<Card>> = json(
         name = "hand",

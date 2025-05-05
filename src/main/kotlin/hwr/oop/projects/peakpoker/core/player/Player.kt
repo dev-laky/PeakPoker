@@ -10,9 +10,9 @@ class Player(
     private var isFolded: Boolean = false,
     private var isAllIn: Boolean = false
 ) {
-    val currentBet: Int get() = bet
-    val currentChips: Int get() = chips
-    val currentHand: List<Card> get() = hand.toList()
+    val getBet: Int get() = bet
+    val getChips: Int get() = chips
+    val getHand: List<Card> get() = hand.toList()
 
     fun raiseBet(amount: Int) {
         when {
@@ -43,6 +43,4 @@ class Player(
     fun isAllIn(): Boolean {
         return isAllIn
     }
-
-    // TODO: Implement the hand functionality and think about it's logic
 }

@@ -1,6 +1,6 @@
 package hwr.oop.projects.peakpoker.db.entities
 
-import hwr.oop.projects.peakpoker.core.game.GameStates
+import hwr.oop.projects.peakpoker.core.game.GameState
 import hwr.oop.projects.peakpoker.db.config.DEFAULT_TTL_DURATION
 import hwr.oop.projects.peakpoker.db.tables.Bets
 import hwr.oop.projects.peakpoker.db.tables.GamePlayers
@@ -30,7 +30,7 @@ class GameEntity(id: EntityID<Int>) : IntEntity(id) {
             new {
                 this.isActive = true
                 this.currentPlayerTurnId = null
-                this.currentGameState = GameStates.PRE_FLOP
+                this.currentGameState = GameState.PRE_FLOP
                 this.deckId = deckId
                 this.lastBet = 0
                 this.lastAction = null
@@ -42,7 +42,7 @@ class GameEntity(id: EntityID<Int>) : IntEntity(id) {
             find { Games.isActive eq true }.toList()
         }
 
-        fun updateGameState(gameId: Int, newState: GameStates) = transaction {
+        fun updateGameState(gameId: Int, newState: GameState) = transaction {
             findById(gameId)?.apply {
                 currentGameState = newState
             }
