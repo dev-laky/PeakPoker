@@ -53,6 +53,7 @@ class DeckTest : AnnotationSpec() {
         repeat(52) { deck.draw() } // draw all cards
 
         // when & then
+        assertEquals(0, deck.show().size) // Check if the list is actually empty (the size is zero)
         assertThrows<IllegalStateException> {
             deck.draw()
         }
