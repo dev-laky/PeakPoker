@@ -1,6 +1,5 @@
-package hwr.oop.projects.peakpoker
+package hwr.oop.projects.peakpoker.core.player
 
-import hwr.oop.projects.peakpoker.core.player.Player
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat

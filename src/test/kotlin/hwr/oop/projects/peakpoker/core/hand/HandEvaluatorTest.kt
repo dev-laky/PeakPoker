@@ -1,10 +1,8 @@
-package hwr.oop.projects.peakpoker
+package hwr.oop.projects.peakpoker.core.hand
 
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
-import hwr.oop.projects.peakpoker.core.hand.HandRank
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
