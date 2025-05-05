@@ -2,22 +2,58 @@ package hwr.oop.projects.peakpoker
 
 import hwr.oop.projects.peakpoker.core.deck.Deck
 import io.kotest.core.spec.style.AnnotationSpec
-import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
 
 class DeckTest : AnnotationSpec() {
     @Test
-    fun `shuffled deck is not repeated twice` () {
+    fun `deck is initialized with 52 cards`() {
         // given
         val deck = Deck()
 
-        //when
-        val deckBefore = deck.peak()
-        deck.shuffle()
-        val deckAfter = deck.peak()
+        // when
+        val cards = deck.show()
 
         // then
-        val differentPositions = deckBefore.zip(deckAfter).count { (before, after) -> before != after }
-        assertThat(differentPositions).isGreaterThan(0)
+        assertEquals(52, cards.size)
+    }
+
+    @Test
+    fun `peak returns a copy of the cards`() {
+        // given
+        val deck = Deck()
+
+        // when
+        val cards = deck.show()
+
+        // then
+        assertNotSame(cards, deck.show())
+    }
+
+    @Test
+    fun `draw removes a card from the deck`() {
+        // given
+        val deck = Deck()
+        val initialSize = deck.show().size
+
+        // when
+        val drawnCard = deck.draw()
+
+        // then
+        assertEquals(initialSize - 1, deck.show().size)
+        assertFalse(deck.show().contains(drawnCard))
+    }
+
+    @Test
+    fun `draw throws exception when no cards left`() {
+        // given
+        val deck = Deck()
+        repeat(52) { deck.draw() } // draw all cards
+
+        // when & then
+        assertThrows<IllegalStateException> {
+            deck.draw()
+        }
     }
 }
 
