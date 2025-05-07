@@ -1,10 +1,9 @@
-package hwr.oop.projects.peakpoker
+package hwr.oop.projects.peakpoker.core.deck
 
-import hwr.oop.projects.peakpoker.core.deck.Deck
 import io.kotest.core.spec.style.AnnotationSpec
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotSame
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.assertThrows
 
 class DeckTest : AnnotationSpec() {
