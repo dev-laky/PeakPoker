@@ -6,23 +6,23 @@ class Game (
     val id: Int, // GameManager automatically generates GameID and passes it on Game-creation
     // Both values are set by GameManager and passed on Game-creation
     val smallBlindAmount: Int,
-    val bigBlindAmount: Int
+    val bigBlindAmount: Int,
+    val playersOnTable: List<Player> = listOf()
 ) {
     init {
         require(smallBlindAmount > 0) { "Small blind amount must be positive" }
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
         require(bigBlindAmount >= smallBlindAmount) { "Big blind amount must be greater than or equal to small blind amount" }
+        require(playersOnTable.size >= 3) { "Minimum number of players is 3" }
     }
 
-    val playersOnTable: MutableList<Player> = mutableListOf()
     val pot: Int = 0
 
     val communityCards: List<Card> = emptyList()
     // Variable to track the index of the small blind player within PlayersOnTable
     val smallBlindIndex: Int = 0 // Changed by GameManager when a round is over (possibly makeTurn() function)
 
-    // TODO: Implement makeTurn function in order to increase/modify currentPlayerIndex
-    var currentPlayerIndex : Int = 0
+    var currentPlayerIndex : Int = 2
 
     fun getSmallBlind(): Int {
         return smallBlindAmount
@@ -32,45 +32,23 @@ class Game (
         return bigBlindAmount
     }
 
-    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
     fun getCurrentPlayer(): Player {
         return playersOnTable[currentPlayerIndex]
     }
 
-    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
     fun getHighestBet(): Int {
-        return playersOnTable[currentPlayerIndex-1].getBetAmount()
+        return playersOnTable[currentPlayerIndex].getBetAmount()
     }
-
-//    fun getPot(): Int {
-//        return pot
-//    }
 
     fun calculatePot(): Int {
         return playersOnTable.sumOf { it.getBetAmount() }
     }
 
-    fun getPlayersListAsString(): String {
-        return playersOnTable.joinToString(", ") { it.name }
+    fun makeTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
     }
 
     fun checkPlayerValidity(player: Player): Boolean {
         return playersOnTable.none { it.name == player.name }
-    }
-
-    fun addPlayer(player: Player) {
-        if (!checkPlayerValidity(player)) {
-            throw IllegalArgumentException("Player with name ${player.name} already exists.")
-        } else {
-            playersOnTable.add(player)
-        }
-    }
-
-    fun removePlayer(player: Player) {
-        if (playersOnTable.contains(player)) {
-            playersOnTable.remove(player)
-        } else {
-            throw IllegalArgumentException("Player ${player.name} does not exist.")
-        }
     }
 }
