@@ -25,10 +25,6 @@ class Player(
         return chips
     }
 
-    fun getHandAsString(): String {
-        return hand.joinToString(", ") { it.toString() }
-    }
-
     fun isFolded(): Boolean {
         return isFolded
     }
