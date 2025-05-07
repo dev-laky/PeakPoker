@@ -8,8 +8,8 @@ class GameInfo : CliktCommand(name = "info") {
     override fun help(context: Context) = "Show information about the game."
     override fun run() {
         val testGame = Game(1002, 10, 20)
-        val testGameSmallBlind = testGame.get
+        val testGameSmallBlind = testGame.getSmallBlind()
 
-        echo()
+//        echo()
     }
 }

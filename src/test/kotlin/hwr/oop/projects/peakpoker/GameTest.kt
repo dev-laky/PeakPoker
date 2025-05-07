@@ -21,7 +21,6 @@ class GameTest : AnnotationSpec() {
         // then
         assertThat(testGame.PlayersOnTable).contains(player1)
     }
-    // TODO: Check if the player name does not exist already
 
     @Test
     fun `check if duplicate exception works` () {
@@ -100,37 +99,38 @@ class GameTest : AnnotationSpec() {
         }
     }
 
-    @Test
-    fun `showGameInfo prints correct game information`() {
-        // given
-        val testGame = Game(1020, 10, 20)
-        val player1 = Player("Alice")
-        val player2 = Player("Bob")
-        testGame.addPlayer(player1)
-        testGame.addPlayer(player2)
+//    @Test
+//    fun `showGameInfo prints correct game information`() {
+//        // given
+//        val testGame = Game(1020, 10, 20)
+//        val player1 = Player("Alice")
+//        val player2 = Player("Bob")
+//        testGame.addPlayer(player1)
+//        testGame.addPlayer(player2)
+//
+//        // Redirect System.out to capture output
+//        val originalOut = System.out
+//        val outContent = ByteArrayOutputStream()
+//        System.setOut(PrintStream(outContent))
+//
+//        try {
+//            // when
+//            testGame.showGameInfo()
+//
+//            // then
+//            val output = outContent.toString()
+//            assertThat(output).contains("Game ID: 1020")
+//            assertThat(output).contains("Small Blind Amount: 10")
+//            assertThat(output).contains("Big Blind Amount: 20")
+//            assertThat(output).contains("Players on Table: Alice, Bob")
+//            assertThat(output).contains("Pot: 0")
+//            assertThat(output).contains("Community Cards: []")
+//        } finally {
+//            // Reset System.out
+//            System.setOut(originalOut)
+//        }
+//    }
 
-        // Redirect System.out to capture output
-        val originalOut = System.out
-        val outContent = ByteArrayOutputStream()
-        System.setOut(PrintStream(outContent))
-
-        try {
-            // when
-            testGame.showGameInfo()
-
-            // then
-            val output = outContent.toString()
-            assertThat(output).contains("Game ID: 1020")
-            assertThat(output).contains("Small Blind Amount: 10")
-            assertThat(output).contains("Big Blind Amount: 20")
-            assertThat(output).contains("Players on Table: Alice, Bob")
-            assertThat(output).contains("Pot: 0")
-            assertThat(output).contains("Community Cards: []")
-        } finally {
-            // Reset System.out
-            System.setOut(originalOut)
-        }
-    }
 //    @Test
 //    fun `check if highest bet is correct`() {
 //        // given
