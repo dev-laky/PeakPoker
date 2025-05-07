@@ -3,8 +3,7 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game (
-    val id: Int, // GameManager automatically generates GameID and passes it on Game-creation
-    // Both values are set by GameManager and passed on Game-creation
+    val id: Int, // must be parsed from fs-persistence
     val smallBlindAmount: Int,
     val bigBlindAmount: Int,
     val playersOnTable: List<Player> = listOf()
@@ -19,8 +18,9 @@ class Game (
     val pot: Int = 0
 
     val communityCards: List<Card> = emptyList()
+
     // Variable to track the index of the small blind player within PlayersOnTable
-    val smallBlindIndex: Int = 0 // Changed by GameManager when a round is over (possibly makeTurn() function)
+    val smallBlindIndex: Int = 0
 
     var currentPlayerIndex : Int = 2
 
@@ -37,7 +37,7 @@ class Game (
     }
 
     fun getHighestBet(): Int {
-        return playersOnTable[currentPlayerIndex].getBetAmount()
+        return playersOnTable.maxOf { it.getBetAmount() }
     }
 
     fun calculatePot(): Int {
