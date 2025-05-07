@@ -1,40 +1,34 @@
 package hwr.oop.projects.peakpoker.core.player
 
-import hwr.oop.projects.peakpoker.core.card.Card
+import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 class Player(
-    val name: String,
+    override val name: String,
     private var chips: Int = 0,
-    private var bet: Int = 0,
-) {
+) : PlayerInterface {
     init {
         require(chips >= 0) { "Chips amount must be non-negative" }
-        require(bet >= 0) { "Bet amount must be non-negative" }
         require(name.isNotBlank()) { "Player name cannot be blank" }
     }
 
-    private var isFolded: Boolean = false
-    private var isAllIn: Boolean = false
-    private var hand: List<Card> = emptyList()
+    var isFolded: Boolean = false
+    var isAllIn: Boolean = false
+    private var hand: HoleCards = HoleCards(emptyList(), this)
+    private var bet: Int = 0
 
-    fun getBetAmount(): Int {
+    fun getBet(): Int {
         return bet
     }
 
-    fun getChipsAmount(): Int {
+    fun getChips(): Int {
         return chips
     }
 
-    fun isFolded(): Boolean {
-        return isFolded
+    fun getHand(): HoleCards {
+        return hand
     }
 
-    fun isAllIn(): Boolean {
-        return isAllIn
-    }
-
-    fun assignCards(cards: List<Card>) {
-        require(hand.isEmpty()) { "Cannot assign cards to a player who already has cards" }
+    fun assignHand(cards: HoleCards) {
         hand = cards
     }
 
@@ -46,13 +40,5 @@ class Player(
         }
         bet += amount
         chips -= amount
-    }
-
-    fun fold() {
-        isFolded = true
-    }
-
-    fun allIn() {
-        isAllIn = true
     }
 }

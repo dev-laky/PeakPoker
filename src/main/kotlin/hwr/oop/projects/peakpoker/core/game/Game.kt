@@ -1,13 +1,14 @@
 package hwr.oop.projects.peakpoker.core.game
-import hwr.oop.projects.peakpoker.core.card.Card
+
+import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.player.Player
 
-class Game (
-    val id: Int, // must be parsed from fs-persistence
+class Game(
+    override val id: Int,
     val smallBlindAmount: Int,
     val bigBlindAmount: Int,
     val playersOnTable: List<Player> = listOf()
-) {
+) : GameInterface {
     init {
         require(smallBlindAmount > 0) { "Small blind amount must be positive" }
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
@@ -15,14 +16,11 @@ class Game (
         require(playersOnTable.size >= 3) { "Minimum number of players is 3" }
     }
 
-    val pot: Int = 0
-
-    val communityCards: List<Card> = emptyList()
-
     // Variable to track the index of the small blind player within PlayersOnTable
     val smallBlindIndex: Int = 0
-
-    var currentPlayerIndex : Int = 2
+    var pot: Int = 0
+    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+    var currentPlayerIndex: Int = 2
 
     fun getSmallBlind(): Int {
         return smallBlindAmount
@@ -37,11 +35,11 @@ class Game (
     }
 
     fun getHighestBet(): Int {
-        return playersOnTable.maxOf { it.getBetAmount() }
+        return playersOnTable.maxOf { it.getBet() }
     }
 
     fun calculatePot(): Int {
-        return playersOnTable.sumOf { it.getBetAmount() }
+        return playersOnTable.sumOf { it.getBet() }
     }
 
     fun makeTurn() {

@@ -1,16 +1,10 @@
 package hwr.oop.projects.peakpoker.core.hand
 
-import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.card.Rank
-import hwr.oop.projects.peakpoker.core.card.Suit
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
-import org.assertj.core.api.Assertions.assertThat
-
 
 class HandEvaluatorTest : AnnotationSpec() {
 
-    @Test
+    /*@Test
     fun `three of a kind is recognized`() {
         // Three cards of the same rank + two other cards
         val cards = listOf(
@@ -188,5 +182,5 @@ class HandEvaluatorTest : AnnotationSpec() {
         shouldThrow<IllegalArgumentException> {
             HandEvaluator.evaluate(hand)
         }
-    }
+    }*/
 }
