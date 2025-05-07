@@ -8,4 +8,11 @@ import hwr.oop.projects.peakpoker.commands.db.DbConnect
 import hwr.oop.projects.peakpoker.commands.db.DbInit
 
 fun main(args: Array<String>) =
-    PokerCommand().subcommands(DbCommand().subcommands(DbInit(), DbConnect())).parse(args)
+    PokerCommand()
+        .subcommands(
+            DbCommand().subcommands(
+                DbInit(),
+                DbConnect()
+            )
+        )
+        .parse(args)

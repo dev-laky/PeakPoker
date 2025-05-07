@@ -10,7 +10,7 @@ class MainTest : AnnotationSpec() {
     @Test
     fun `test main function execution without errors`() {
         // Test execution - use `parse` for non-exiting invocation
-        assertThatNoException().isThrownBy { main(arrayOf("db", "init")) }
-        assertThrows<CliktError> { main(arrayOf("nonesense")) }
+        assertThatNoException().isThrownBy { main(arrayOf("--help")) }
+        assertThrows<CliktError> { main(arrayOf("nonsense_command")) }
     }
 }
