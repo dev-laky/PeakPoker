@@ -1,9 +1,8 @@
 package hwr.oop.projects.peakpoker
 
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.parse
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.core.PrintHelpMessage
-import com.github.ajalt.clikt.core.CliktError
 import hwr.oop.projects.peakpoker.commands.PokerCommand
 import hwr.oop.projects.peakpoker.commands.db.DbCommand
 import hwr.oop.projects.peakpoker.commands.db.DbConnect
@@ -19,7 +18,7 @@ fun main(args: Array<String>) {
 
     try {
         command.parse(args)
-    } catch (e: CliktError) {
+    } catch (_: CliktError) {
         println(command.getFormattedHelp())
     }
 }
