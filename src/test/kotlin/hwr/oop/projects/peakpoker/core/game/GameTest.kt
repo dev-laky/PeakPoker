@@ -1,18 +1,19 @@
-package hwr.oop.projects.peakpoker
+package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.game.Game
 import hwr.oop.projects.peakpoker.core.player.Player
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 
 class GameTest : AnnotationSpec() {
     @Test
     fun `test if game throws exception if too little players are added` () {
         // when/then
         shouldThrow<IllegalArgumentException> {
-            Game(1001, 10, 20,
-                listOf(Player("Hans"), Player("Peter")))
+            Game(
+                1001, 10, 20,
+                listOf(Player("Hans"), Player("Peter"))
+            )
         }
     }
 
@@ -24,39 +25,49 @@ class GameTest : AnnotationSpec() {
         val duplicatePlayer = Player("Hans")
 
         // when/then
-        assertThat(testGame.checkPlayerValidity(duplicatePlayer)).isFalse()
+        Assertions.assertThat(testGame.checkPlayerValidity(duplicatePlayer)).isFalse()
     }
 
     @Test
     fun `invalid blind amounts throw exceptions`() {
         // negative small blind
         shouldThrow<IllegalArgumentException> {
-            Game(1010, -10, 20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max")))
+            Game(
+                1010, -10, 20,
+                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            )
         }
 
         // negative big blind
         shouldThrow<IllegalArgumentException> {
-            Game(1011, 10, -20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max")))
+            Game(
+                1011, 10, -20,
+                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            )
         }
 
         // zero small blind
         shouldThrow<IllegalArgumentException> {
-            Game(1012, 0, 20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max")))
+            Game(
+                1012, 0, 20,
+                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            )
         }
 
         // zero big blind
         shouldThrow<IllegalArgumentException> {
-            Game(1013, 10, 0,
-                listOf(Player("Hans"), Player("Peter"), Player("Max")))
+            Game(
+                1013, 10, 0,
+                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            )
         }
 
         // big blind smaller than small blind
         shouldThrow<IllegalArgumentException> {
-            Game(1014, 30, 20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max")))
+            Game(
+                1014, 30, 20,
+                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            )
         }
     }
 
@@ -72,7 +83,7 @@ class GameTest : AnnotationSpec() {
         testGame.playersOnTable[testGame.currentPlayerIndex].raiseBet(20)
 
         // then
-        assertThat(testGame.getHighestBet()).isEqualTo(20)
+        Assertions.assertThat(testGame.getHighestBet()).isEqualTo(20)
     }
 
     @Test
@@ -85,6 +96,6 @@ class GameTest : AnnotationSpec() {
         val currentPlayer = testGame.getCurrentPlayer()
 
         // then
-        assertThat(currentPlayer.name).isEqualTo("Max")
+        Assertions.assertThat(currentPlayer.name).isEqualTo("Max")
     }
 }
