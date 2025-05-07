@@ -13,6 +13,7 @@ class Game (
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
         require(bigBlindAmount >= smallBlindAmount) { "Big blind amount must be greater than or equal to small blind amount" }
     }
+
     val PlayersOnTable: MutableList<Player> = mutableListOf()
     val pot: Int = 0
 
@@ -22,6 +23,36 @@ class Game (
 
     // TODO: Implement makeTurn function in order to increase/modify currentPlayerIndex
     var currentPlayerIndex : Int = 0
+
+    fun getSmallBlind(): Int {
+        return smallBlindAmount
+    }
+
+    fun getBigBlind(): Int {
+        return bigBlindAmount
+    }
+
+    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
+    fun getCurrentPlayer(): Player {
+        return PlayersOnTable[currentPlayerIndex]
+    }
+
+    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
+    fun getHighestBet(): Int {
+        return PlayersOnTable[currentPlayerIndex-1].getBetAmount()
+    }
+
+    fun getPot(): Int {
+        return pot
+    }
+
+    fun calculatePot(): Int {
+        return PlayersOnTable.sumOf { it.getBetAmount() }
+    }
+
+    fun getPlayersListAsString(): String {
+        return PlayersOnTable.joinToString(", ") { it.name }
+    }
 
     fun checkPlayerValidity(player: Player): Boolean {
         return PlayersOnTable.none { it.name == player.name }
@@ -41,27 +72,5 @@ class Game (
         } else {
             throw IllegalArgumentException("Player ${player.name} does not exist.")
         }
-    }
-
-    fun getSmallBlind(): Int {
-        return smallBlindAmount
-    }
-
-    fun getBigBlind(): Int {
-        return bigBlindAmount
-    }
-
-    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
-    fun getCurrentPlayer(): Player {
-        return PlayersOnTable[currentPlayerIndex]
-    }
-
-    fun playersListAsString(): String {
-        return PlayersOnTable.joinToString(", ") { it.name }
-    }
-
-    // FIXME: Does not work yet since currentPlayerIndex is not set/modified correctly.
-    fun getHighestBet(): Int {
-        return PlayersOnTable[currentPlayerIndex-1].getBet
     }
 }

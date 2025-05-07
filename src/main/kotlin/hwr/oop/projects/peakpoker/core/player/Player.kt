@@ -5,14 +5,44 @@ import hwr.oop.projects.peakpoker.core.card.Card
 class Player(
     val name: String,
     private var chips: Int = 0,
-    private var hand: List<Card> = emptyList(),
     private var bet: Int = 0,
-    private var isFolded: Boolean = false,
-    private var isAllIn: Boolean = false
 ) {
-    val getBet: Int get() = bet
-    val getChips: Int get() = chips
-    val getHand: List<Card> get() = hand.toList()
+    init {
+        require(chips >= 0) { "Chips amount must be non-negative" }
+        require(bet >= 0) { "Bet amount must be non-negative" }
+        require(name.isNotBlank()) { "Player name cannot be blank" }
+    }
+
+    private var isFolded: Boolean = false
+    private var isAllIn: Boolean = false
+    private var hand: List<Card> = emptyList()
+
+    fun getBetAmount(): Int {
+        return bet
+    }
+
+    fun getChipsAmount(): Int {
+        return chips
+    }
+
+    fun getHandAsString(): String {
+        return hand.joinToString(", ") { it.toString() }
+    }
+
+    fun isFolded(): Boolean {
+        return isFolded
+    }
+
+    fun isAllIn(): Boolean {
+        return isAllIn
+    }
+
+    fun assignCards(cards: List<Card>) {
+        if (hand.isNotEmpty()) {
+            throw IllegalStateException("Cannot assign cards to a player who already has cards")
+        }
+        hand = cards
+    }
 
     fun raiseBet(amount: Int) {
         when {
@@ -28,15 +58,7 @@ class Player(
         isFolded = true
     }
 
-    fun isFolded(): Boolean {
-        return isFolded
-    }
-
     fun allIn() {
         isAllIn = true
-    }
-
-    fun isAllIn(): Boolean {
-        return isAllIn
     }
 }
