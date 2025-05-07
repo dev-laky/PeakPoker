@@ -34,9 +34,7 @@ class Player(
     }
 
     fun assignCards(cards: List<Card>) {
-        if (hand.isNotEmpty()) {
-            throw IllegalStateException("Cannot assign cards to a player who already has cards")
-        }
+        require(hand.isEmpty()) { "Cannot assign cards to a player who already has cards" }
         hand = cards
     }
 
