@@ -19,7 +19,7 @@ class GameTest : AnnotationSpec() {
         testGame.addPlayer(player1)
 
         // then
-        assertThat(testGame.PlayersOnTable).contains(player1)
+        assertThat(testGame.playersOnTable).contains(player1)
     }
 
     @Test
@@ -50,7 +50,7 @@ class GameTest : AnnotationSpec() {
         testGame.removePlayer(player1)
 
         // then
-        assertThat(testGame.PlayersOnTable).doesNotContain(player1)
+        assertThat(testGame.playersOnTable).doesNotContain(player1)
     }
 
     @Test
@@ -67,7 +67,7 @@ class GameTest : AnnotationSpec() {
         }
 
         // then
-        assertThat(testGame.PlayersOnTable).doesNotContain(player2)
+        assertThat(testGame.playersOnTable).doesNotContain(player2)
         assertThat(exception.message).isEqualTo("Player ${player2.name} does not exist.")
     }
 
