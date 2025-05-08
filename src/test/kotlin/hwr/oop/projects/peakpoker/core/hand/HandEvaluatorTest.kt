@@ -7,8 +7,8 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
-import hwr.oop.projects.peakpoker.core.card.Suit.*
-import hwr.oop.projects.peakpoker.core.card.Rank.*
+import hwr.oop.projects.peakpoker.core.card.Suit
+import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
 import hwr.oop.projects.peakpoker.core.hand.HandRank
