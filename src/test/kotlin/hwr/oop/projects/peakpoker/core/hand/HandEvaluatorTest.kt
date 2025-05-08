@@ -1,186 +1,179 @@
 package hwr.oop.projects.peakpoker.core.hand
 
 import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.throwables.shouldThrow
+import hwr.oop.projects.peakpoker.core.card.Card
+import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.card.Rank
+import hwr.oop.projects.peakpoker.core.card.Suit.*
+import hwr.oop.projects.peakpoker.core.card.Rank.*
+import hwr.oop.projects.peakpoker.core.card.Suit
+import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
+import hwr.oop.projects.peakpoker.core.hand.HandRank
+import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 
 class HandEvaluatorTest : AnnotationSpec() {
+    //instanciating cards for testing
+    private fun c(suit: Suit, rank: Rank) = Card(suit, rank)
 
-    /*@Test
-    fun `three of a kind is recognized`() {
-        // Three cards of the same rank + two other cards
+    @Test
+    fun `high card is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.CLUBS, Rank.ACE),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.THREE)
+            c(CLUBS, TWO),
+            c(HEARTS, FIVE),
+            c(DIAMONDS, NINE),
+            c(SPADES, JACK),
+            c(HEARTS, KING)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.THREE_OF_A_KIND)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.HIGH_CARD
     }
 
     @Test
     fun `one pair is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.TWO),
-            Card(Suit.DIAMONDS, Rank.TWO),
-            Card(Suit.CLUBS, Rank.FIVE),
-            Card(Suit.SPADES, Rank.SEVEN),
-            Card(Suit.HEARTS, Rank.NINE)
+            c(HEARTS, TWO),
+            c(DIAMONDS, TWO),
+            c(CLUBS, FIVE),
+            c(SPADES, SEVEN),
+            c(HEARTS, NINE)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.ONE_PAIR)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.ONE_PAIR
     }
 
     @Test
     fun `two pair is recognized`() {
-        // Two pairs of cards + any fifth card
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.CLUBS, Rank.KING),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.THREE)
+            c(HEARTS, TEN),
+            c(DIAMONDS, TEN),
+            c(CLUBS, FOUR),
+            c(SPADES, FOUR),
+            c(HEARTS, KING)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.TWO_PAIR)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.TWO_PAIR
     }
 
     @Test
-    fun `royal flush is recognized`() {
-        // Ten, Jack, Queen, King, Ace of the same suit
+    fun `three of a kind is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.TEN),
-            Card(Suit.HEARTS, Rank.JACK),
-            Card(Suit.HEARTS, Rank.QUEEN),
-            Card(Suit.HEARTS, Rank.KING),
-            Card(Suit.HEARTS, Rank.ACE)
+            c(HEARTS, ACE),
+            c(DIAMONDS, ACE),
+            c(CLUBS, ACE),
+            c(SPADES, KING),
+            c(HEARTS, THREE)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.ROYAL_FLUSH)
-    }
-
-    @Test
-    fun `flush is recognized`() {
-        // Five cards of the same suit, but not in sequence
-        val cards = listOf(
-            Card(Suit.HEARTS, Rank.TWO),
-            Card(Suit.HEARTS, Rank.FIVE),
-            Card(Suit.HEARTS, Rank.NINE),
-            Card(Suit.HEARTS, Rank.JACK),
-            Card(Suit.HEARTS, Rank.KING)
-        )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.FLUSH)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.THREE_OF_A_KIND
     }
 
     @Test
     fun `straight is recognized`() {
-        // Five consecutive values, different suits
         val cards = listOf(
-            Card(Suit.CLUBS, Rank.FOUR),
-            Card(Suit.HEARTS, Rank.FIVE),
-            Card(Suit.DIAMONDS, Rank.SIX),
-            Card(Suit.SPADES, Rank.SEVEN),
-            Card(Suit.CLUBS, Rank.EIGHT)
+            c(HEARTS, THREE),
+            c(DIAMONDS, FOUR),
+            c(CLUBS, FIVE),
+            c(SPADES, SIX),
+            c(HEARTS, SEVEN)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.STRAIGHT)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT
     }
 
     @Test
-    fun `straight flush is recognized`() {
-        // Five consecutive values of the same suit
+    fun `wheel straight is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.FOUR),
-            Card(Suit.HEARTS, Rank.FIVE),
-            Card(Suit.HEARTS, Rank.SIX),
-            Card(Suit.HEARTS, Rank.SEVEN),
-            Card(Suit.HEARTS, Rank.EIGHT)
+            c(HEARTS, TWO),
+            c(DIAMONDS, THREE),
+            c(CLUBS, FOUR),
+            c(SPADES, FIVE),
+            c(HEARTS, ACE)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.STRAIGHT_FLUSH)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT
     }
 
     @Test
-    fun `four of a kind is recognized`() {
-        // Four cards of the same rank + any fifth card
+    fun `flush is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.CLUBS, Rank.ACE),
-            Card(Suit.SPADES, Rank.ACE),
-            Card(Suit.HEARTS, Rank.THREE)
+            c(CLUBS, TWO),
+            c(CLUBS, FIVE),
+            c(CLUBS, NINE),
+            c(CLUBS, JACK),
+            c(CLUBS, KING)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.FOUR_OF_A_KIND)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.FLUSH
     }
 
     @Test
     fun `full house is recognized`() {
-        // Three of a kind + a pair
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.KING),
-            Card(Suit.DIAMONDS, Rank.KING),
-            Card(Suit.CLUBS, Rank.KING),
-            Card(Suit.HEARTS, Rank.QUEEN),
-            Card(Suit.SPADES, Rank.QUEEN)
+            c(CLUBS, THREE),
+            c(HEARTS, THREE),
+            c(SPADES, THREE),
+            c(DIAMONDS, QUEEN),
+            c(HEARTS, QUEEN)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.FULL_HOUSE)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.FULL_HOUSE
     }
 
     @Test
-    fun `high card is recognized when nothing else fits`() {
+    fun `four of a kind is recognized`() {
         val cards = listOf(
-            Card(Suit.HEARTS, Rank.TWO),
-            Card(Suit.DIAMONDS, Rank.FIVE),
-            Card(Suit.CLUBS, Rank.NINE),
-            Card(Suit.SPADES, Rank.JACK),
-            Card(Suit.HEARTS, Rank.KING)
+            c(DIAMONDS, KING),
+            c(HEARTS, KING),
+            c(CLUBS, KING),
+            c(SPADES, KING),
+            c(HEARTS, TWO)
         )
-
-        val ranking = HandEvaluator.evaluate(cards)
-        assertThat(ranking).isEqualTo(HandRank.HIGH_CARD)
+        HandEvaluator.evaluate(cards) shouldBe HandRank.FOUR_OF_A_KIND
     }
 
     @Test
-    fun `evaluate throws IllegalArgumentException for duplicates`() {
-        // Five cards, two are identical
-        val duplicateCard = Card(Suit.HEARTS, Rank.ACE)
-        val hand = listOf(
-            duplicateCard,
-            duplicateCard,
-            Card(Suit.DIAMONDS, Rank.KING),
-            Card(Suit.CLUBS, Rank.QUEEN),
-            Card(Suit.SPADES, Rank.JACK)
+    fun `straight flush is recognized`() {
+        val cards = listOf(
+            c(SPADES, FIVE),
+            c(SPADES, SIX),
+            c(SPADES, SEVEN),
+            c(SPADES, EIGHT),
+            c(SPADES, NINE)
         )
+        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT_FLUSH
+    }
 
+    @Test
+    fun `royal flush is recognized`() {
+        val cards = listOf(
+            c(HEARTS, TEN),
+            c(HEARTS, JACK),
+            c(HEARTS, QUEEN),
+            c(HEARTS, KING),
+            c(HEARTS, ACE)
+        )
+        HandEvaluator.evaluate(cards) shouldBe HandRank.ROYAL_FLUSH
+    }
+
+    @Test
+    fun `evaluate throws on invalid list size`() {
         shouldThrow<IllegalArgumentException> {
-            HandEvaluator.evaluate(hand)
+            HandEvaluator.evaluate(
+                listOf(
+                    c(HEARTS, ACE),
+                    c(HEARTS, KING)
+                )
+            )
         }
     }
 
     @Test
-    fun `evaluate throws IllegalArgumentException for less than five cards`() {
-        // Four cards
-        val hand = listOf(
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.DIAMONDS, Rank.KING),
-            Card(Suit.CLUBS, Rank.QUEEN),
-            Card(Suit.SPADES, Rank.JACK)
-        )
-
+    fun `evaluate throws on duplicates`() {
         shouldThrow<IllegalArgumentException> {
-            HandEvaluator.evaluate(hand)
+            HandEvaluator.evaluate(
+                listOf(
+                    c(HEARTS, ACE),
+                    c(HEARTS, ACE),
+                    c(CLUBS, TWO),
+                    c(DIAMONDS, THREE),
+                    c(SPADES, FOUR)
+                )
+            )
         }
-    }*/
+    }
 }
