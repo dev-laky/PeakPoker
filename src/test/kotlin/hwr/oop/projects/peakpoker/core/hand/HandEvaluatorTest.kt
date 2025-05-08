@@ -5,8 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
-import hwr.oop.projects.peakpoker.core.card.Suit.*
-import hwr.oop.projects.peakpoker.core.card.Rank.*
+import hwr.oop.projects.peakpoker.core.card.Suit
+import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 
 
