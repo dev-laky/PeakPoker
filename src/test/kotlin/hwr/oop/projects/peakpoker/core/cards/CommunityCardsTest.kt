@@ -11,12 +11,12 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class CommunityCardsTest : AnnotationSpec() {
 
+    private val mockGame = object : GameInterface {
+        override val id: Int = 1
+    }
+
     @Test
     fun `CommunityCards should contain exactly five cards`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.DIAMONDS, Rank.TEN),
@@ -32,10 +32,6 @@ class CommunityCardsTest : AnnotationSpec() {
 
     @Test
     fun `CommunityCards should throw exception when less than 5 cards are provided`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.DIAMONDS, Rank.TEN),
@@ -50,10 +46,6 @@ class CommunityCardsTest : AnnotationSpec() {
 
     @Test
     fun `CommunityCards should throw exception when more than 5 cards are provided`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.DIAMONDS, Rank.TEN),
@@ -70,10 +62,6 @@ class CommunityCardsTest : AnnotationSpec() {
 
     @Test
     fun `CommunityCards should not allow duplicate cards`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val duplicateCard = Card(Suit.DIAMONDS, Rank.FIVE)
         val cards = listOf(
             duplicateCard,
@@ -90,10 +78,6 @@ class CommunityCardsTest : AnnotationSpec() {
 
     @Test
     fun `CommunityCards should work with empty list initialization`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val communityCards = CommunityCards(emptyList(), mockGame)
 
         assertThat(communityCards.cards).isEmpty()
@@ -101,10 +85,6 @@ class CommunityCardsTest : AnnotationSpec() {
 
     @Test
     fun `CommunityCards should implement Iterable interface correctly`() {
-        val mockGame = object : GameInterface {
-            override val id: Int = 1
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.DIAMONDS, Rank.TEN),

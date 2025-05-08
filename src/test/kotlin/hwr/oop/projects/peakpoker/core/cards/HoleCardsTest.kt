@@ -11,12 +11,12 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HoleCardsTest : AnnotationSpec() {
 
+    private val mockPlayer = object : PlayerInterface {
+        override val name: String = "TestPlayer"
+    }
+
     @Test
     fun `HoleCards should contain exactly two cards`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.HEARTS, Rank.ACE)
@@ -29,10 +29,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should throw exception when less than 2 cards are provided`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE)
         )
@@ -44,10 +40,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should throw exception when more than 2 cards are provided`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.HEARTS, Rank.ACE),
@@ -61,10 +53,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should return the correct cards`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val card1 = Card(Suit.DIAMONDS, Rank.FIVE)
         val card2 = Card(Suit.HEARTS, Rank.ACE)
 
@@ -76,10 +64,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should not allow duplicate cards`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val duplicateCard = Card(Suit.DIAMONDS, Rank.FIVE)
         val cards = listOf(
             duplicateCard,
@@ -93,10 +77,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should work with empty list initialization`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val holeCards = HoleCards(emptyList(), mockPlayer)
 
         assertThat(holeCards.cards).isEmpty()
@@ -104,10 +84,6 @@ class HoleCardsTest : AnnotationSpec() {
 
     @Test
     fun `HoleCards should implement Iterable interface correctly`() {
-        val mockPlayer = object : PlayerInterface {
-            override val name: String = "TestPlayer"
-        }
-
         val cards = listOf(
             Card(Suit.DIAMONDS, Rank.FIVE),
             Card(Suit.HEARTS, Rank.ACE)
