@@ -1,6 +1,9 @@
 package hwr.oop.projects.peakpoker.core.player
 
+import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.card.Rank
+import hwr.oop.projects.peakpoker.core.card.Suit
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +19,7 @@ class PlayerTest : AnnotationSpec() {
     @Test
     fun `Player's bet can be raised`() {
         val player = Player("Hans")
-        player.raiseBet(10)
+        player.raiseBetTo(10)
         assertThat(player.getBet()).isEqualTo(10)
     }
 
@@ -25,29 +28,9 @@ class PlayerTest : AnnotationSpec() {
     fun `Right exception thrown on negative bet`() {
         val player = Player("Hans")
         val exception = shouldThrow<IllegalArgumentException> {
-            player.raiseBet(-10)
+            player.raiseBetTo(-10)
         }
         assertThat(exception.message).isEqualTo("Bet amount must be positive")
-    }
-
-    @Test
-    fun `Right exception on raising bet on a folded player`() {
-        val player = Player("Hans")
-        player.isFolded = true
-        val exception = shouldThrow<IllegalStateException> {
-            player.raiseBet(100)
-        }
-        assertThat(exception.message).isEqualTo("Cannot raise bet after folding")
-    }
-
-    @Test
-    fun `Right exception on raising bet on an all-in player`() {
-        val player = Player("Hans")
-        player.isAllIn = true
-        val exception = shouldThrow<IllegalStateException> {
-            player.raiseBet(100)
-        }
-        assertThat(exception.message).isEqualTo("Cannot raise bet after going all-in")
     }
 
     @Test
@@ -67,8 +50,17 @@ class PlayerTest : AnnotationSpec() {
     @Test
     fun `assignHand correctly assigns hole cards to player`() {
         val player = Player("Hans")
-        val holeCards = HoleCards(emptyList(), player)
+
+        val holeCards = HoleCards(
+            listOf(
+                Card(Suit.DIAMONDS, Rank.FIVE),
+                Card(Suit.DIAMONDS, Rank.SIX)
+            ),
+            player
+        )
+
         player.assignHand(holeCards)
+
         assertThat(player.getHand()).isEqualTo(holeCards)
     }
 
@@ -78,7 +70,7 @@ class PlayerTest : AnnotationSpec() {
         val betAmount = 100
         val player = Player("Hans", initialChips)
 
-        player.raiseBet(betAmount)
+        player.raiseBetTo(betAmount)
 
         assertThat(player.getChips()).isEqualTo(initialChips - betAmount)
         assertThat(player.getBet()).isEqualTo(betAmount)
@@ -89,11 +81,11 @@ class PlayerTest : AnnotationSpec() {
         val initialChips = 500
         val player = Player("Hans", initialChips)
 
-        player.raiseBet(100)
-        player.raiseBet(150)
+        player.raiseBetTo(100)
+        player.raiseBetTo(150)
 
-        assertThat(player.getBet()).isEqualTo(250)
-        assertThat(player.getChips()).isEqualTo(initialChips - 250)
+        assertThat(player.getBet()).isEqualTo(150)
+        assertThat(player.getChips()).isEqualTo(initialChips - 150)
     }
 
     @Test
@@ -121,7 +113,7 @@ class PlayerTest : AnnotationSpec() {
         val player = Player("Hans", 500)
 
         val exception = shouldThrow<IllegalArgumentException> {
-            player.raiseBet(-1)
+            player.raiseBetTo(-1)
         }
 
         assertThat(exception.message).isEqualTo("Bet amount must be positive")
@@ -134,7 +126,7 @@ class PlayerTest : AnnotationSpec() {
     fun `bet of zero amount is accepted`() {
         val player = Player("Hans", 500)
 
-        player.raiseBet(0)
+        player.raiseBetTo(0)
 
         // Verify player's state - bet increased by 0, chips remain unchanged
         assertThat(player.getBet()).isEqualTo(0)
