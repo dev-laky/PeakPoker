@@ -3,14 +3,14 @@ package hwr.oop.projects.peakpoker.core.hand
 import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
+
 import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.card.CommunityCards
-import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit.CLUBS
 import hwr.oop.projects.peakpoker.core.card.Suit.HEARTS
 import hwr.oop.projects.peakpoker.core.card.Suit.DIAMONDS
 import hwr.oop.projects.peakpoker.core.card.Suit.SPADES
+
 import hwr.oop.projects.peakpoker.core.card.Rank.TWO
 import hwr.oop.projects.peakpoker.core.card.Rank.THREE
 import hwr.oop.projects.peakpoker.core.card.Rank.FOUR
