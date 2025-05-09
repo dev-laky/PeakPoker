@@ -1,58 +1,82 @@
 package hwr.oop.projects.peakpoker.core.player
 
-import hwr.oop.projects.peakpoker.core.card.Card
+import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 class Player(
-    val name: String,
-    private var chips: Int = 0,
-    private var bet: Int = 0,
-) {
+    override val name: String,
+    private var chips: Int = 100,
+) : PlayerInterface {
     init {
         require(chips >= 0) { "Chips amount must be non-negative" }
-        require(bet >= 0) { "Bet amount must be non-negative" }
         require(name.isNotBlank()) { "Player name cannot be blank" }
     }
 
-    private var isFolded: Boolean = false
-    private var isAllIn: Boolean = false
-    private var hand: List<Card> = emptyList()
+    var isFolded: Boolean = false
+    var isAllIn: Boolean = false
 
-    fun getBetAmount(): Int {
+    private var hand: HoleCards = HoleCards(emptyList(), this)
+    private var bet: Int = 0
+
+    fun getBet(): Int {
         return bet
     }
 
-    fun getChipsAmount(): Int {
+    fun getChips(): Int {
         return chips
     }
 
-    fun isFolded(): Boolean {
-        return isFolded
+    fun getHand(): HoleCards {
+        return hand
     }
 
-    fun isAllIn(): Boolean {
-        return isAllIn
-    }
-
-    fun assignCards(cards: List<Card>) {
-        require(hand.isEmpty()) { "Cannot assign cards to a player who already has cards" }
+    fun assignHand(cards: HoleCards) {
+        require(cards.cards.size == 2) { "A player must have exactly 2 hole cards" }
         hand = cards
     }
 
-    fun raiseBet(amount: Int) {
-        when {
-            amount < 0 -> throw IllegalArgumentException("Bet amount must be positive")
-            isFolded -> throw IllegalStateException("Cannot raise bet after folding")
-            isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
-        }
-        bet += amount
-        chips -= amount
+    /**
+     * Raises the player's bet to the specified amount.
+     * CAUTION: Should only be called from Game.
+     *
+     * This method increases the player's bet to the given amount, deducting only the difference
+     * between the new bet and current bet from the player's chips.
+     *
+     * @param chips The total amount to bet (not the additional amount)
+     */
+    fun raiseBetTo(chips: Int) {
+        require(chips >= 0) { "Bet amount must be positive" }
+
+        this@Player.chips -= chips - bet
+        bet = chips
+    }
+
+    fun call(chips: Int) {
+        require(chips > 0) { "Call amount must be positive" }
+
+        this@Player.chips -= chips - bet
+        bet = chips
+    }
+
+    fun check() {
+        TODO(
+            """
+            Consider if check is needed inside of Player?
+            What could be the use case for this?
+            Otherwise remove, handle necessary actions in Game. 
+            
+            Quick thought:
+            Since nothing needs to be changed of bet or chips, 
+            all other properties of Player can be accessed through Game.
+            So right know I don't think we need this here.
+            """
+        )
     }
 
     fun fold() {
-        isFolded = true
+        TODO("The fold function is not implemented yet.")
     }
 
     fun allIn() {
-        isAllIn = true
+        TODO("The allIn function is not implemented yet.")
     }
 }
