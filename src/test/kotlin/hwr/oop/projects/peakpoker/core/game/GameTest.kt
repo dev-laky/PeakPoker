@@ -78,12 +78,12 @@ class GameTest : AnnotationSpec() {
             listOf(Player("Hans"), Player("Peter"), Player("Max")))
 
         // when
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBet(10)
+        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(30)
         testGame.makeTurn()
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBet(20)
+        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(40)
 
         // then
-        assertThat(testGame.getHighestBet()).isEqualTo(20)
+        assertThat(testGame.getHighestBet()).isEqualTo(40)
     }
 
     @Test
@@ -130,11 +130,9 @@ class GameTest : AnnotationSpec() {
         val player3 = Player("Max")
         val testGame = Game(1031, 10, 20, listOf(player1, player2, player3))
 
-        player1.raiseBet(10)
-        player2.raiseBet(30)
-        player3.raiseBet(20)
+        player3.raiseBetTo(40)
 
-        assertThat(testGame.calculatePot()).isEqualTo(60)
+        assertThat(testGame.calculatePot()).isEqualTo(70)
     }
 
     @Test
@@ -167,41 +165,13 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `getHighestBet handles edge cases with equal bets`() {
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1040, 10, 20, listOf(player1, player2, player3))
-
-        player1.raiseBet(30)
-        player2.raiseBet(30)
-        player3.raiseBet(30)
-
-        assertThat(testGame.getHighestBet()).isEqualTo(30)
-    }
-
-    @Test
-    fun `getHighestBet works with zero bets`() {
+    fun `getHighestBet is equal to big blind amount on init`() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
         val testGame = Game(1041, 10, 20, listOf(player1, player2, player3))
 
-        assertThat(testGame.getHighestBet()).isEqualTo(0)
-    }
-
-    @Test
-    fun `getHighestBet returns correct value when some bets are the same`() {
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1042, 10, 20, listOf(player1, player2, player3))
-
-        player1.raiseBet(10)
-        player2.raiseBet(30)
-        player3.raiseBet(10)
-
-        assertThat(testGame.getHighestBet()).isEqualTo(30)
+        assertThat(testGame.getHighestBet()).isEqualTo(20)
     }
 
     @Test
@@ -223,18 +193,6 @@ class GameTest : AnnotationSpec() {
         )
 
         assertThat(testGame.smallBlindIndex).isEqualTo(0)
-    }
-
-    @Test
-    fun `getPot returns correct value`() {
-        val testGame = Game(
-            1061, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
-        )
-
-        testGame.pot = 100
-
-        assertThat(testGame.pot).isEqualTo(100)
     }
 
     @Test
