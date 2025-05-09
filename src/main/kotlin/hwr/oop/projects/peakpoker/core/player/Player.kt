@@ -56,4 +56,27 @@ class Player(
         this@Player.chips -= chips - bet
         bet = chips
     }
+
+    fun check() {
+        TODO(
+            """
+            Consider if check is needed inside of Player?
+            What could be the use case for this?
+            Otherwise remove, handle necessary actions in Game. 
+            
+            Quick thought:
+            Since nothing needs to be changed of bet or chips, 
+            all other properties of Player can be accessed through Game.
+            So right know I don't think we need this here.
+            """
+        )
+    }
+
+    fun fold() {
+        TODO("The fold function is not implemented yet.")
+    }
+
+    fun allIn() {
+        TODO("The allIn function is not implemented yet.")
+    }
 }

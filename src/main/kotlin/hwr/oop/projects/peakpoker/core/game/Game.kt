@@ -93,6 +93,18 @@ class Game(
         player.call(highestBet)
     }
 
+    fun check(player: Player) {
+        TODO("The check function is not implemented yet.")
+    }
+
+    fun fold(player: Player) {
+        TODO("The fold function is not implemented yet.")
+    }
+
+    fun allIn(player: Player) {
+        TODO("The allIn function is not implemented yet.")
+    }
+
     private fun setBlinds() {
         raiseBetTo(getCurrentPlayer(), smallBlindAmount)
         makeTurn()
