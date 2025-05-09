@@ -4,7 +4,7 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 class Player(
     override val name: String,
-    private var chips: Int = 0,
+    private var chips: Int = 100,
 ) : PlayerInterface {
     init {
         require(chips >= 0) { "Chips amount must be non-negative" }
@@ -13,6 +13,7 @@ class Player(
 
     var isFolded: Boolean = false
     var isAllIn: Boolean = false
+
     private var hand: HoleCards = HoleCards(emptyList(), this)
     private var bet: Int = 0
 
@@ -29,16 +30,30 @@ class Player(
     }
 
     fun assignHand(cards: HoleCards) {
+        require(cards.cards.size == 2) { "A player must have exactly 2 hole cards" }
         hand = cards
     }
 
-    fun raiseBet(amount: Int) {
-        when {
-            amount < 0 -> throw IllegalArgumentException("Bet amount must be positive")
-            isFolded -> throw IllegalStateException("Cannot raise bet after folding")
-            isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
-        }
-        bet += amount
-        chips -= amount
+    /**
+     * Raises the player's bet to the specified amount.
+     * CAUTION: Should only be called from Game.
+     *
+     * This method increases the player's bet to the given amount, deducting only the difference
+     * between the new bet and current bet from the player's chips.
+     *
+     * @param chips The total amount to bet (not the additional amount)
+     */
+    fun raiseBetTo(chips: Int) {
+        require(chips >= 0) { "Bet amount must be positive" }
+
+        this@Player.chips -= chips - bet
+        bet = chips
+    }
+
+    fun call(chips: Int) {
+        require(chips > 0) { "Call amount must be positive" }
+
+        this@Player.chips -= chips - bet
+        bet = chips
     }
 }
