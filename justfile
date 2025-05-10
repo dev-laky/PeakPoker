@@ -1,10 +1,10 @@
-set shell := ["powershell"]
+
 default:
   just --list
 
 # Useful commands for the project
 build:
-  ./mvnw.cmd clean package
+  ./mvnw clean package
 
 mutation-testing:
   ./mvnw package pitest:mutationCoverage
