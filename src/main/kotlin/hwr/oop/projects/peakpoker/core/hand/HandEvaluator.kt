@@ -21,6 +21,7 @@ object HandEvaluator {
         val isFlush = suits.distinct().size == 1
         val isStraight = when {
             ranks.zipWithNext().all { (a, b) -> b == a + 1 } -> true
+            //Special Case: Ace can be low in a straight
             ranks == listOf(
                 Rank.TWO.ordinal,
                 Rank.THREE.ordinal,
@@ -57,7 +58,7 @@ object HandEvaluator {
         val n = allCards.size                           //will be 7 anyway
         val totalMasks = 1 shl n                        // 128 = 2^7 (7 = number of cards) -> possible combinations to choose from and evaluate
         for (mask in 0 until totalMasks) {
-            if (Integer.bitCount(mask) == 5) {      //whenever we are looking at a combination of 5 cards (when 5 bits are set to 1) ->(7 über 5 = 21 valid combinations)
+            if (Integer.bitCount(mask) == 5) {      //whenever we are looking at a combination of 5 cards (when 5 bits are set to 1) ->(7 over 5 = 21 valid combinations)
                 val combo = mutableListOf<Card>()
                 for (i in 0 until n) {
                     if (mask shr i and 1 == 1) combo += allCards[i] //if the i-th bit is set to 1, add the i-th card to the combination
