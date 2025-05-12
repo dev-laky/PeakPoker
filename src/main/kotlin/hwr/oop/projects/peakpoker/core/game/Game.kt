@@ -84,7 +84,7 @@ class Game(
             player.isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
             chips > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
         }
-        player.setBetAmount(chips)
+        player.raiseBetTo(chips)
     }
 
     fun call(player: Player) {
