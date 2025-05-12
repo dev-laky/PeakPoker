@@ -1,6 +1,8 @@
 package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game(
@@ -9,6 +11,16 @@ class Game(
     val bigBlindAmount: Int,
     val playersOnTable: List<Player> = listOf()
 ) : GameInterface {
+
+    // Variable to track the index of the small blind player within PlayersOnTable
+    val smallBlindIndex: Int = 0
+    val deck: Deck = Deck()
+    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+    val gameState = GameState.PRE_FLOP
+
+    // Will be = 2 after "blind" init
+    var currentPlayerIndex: Int = 0
+
     init {
         require(smallBlindAmount > 0) { "Small blind amount must be positive" }
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
@@ -18,15 +30,10 @@ class Game(
 
         // Set the blinds for the players at the table
         setBlinds()
+
+        // Deal hole cards to players
+        dealHoleCards()
     }
-
-    // Variable to track the index of the small blind player within PlayersOnTable
-    val smallBlindIndex: Int = 0
-    var pot: Int = 0
-    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
-
-    // Will be = 2 after "blind" init
-    var currentPlayerIndex: Int = 0
 
     fun getSmallBlind(): Int {
         return smallBlindAmount
@@ -77,7 +84,7 @@ class Game(
             player.isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
             chips > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
         }
-        player.raiseBetTo(chips)
+        player.setBetAmount(chips)
     }
 
     fun call(player: Player) {
@@ -104,6 +111,13 @@ class Game(
 
     fun allIn(player: Player) {
         TODO("The allIn function is not implemented yet.")
+    }
+
+    private fun dealHoleCards() {
+        playersOnTable.forEach { player ->
+            val cards = deck.draw(2)
+            player.assignHand(HoleCards(cards, player))
+        }
     }
 
     private fun setBlinds() {
