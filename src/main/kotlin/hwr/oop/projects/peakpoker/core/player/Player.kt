@@ -44,15 +44,18 @@ class Player(
      * @param chips The total amount to bet (not the additional amount)
      */
     fun raiseBetTo(chips: Int) {
-        require(chips >= 0) { "Bet amount must be positive" }
+        require(chips > 0) { "Bet amount must be positive" }
 
-        this.chips -= chips - bet
-        bet = chips
+        setBetAmount(chips)
     }
 
     fun call(chips: Int) {
         require(chips > 0) { "Call amount must be positive" }
 
+        setBetAmount(chips)
+    }
+
+    private fun setBetAmount(chips: Int) {
         this.chips -= chips - bet
         bet = chips
     }
