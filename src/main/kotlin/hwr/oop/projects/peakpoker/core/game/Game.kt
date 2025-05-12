@@ -68,10 +68,11 @@ class Game(
      *                               or if it's not the player's turn
      */
     fun raiseBetTo(player: Player, chips: Int) {
+        val currentPlayer = getCurrentPlayer()
         when {
             chips < 0 -> throw IllegalArgumentException("Bet amount must be positive")
             chips <= getHighestBet() -> throw IllegalStateException("Bet must be higher than the current highest bet")
-            getCurrentPlayer() != player -> throw IllegalStateException("It's not your turn to bet")
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to bet")
             player.isFolded -> throw IllegalStateException("Cannot raise bet after folding")
             player.isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
             chips > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
