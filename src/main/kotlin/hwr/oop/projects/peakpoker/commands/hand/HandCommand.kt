@@ -51,7 +51,7 @@ class HandCommand : CliktCommand(name = "hand") {
             "${card.suit}, ${card.rank}"
         }
 
-        echo("Game ID: $gameId")
+        echo("Game ID: ${game.id}")
         echo("Player: ${player.name}")
         echo("Hand: $cardDisplay")
     }
