@@ -84,11 +84,11 @@ class Game(
         when {
             getCurrentPlayer() != player -> throw IllegalStateException("It's not your turn to call")
             highestBet <= player.getBet() -> throw IllegalStateException("You are already at the highest bet")
-            player.isFolded -> throw IllegalStateException("Cannot call after folding")
-            player.isAllIn -> throw IllegalStateException("Cannot call after going all-in")
+            player.isFolded -> throw IllegalStateException("You can not call after having folded")
+            player.isAllIn -> throw IllegalStateException("You can not call after having gone all-in")
 
             // needs to go all-in or fold
-            player.getChips() < highestBet -> throw IllegalStateException("Not enough chips to call.")
+            player.getChips() < highestBet -> throw IllegalStateException("You do not have enough chips to call.")
         }
         player.call(highestBet)
     }
