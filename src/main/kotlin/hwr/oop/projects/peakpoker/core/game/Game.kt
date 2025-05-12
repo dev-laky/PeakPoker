@@ -28,10 +28,6 @@ class Game(
     // Will be = 2 after "blind" init
     var currentPlayerIndex: Int = 0
 
-    fun makeTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
-    }
-
     fun getSmallBlind(): Int {
         return smallBlindAmount
     }
@@ -56,6 +52,10 @@ class Game(
         return playersOnTable.none { it.name == player.name }
     }
 
+    fun makeTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
+    }
+
     /**
      * Sets the player's bet to the specified amount.
      *
@@ -68,10 +68,11 @@ class Game(
      *                               or if it's not the player's turn
      */
     fun raiseBetTo(player: Player, chips: Int) {
+        val currentPlayer = getCurrentPlayer()
         when {
             chips < 0 -> throw IllegalArgumentException("Bet amount must be positive")
             chips <= getHighestBet() -> throw IllegalStateException("Bet must be higher than the current highest bet")
-            getCurrentPlayer() != player -> throw IllegalStateException("It's not your turn to bet")
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to bet")
             player.isFolded -> throw IllegalStateException("Cannot raise bet after folding")
             player.isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
             chips > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
@@ -84,11 +85,11 @@ class Game(
         when {
             getCurrentPlayer() != player -> throw IllegalStateException("It's not your turn to call")
             highestBet <= player.getBet() -> throw IllegalStateException("You are already at the highest bet")
-            player.isFolded -> throw IllegalStateException("Cannot call after folding")
-            player.isAllIn -> throw IllegalStateException("Cannot call after going all-in")
+            player.isFolded -> throw IllegalStateException("You can not call after having folded")
+            player.isAllIn -> throw IllegalStateException("You can not call after having gone all-in")
 
-            // needs to go all-in or fold
-            player.getChips() < highestBet -> throw IllegalStateException("Not enough chips to call.")
+            // The player needs to go all-in or fold
+            player.getChips() < highestBet -> throw IllegalStateException("You do not have enough chips to call.")
         }
         player.call(highestBet)
     }
