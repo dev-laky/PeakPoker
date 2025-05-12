@@ -21,6 +21,10 @@ object HandEvaluator {
         val isFlush = suits.distinct().size == 1
         val isStraight = when {
             ranks.zipWithNext().all { (a, b) -> b == a + 1 } -> true
+            /*
+            * After sorting the card list we create a series of pairs (1,2,3,4,5) -> ((1,2),(2,3),...,(4,5)) and evaluating
+            * if their pair member inside the brackets is the successor -exactly the next card.If this property holds for all
+            * pairs in the zip, we have a straight, with the edge case of ordinal 14, the Ace, listed in Line 25.*/
             //Special Case: Ace can be low in a straight
             ranks == listOf(
                 Rank.TWO.ordinal,
