@@ -87,7 +87,7 @@ class Game(
             player.isFolded -> throw IllegalStateException("You can not call after having folded")
             player.isAllIn -> throw IllegalStateException("You can not call after having gone all-in")
 
-            // needs to go all-in or fold
+            // The player needs to go all-in or fold
             player.getChips() < highestBet -> throw IllegalStateException("You do not have enough chips to call.")
         }
         player.call(highestBet)
