@@ -19,7 +19,7 @@ class PlayerTest : AnnotationSpec() {
     @Test
     fun `Player's bet can be raised`() {
         val player = Player("Hans")
-        player.raiseBetTo(10)
+        player.setBetAmount(10)
         assertThat(player.getBet()).isEqualTo(10)
     }
 
@@ -60,7 +60,7 @@ class PlayerTest : AnnotationSpec() {
         val betAmount = 100
         val player = Player("Hans", initialChips)
 
-        player.raiseBetTo(betAmount)
+        player.setBetAmount(betAmount)
 
         assertThat(player.getChips()).isEqualTo(initialChips - betAmount)
         assertThat(player.getBet()).isEqualTo(betAmount)
@@ -71,8 +71,8 @@ class PlayerTest : AnnotationSpec() {
         val initialChips = 500
         val player = Player("Hans", initialChips)
 
-        player.raiseBetTo(100)
-        player.raiseBetTo(150)
+        player.setBetAmount(100)
+        player.setBetAmount(150)
 
         assertThat(player.getBet()).isEqualTo(150)
         assertThat(player.getChips()).isEqualTo(initialChips - 150)
@@ -103,10 +103,10 @@ class PlayerTest : AnnotationSpec() {
         val player = Player("Hans", 500)
 
         val exception = shouldThrow<IllegalArgumentException> {
-            player.raiseBetTo(-1)
+            player.setBetAmount(-1)
         }
 
-        assertThat(exception.message).isEqualTo("Bet amount must be greater than zero")
+        assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
         // Verify player's state remains unchanged
         assertThat(player.getBet()).isEqualTo(0)
         assertThat(player.getChips()).isEqualTo(500)
@@ -117,10 +117,10 @@ class PlayerTest : AnnotationSpec() {
         val player = Player("Hans", 500)
 
         val exception = shouldThrow<IllegalArgumentException> {
-            player.raiseBetTo(0)
+            player.setBetAmount(0)
         }
 
-        assertThat(exception.message).isEqualTo("Bet amount must be greater than zero")
+        assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
         // Verify player's state remains unchanged
         assertThat(player.getBet()).isEqualTo(0)
         assertThat(player.getChips()).isEqualTo(500)

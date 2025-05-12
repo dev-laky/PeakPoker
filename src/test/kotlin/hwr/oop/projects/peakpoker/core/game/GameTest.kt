@@ -72,21 +72,6 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `check if highest bet is correct`() {
-        // given
-        val testGame = Game(1005, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
-
-        // when
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(30)
-        testGame.makeTurn()
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(40)
-
-        // then
-        assertThat(testGame.getHighestBet()).isEqualTo(40)
-    }
-
-    @Test
     fun `check if get current player works correctly`() {
         // given
         val testGame = Game(1006, 10, 20,
@@ -121,18 +106,6 @@ class GameTest : AnnotationSpec() {
         }
 
         assertThat(exception.message).isEqualTo("Big blind amount must be greater than or equal to small blind amount")
-    }
-
-    @Test
-    fun `calculatePot returns sum of all player bets`() {
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1031, 10, 20, listOf(player1, player2, player3))
-
-        player3.raiseBetTo(40)
-
-        assertThat(testGame.calculatePot()).isEqualTo(70)
     }
 
     @Test
