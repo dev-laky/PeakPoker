@@ -23,16 +23,6 @@ class PlayerTest : AnnotationSpec() {
         assertThat(player.getBet()).isEqualTo(10)
     }
 
-
-    @Test
-    fun `Right exception thrown on negative bet`() {
-        val player = Player("Hans")
-        val exception = shouldThrow<IllegalArgumentException> {
-            player.raiseBetTo(-10)
-        }
-        assertThat(exception.message).isEqualTo("Bet amount must be positive")
-    }
-
     @Test
     fun `Player initializes with isFolded and isAllIn as false`() {
         val player = Player("Hans")
@@ -116,19 +106,22 @@ class PlayerTest : AnnotationSpec() {
             player.raiseBetTo(-1)
         }
 
-        assertThat(exception.message).isEqualTo("Bet amount must be positive")
+        assertThat(exception.message).isEqualTo("Bet amount must be greater than zero")
         // Verify player's state remains unchanged
         assertThat(player.getBet()).isEqualTo(0)
         assertThat(player.getChips()).isEqualTo(500)
     }
 
     @Test
-    fun `bet of zero amount is accepted`() {
+    fun `bet of zero amount is not accepted`() {
         val player = Player("Hans", 500)
 
-        player.raiseBetTo(0)
+        val exception = shouldThrow<IllegalArgumentException> {
+            player.raiseBetTo(0)
+        }
 
-        // Verify player's state - bet increased by 0, chips remain unchanged
+        assertThat(exception.message).isEqualTo("Bet amount must be greater than zero")
+        // Verify player's state remains unchanged
         assertThat(player.getBet()).isEqualTo(0)
         assertThat(player.getChips()).isEqualTo(500)
     }
