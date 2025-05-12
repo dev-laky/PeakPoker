@@ -46,14 +46,14 @@ class Player(
     fun raiseBetTo(chips: Int) {
         require(chips >= 0) { "Bet amount must be positive" }
 
-        this@Player.chips -= chips - bet
+        this.chips -= chips - bet
         bet = chips
     }
 
     fun call(chips: Int) {
         require(chips > 0) { "Call amount must be positive" }
 
-        this@Player.chips -= chips - bet
+        this.chips -= chips - bet
         bet = chips
     }
 
