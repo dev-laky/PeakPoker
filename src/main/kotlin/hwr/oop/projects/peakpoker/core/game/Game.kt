@@ -28,10 +28,6 @@ class Game(
     // Will be = 2 after "blind" init
     var currentPlayerIndex: Int = 0
 
-    fun makeTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
-    }
-
     fun getSmallBlind(): Int {
         return smallBlindAmount
     }
@@ -54,6 +50,10 @@ class Game(
 
     fun checkPlayerValidity(player: Player): Boolean {
         return playersOnTable.none { it.name == player.name }
+    }
+
+    fun makeTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
     }
 
     /**
