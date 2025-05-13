@@ -13,7 +13,7 @@ class GameNew : CliktCommand(name = "new") {
 
     val players: List<String>? by option("--players")
         .convert { input -> input.split(":").map { it.trim() } }
-        .help("Comma-separated list of player names")
+        .help("Colon-separated list of player names")
 
     override fun run() {
         if (players.isNullOrEmpty()) {

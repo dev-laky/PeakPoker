@@ -12,19 +12,19 @@ class HandCommand : CliktCommand(name = "hand") {
     override fun help(context: Context) = "Create a new Game."
 
     val playerName: String? by option("--player")
-        .help("Comma-separated list of player names")
+        .help("Colon-separated list of player names")
     val gameId: Int? by option("--gameID").int()
         .help("Game ID")
         .check("Game ID must be greater than 0") { it > 0 }
 
     override fun run() {
         if (gameId == null) {
-            echo("No game ID provided. Use --game=<id>")
+            echo("You need to provide a game ID. Use --game=<id>")
             return
         }
 
         if (playerName == null) {
-            echo("No player provided. Use --player=<name>")
+            echo("You need to provide a list of at least three players. Use --player=<name>")
             return
         }
 
