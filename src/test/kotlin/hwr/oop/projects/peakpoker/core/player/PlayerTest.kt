@@ -126,4 +126,72 @@ class PlayerTest : AnnotationSpec() {
         assertThat(player.getChips()).isEqualTo(500)
     }
 
+    @Test
+    fun `player cannot have negative chips`() {
+        val exception = shouldThrow<IllegalArgumentException> {
+            Player("Hans", -100)
+        }
+
+        assertThat(exception.message).isEqualTo("Chips amount must be non-negative")
+    }
+
+    @Test
+    fun `player cannot have blank name`() {
+        val exception = shouldThrow<IllegalArgumentException> {
+            Player("")
+        }
+
+        assertThat(exception.message).isEqualTo("Player name cannot be blank")
+    }
+
+    @Test
+    fun `allIn sets bet to all remaining chips and chips to zero`() {
+        val player = Player("Hans", 500)
+        player.allIn(200)
+
+        assertThat(player.getBet()).isEqualTo(200)
+        assertThat(player.getChips()).isEqualTo(0)
+        assertThat(player.isAllIn).isTrue()
+    }
+
+    @Test
+    fun `allIn sets bet to all chips when allIn amount is greater than chips`() {
+        val player = Player("Hans", 500)
+        player.allIn(600)
+
+        assertThat(player.getBet()).isEqualTo(500)
+        assertThat(player.getChips()).isEqualTo(0)
+        assertThat(player.isAllIn).isTrue()
+    }
+
+    @Test
+    fun `setBetAmount only deducts the difference to previous bet`() {
+        val player = Player("Hans", 500)
+
+        player.setBetAmount(100)
+        assertThat(player.getChips()).isEqualTo(400)
+
+        player.setBetAmount(150)
+        assertThat(player.getChips()).isEqualTo(350)
+    }
+
+    @Test
+    fun `assignHand throws exception for invalid hand size`() {
+        val player = Player("Hans")
+
+        val exception = shouldThrow<IllegalArgumentException> {
+            player.assignHand(
+                HoleCards(
+                    listOf(
+                        Card(Suit.DIAMONDS, Rank.FIVE),
+                        Card(Suit.DIAMONDS, Rank.SIX),
+                        Card(Suit.DIAMONDS, Rank.SEVEN)
+                    ),
+                    player
+                )
+            )
+        }
+
+        assertThat(exception.message).isEqualTo("Hole cards must be empty or contain exactly two cards.")
+    }
 }

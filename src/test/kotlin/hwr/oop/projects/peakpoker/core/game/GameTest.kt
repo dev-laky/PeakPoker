@@ -225,5 +225,87 @@ class GameTest : AnnotationSpec() {
         assertThat(testGame.smallBlindIndex).isLessThan(players.size)
         assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
     }
+
+    @Test
+    fun `calculatePot returns correct pot amount`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1090, 10, 20, listOf(player1, player2, player3))
+
+        player1.setBetAmount(30)
+        player2.setBetAmount(50)
+        player3.setBetAmount(20)
+
+        assertThat(testGame.calculatePot()).isEqualTo(100)
+    }
+
+    @Test
+    fun `calculatePot returns correct pot amount after new bets`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1093, 10, 20, listOf(player1, player2, player3))
+
+        player1.setBetAmount(30)
+        player2.setBetAmount(50)
+        player3.setBetAmount(20)
+
+        assertThat(testGame.calculatePot()).isEqualTo(100)
+
+        // setBetAmount overwrites previous bet
+        player1.setBetAmount(40) // 30 -> 40 (+10)
+        player2.setBetAmount(60) // 50 -> 60 (+10)
+        player3.setBetAmount(30) // 20 -> 30 (+10)
+
+        assertThat(testGame.calculatePot()).isEqualTo(130)
+    }
+
+    @Test
+    fun `pot contains Blinds at game start`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1091, 10, 20, listOf(player1, player2, player3))
+
+        assertThat(testGame.pot).isEqualTo(30)
+    }
+
+    @Test
+    fun `makeTurn cycles back to the first player after the last player`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1095, 10, 20, listOf(player1, player2, player3))
+
+        println("Start index: ${testGame.currentPlayerIndex}")
+        // start Index returns 2, because of the blinds
+
+        // when
+        testGame.makeTurn()
+        testGame.makeTurn()
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.currentPlayerIndex).isEqualTo(2)
+    }
+
+    @Test
+    fun `getHighestBet updates after player bets more`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1094, 10, 20, listOf(player1, player2, player3))
+
+        // when
+        player1.setBetAmount(30)
+        player2.setBetAmount(40)
+        player3.setBetAmount(50)
+
+        // then
+        assertThat(testGame.getHighestBet()).isEqualTo(50)
+    }
 }
 
