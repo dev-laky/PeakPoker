@@ -31,8 +31,8 @@ class Game(
         // Set the blinds for the players at the table
         setBlinds()
 
-        // Deal hole cards to players
-        dealHoleCards()
+    // Deal hole cards to players
+    dealHoleCards()
     }
 
     fun getSmallBlind(): Int {
