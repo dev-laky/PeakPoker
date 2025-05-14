@@ -40,6 +40,10 @@ class Game(
         return playersOnTable[currentPlayerIndex]
     }
 
+    fun getNextPlayer(): Player {
+        return playersOnTable[(currentPlayerIndex + 1) % playersOnTable.size]
+    }
+
     fun getHighestBet(): Int {
         return playersOnTable.maxOf { it.getBet() }
     }
@@ -53,7 +57,16 @@ class Game(
     }
 
     fun makeTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
+        val nextPlayer = getNextPlayer()
+
+        // skip any folded / all-in players
+        if (nextPlayer.isFolded || nextPlayer.isAllIn) {
+            currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
+            makeTurn()
+            return
+        }
+
+        currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
     }
 
     /**
@@ -64,8 +77,12 @@ class Game(
      *
      * @param player The player who is raising their bet
      * @param chips The total amount to bet (not the additional amount)
-     * @throws IllegalStateException If the bet is not higher than the current highest bet,
-     *                               or if it's not the player's turn
+     * @throws IllegalArgumentException if the bet amount is negative
+     * @throws IllegalStateException if: the bet is not higher than current highest bet;
+     *                               it's not the player's turn;
+     *                               the player has already folded;
+     *                               the player has already gone all-in;
+     *                               the player doesn't have enough chips
      */
     fun raiseBetTo(player: Player, chips: Int) {
         val currentPlayer = getCurrentPlayer()
