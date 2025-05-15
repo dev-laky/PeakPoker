@@ -175,7 +175,7 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
 
     @Test
-    fun `evaluate throws on invalid list size`() {
+    fun `evaluate throws exception on invalid list size`() {
         shouldThrow<IllegalArgumentException> {
             HandEvaluator.evaluate(
                 listOf(
@@ -187,7 +187,7 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
 
     @Test
-    fun `evaluate throws on duplicates`() {
+    fun `evaluate throws exception on duplicates`() {
         shouldThrow<IllegalArgumentException> {
             HandEvaluator.evaluate(
                 listOf(
@@ -201,7 +201,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         }
     }
     @Test
-    fun `evaluateAll throws if total cards not equal 7`() {
+    fun `evaluateAll throws exception if total cards unequal 7`() {
         // get = 2 cards, community = 0 cards -> totalCards = 2 != 7
         val hole = HoleCards(listOf(
             Card(CLUBS, TWO),
@@ -263,7 +263,7 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
 
     @Test
-    fun `getHighestHandRank throws if no hands provided`() {
+    fun `getHighestHandRank throws exception if no hands provided`() {
         val community = CommunityCards(
             listOf(
                 Card(HEARTS, TWO),

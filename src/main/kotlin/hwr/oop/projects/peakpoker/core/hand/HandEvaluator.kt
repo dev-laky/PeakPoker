@@ -15,17 +15,14 @@ object HandEvaluator {
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
 
-        val ranks = cards.map { it.rank.ordinal }.sorted()
+        val ranks = cards.map { it.rank }.sorted() //omitted it.rank.ordinal
         val suits = cards.map { it.suit }
         val rankCounts = ranks.groupingBy { it }.eachCount().values.sortedDescending()
         val isFlush = suits.distinct().size == 1
         val isStraight = when {
-            ranks.zipWithNext().all { (a, b) -> b == a + 1 } -> true
-            /*
-            * After sorting the card list we create a series of pairs (1,2,3,4,5) -> ((1,2),(2,3),...,(4,5)) and evaluating
-            * if their pair member inside the brackets is the successor -exactly the next card.If this property holds for all
-            * pairs in the zip, we have a straight, with the edge case of ordinal 14, the Ace, listed in Line 25.*/
-            //Special Case: Ace can be low in a straight
+            ranks.zipWithNext().all { (a, b) -> b.value == a.value + 1 } -> true
+            // After sorting, pairs of consecutive ranks (e.g., (1,2), (2,3), ...) are checked to confirm each card is a direct successor.
+            // This determines a straight, with a special case for Ace (ordinal 14) as the lowest card.
             ranks == listOf(
                 Rank.TWO.ordinal,
                 Rank.THREE.ordinal,
@@ -37,7 +34,7 @@ object HandEvaluator {
         }
 
         return when {
-            isStraight && isFlush && ranks.maxOrNull() == Rank.ACE.ordinal -> HandRank.ROYAL_FLUSH
+            isStraight && isFlush && ranks.maxOrNull() == Rank.ACE         -> HandRank.ROYAL_FLUSH
             isStraight && isFlush                                          -> HandRank.STRAIGHT_FLUSH
             rankCounts[0] == 4                                             -> HandRank.FOUR_OF_A_KIND
             rankCounts[0] == 3 && rankCounts[1] == 2                       -> HandRank.FULL_HOUSE
@@ -77,12 +74,17 @@ object HandEvaluator {
     }
 
     /**
-     * Chooses the HoleCards with the highest best 5-card HandRank.
+     * Determines the HoleCards with the strongest 5-card HandRank
+     * by evaluating all possible combinations with the community cards.
+     *
+     * @param hands The list of HoleCards to evaluate.
+     * @param community The CommunityCards shared by all players.
+     * @return The HoleCards that form the highest-ranked hand.
+     * @throws IllegalStateException if no hands are provided.
      */
-    // -> is separator for lambda params!!
     fun getHighestHandRank(hands: List<HoleCards>, community: CommunityCards): HoleCards {
         return hands.maxByOrNull { hand ->
-            evaluateAll(hand, community).ordinal
+            evaluateAll(hand, community).rank
         } ?: throw IllegalStateException("No hands to evaluate")
     }
 }
