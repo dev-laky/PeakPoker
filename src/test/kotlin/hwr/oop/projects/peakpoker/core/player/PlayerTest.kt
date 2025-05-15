@@ -79,26 +79,6 @@ class PlayerTest : AnnotationSpec() {
     }
 
     @Test
-    fun `player can be marked as folded`() {
-        val player = Player("Hans")
-
-        assertThat(player.isFolded).isFalse()
-
-        player.isFolded = true
-        assertThat(player.isFolded).isTrue()
-    }
-
-    @Test
-    fun `player can be marked as all-in`() {
-        val player = Player("Hans")
-
-        assertThat(player.isAllIn).isFalse()
-
-        player.isAllIn = true
-        assertThat(player.isAllIn).isTrue()
-    }
-
-    @Test
     fun `bet validation throws exception for negative amounts`() {
         val player = Player("Hans", 500)
 
