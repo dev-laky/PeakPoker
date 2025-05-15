@@ -48,14 +48,13 @@ class Player(
     fun allIn(chips: Int) {
         when {
             chips >= this.chips -> {
-                bet = this.chips
+                setBetAmount(this.chips)
             }
 
             chips < this.chips -> {
-                bet = chips
+                setBetAmount(chips)
             }
         }
-        this.chips = 0
         isAllIn = true
     }
 }
