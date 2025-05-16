@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 
 class GameTest : AnnotationSpec() {
     @Test
-    fun `test if game throws exception if too little players are added` () {
+    fun `test if game throws exception if too little players are added`() {
         // when/then
         shouldThrow<IllegalArgumentException> {
             Game(
@@ -18,10 +18,12 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `check if duplicate exception works` () {
+    fun `check if duplicate exception works`() {
         // given
-        val testGame = Game(1002, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
+        val testGame = Game(
+            1002, 10, 20,
+            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        )
         val duplicatePlayer = Player("Hans")
 
         // when/then
@@ -74,8 +76,10 @@ class GameTest : AnnotationSpec() {
     @Test
     fun `check if get current player works correctly`() {
         // given
-        val testGame = Game(1006, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
+        val testGame = Game(
+            1006, 10, 20,
+            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        )
 
         // when
         val currentPlayer = testGame.getCurrentPlayer()
@@ -301,11 +305,264 @@ class GameTest : AnnotationSpec() {
 
         // when
         player1.setBetAmount(30)
-        player2.setBetAmount(40)
-        player3.setBetAmount(50)
+        player2.setBetAmount(50)
+        player3.setBetAmount(40)
 
         // then
         assertThat(testGame.getHighestBet()).isEqualTo(50)
     }
-}
 
+    @Test
+    fun `call throws exception if player cannot match highest bet`() {
+        val p1 = Player("A", 500)
+        val p2 = Player("B", 20)
+        val p3 = Player("C", 500)
+
+        val game = Game(1, 10, 20, listOf(p1, p2, p3))
+
+        // simulate that p1 already raised
+        p1.setBetAmount(100)
+        p2.setBetAmount(20)
+
+
+        // force turn to p2
+        while (game.getCurrentPlayer() != p2) {
+            game.makeTurn()
+        }
+
+        val exception = shouldThrow<IllegalStateException> {
+            game.call(p2)
+        }
+
+        assertThat(exception.message).isEqualTo("You do not have enough chips to call.")
+    }
+
+    @Test
+    fun `smallBlindIndex is initialized to 0`() {
+        val testGame = Game(
+            1100, 10, 20,
+            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        )
+
+        assertThat(testGame.smallBlindIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `setBetAmount throws exception for negative values`() {
+        val player = Player("Hans", 500)
+
+        shouldThrow<IllegalArgumentException> {
+            player.setBetAmount(-10)
+        }
+    }
+
+    @Test
+    fun `raiseBetTo throws if not player's turn`() {
+        val p1 = Player("Hans", 500)
+        val p2 = Player("Peter", 500)
+        val p3 = Player("Max",   500)
+
+        val g = Game(1, 10, 20, listOf(p1, p2, p3))
+
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.raiseBetTo(p1, 100)
+        }
+
+        assertThat(ex.message).isEqualTo("It's not your turn to bet")
+    }
+
+    @Test
+    fun `raiseBetTo throws if player is folded`() {
+
+        val p = Player("Hans", 500)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+
+
+        while (g.getCurrentPlayer() != p) {
+            g.makeTurn()
+        }
+
+        p.fold()
+
+        val exception = shouldThrow<IllegalStateException> {
+            g.raiseBetTo(p, 100)
+        }
+
+        assertThat(exception.message).isEqualTo("Cannot raise bet after folding")
+    }
+
+    @Test
+    fun `raiseBetTo throws if chips is negative`() {
+        val p = Player("Hans", 500)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+
+        val ex = shouldThrow<IllegalArgumentException> {
+            g.raiseBetTo(p, -1)
+        }
+        assertThat(ex.message).isEqualTo("Bet amount must be positive")
+    }
+
+    @Test
+    fun `raiseBetTo throws if player is all-in`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+
+        p.allIn(10)
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.raiseBetTo(p, 50)
+        }
+        assertThat(ex.message).isEqualTo("Cannot raise bet after going all-in")
+    }
+
+    @Test
+    fun `raiseBetTo throws if not enough chips to raise`() {
+        val p = Player("Hans", 50)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.raiseBetTo(p, 100)
+        }
+        assertThat(ex.message).isEqualTo("Not enough chips to raise bet")
+    }
+
+    @Test
+    fun `check throws if player has folded`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.fold()
+
+        shouldThrow<IllegalStateException> {
+            g.check(p)
+        }.also {
+            assertThat(it.message).isEqualTo("You can not check after having folded")
+        }
+    }
+
+    @Test
+    fun `check throws if not player's turn`() {
+        val p1 = Player("Hans", 500)
+        val p2 = Player("Peter", 500)
+        val p3 = Player("Max", 500)
+
+        val g = Game(1, 10, 20, listOf(p1, p2, p3))
+
+        val ex = shouldThrow<IllegalStateException> { g.check(p1) }
+        assertThat(ex.message).isEqualTo("It's not your turn to check")
+    }
+
+
+    @Test
+    fun `check throws if player is all-in`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.allIn(10)
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.check(p)
+        }
+        assertThat(ex.message).isEqualTo("You can not check after having gone all-in")
+    }
+
+    @Test
+    fun `check throws if bet not at highest`() {
+        val p1 = Player("A", 500)
+        val p2 = Player("B", 500)
+        val p3 = Player("C", 500)
+        val g = Game(1, 10, 20, listOf(p1, p2, p3))
+
+        while (g.getCurrentPlayer() != p1) g.makeTurn()
+        g.raiseBetTo(p1, 100)
+
+        while (g.getCurrentPlayer() != p2) g.makeTurn()
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.check(p2)
+        }
+        assertThat(ex.message).isEqualTo("You can not check if you are not at the highest bet")
+    }
+
+    @Test
+    fun `fold throws if player has already folded`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.fold()
+
+        shouldThrow<IllegalStateException> {
+            g.fold(p)
+        }.also {
+            assertThat(it.message).isEqualTo("You have already folded")
+        }
+    }
+
+    @Test
+    fun `fold throws if not player's turn`() {
+        val p1 = Player("Hans", 500)
+        val p2 = Player("Peter",500)
+        val p3 = Player("Max",   500)
+        val g = Game(1, 10, 20, listOf(p1,p2,p3))
+
+        val ex = shouldThrow<IllegalStateException> { g.fold(p2) }
+
+        assertThat(ex.message).isEqualTo("It's not your turn to fold")
+    }
+
+    @Test
+    fun `fold throws if player is all-in`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.allIn(10)
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.fold(p)
+        }
+        assertThat(ex.message).isEqualTo("You can not fold after having gone all-in")
+    }
+
+    @Test
+    fun `allIn throws if player already all-in`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.allIn(100)
+
+        shouldThrow<IllegalStateException> {
+            g.allIn(p)
+        }.also {
+            assertThat(it.message).isEqualTo("You have already gone all-in")
+        }
+    }
+
+    @Test
+    fun `allIn throws if not player's turn`() {
+        val p1 = Player("Hans", 500)
+        val p2 = Player("Peter",500)
+        val p3 = Player("Max",   500)
+        val g = Game(1, 10, 20, listOf(p1,p2,p3))
+        // current = Max → benutze z.B. Hans
+        val ex = shouldThrow<IllegalStateException> { g.allIn(p1) }
+        assertThat(ex.message).isEqualTo("It's not your turn to all in")
+    }
+
+    @Test
+    fun `allIn throws if player has folded`() {
+        val p = Player("Hans", 100)
+        val g = Game(1, 10, 20, listOf(p, Player("Peter"), Player("Max")))
+        while (g.getCurrentPlayer() != p) g.makeTurn()
+        p.fold()
+
+        val ex = shouldThrow<IllegalStateException> {
+            g.allIn(p)
+        }
+        assertThat(ex.message).isEqualTo("You can not go all-in after having folded")
+    }
+}
