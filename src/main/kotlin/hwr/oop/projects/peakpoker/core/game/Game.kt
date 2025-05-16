@@ -66,7 +66,7 @@ class Game(
         return playersOnTable.none { it.name == player.name }
     }
 
-    fun makeTurn() {
+    private fun makeTurn() {
         val nextPlayer = getNextPlayer()
 
         // Skip any folded / all-in players
