@@ -45,17 +45,8 @@ class Player(
         isFolded = true
     }
 
-    fun allIn(chips: Int) {
-        when {
-            chips >= this.chips -> {
-                bet = this.chips
-            }
-
-            chips < this.chips -> {
-                bet = chips
-            }
-        }
-        this.chips = 0
+    fun allIn() {
+        setBetAmount(this.chips)
         isAllIn = true
     }
 }

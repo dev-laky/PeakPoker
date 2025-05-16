@@ -7,13 +7,20 @@ import hwr.oop.projects.peakpoker.commands.PokerCommand
 import hwr.oop.projects.peakpoker.commands.db.DbCommand
 import hwr.oop.projects.peakpoker.commands.db.DbConnect
 import hwr.oop.projects.peakpoker.commands.db.DbInit
+import hwr.oop.projects.peakpoker.commands.game.GameCommand
+import hwr.oop.projects.peakpoker.commands.game.GameNew
+import hwr.oop.projects.peakpoker.commands.hand.HandCommand
 
 fun main(args: Array<String>) {
     val command = PokerCommand().subcommands(
         DbCommand().subcommands(
             DbInit(),
             DbConnect()
-        )
+        ),
+        GameCommand().subcommands(
+            GameNew()
+        ),
+        HandCommand()
     )
 
     try {
