@@ -313,19 +313,16 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `call throws exception if player cannot match highest bet`() {
+    fun `call throws if player cannot match highest bet`() {
         val p1 = Player("A", 500)
         val p2 = Player("B", 20)
         val p3 = Player("C", 500)
 
         val game = Game(1, 10, 20, listOf(p1, p2, p3))
 
-        // simulate that p1 already raised
         p1.setBetAmount(100)
         p2.setBetAmount(20)
 
-
-        // force turn to p2
         while (game.getCurrentPlayer() != p2) {
             game.makeTurn()
         }
@@ -335,6 +332,62 @@ class GameTest : AnnotationSpec() {
         }
 
         assertThat(exception.message).isEqualTo("You do not have enough chips to call.")
+    }
+
+    @Test
+    fun `call throws if already at highest bet`() {
+        val p1 = Player("A", 500)
+        val p2 = Player("B", 500)
+        val p3 = Player("C", 500)
+        val game = Game(1, 10, 20, listOf(p1, p2, p3))
+
+
+        val highest = game.getHighestBet()
+        p3.setBetAmount(highest)
+
+        val ex = shouldThrow<IllegalStateException> {
+            game.call(p3)
+        }
+        assertThat(ex.message).isEqualTo("You are already at the highest bet")
+    }
+
+    @Test
+    fun `call throws if player has folded`() {
+        val p1 = Player("A", 500)
+        val p2 = Player("B", 500)
+        val p3 = Player("C", 500)
+        val game = Game(1, 10, 20, listOf(p1, p2, p3))
+
+        while (game.getCurrentPlayer() != p3) game.makeTurn()
+        p3.fold()
+
+        val ex = shouldThrow<IllegalStateException> {
+            game.call(p3)
+        }
+        assertThat(ex.message).isEqualTo("You can not call after having folded")
+    }
+
+    @Test
+    fun `call throws if not enough chips to call`() {
+        val p1 = Player("A", 500)
+        val p2 = Player("B", 50)
+        val p3 = Player("C", 500)
+        val game = Game(1, 10, 20, listOf(p1, p2, p3))
+
+        while (game.getCurrentPlayer() != p1) {
+            game.makeTurn()
+        }
+        game.raiseBetTo(p1, 100)
+
+        while (game.getCurrentPlayer() != p2) {
+            game.makeTurn()
+        }
+
+
+        val ex = shouldThrow<IllegalStateException> {
+            game.call(p2)
+        }
+        assertThat(ex.message).isEqualTo("You do not have enough chips to call.")
     }
 
     @Test
@@ -429,6 +482,24 @@ class GameTest : AnnotationSpec() {
             g.raiseBetTo(p, 100)
         }
         assertThat(ex.message).isEqualTo("Not enough chips to raise bet")
+    }
+
+    @Test
+    fun `raiseBetTo throws if bet not higher than current highest bet`() {
+        val p1 = Player("Hans", 500)
+        val p2 = Player("Peter", 500)
+        val p3 = Player("Max", 500)
+        val game = Game(1, 10, 20, listOf(p1, p2, p3))
+
+
+        while (game.getCurrentPlayer() != p1) game.makeTurn()
+
+        val currentHighest = game.getHighestBet()
+
+        val ex = shouldThrow<IllegalStateException> {
+            game.raiseBetTo(p1, currentHighest)  // not strictly greater
+        }
+        assertThat(ex.message).isEqualTo("Bet must be higher than the current highest bet")
     }
 
     @Test
@@ -548,7 +619,7 @@ class GameTest : AnnotationSpec() {
         val p2 = Player("Peter",500)
         val p3 = Player("Max",   500)
         val g = Game(1, 10, 20, listOf(p1,p2,p3))
-        // current = Max → benutze z.B. Hans
+
         val ex = shouldThrow<IllegalStateException> { g.allIn(p1) }
         assertThat(ex.message).isEqualTo("It's not your turn to all in")
     }
