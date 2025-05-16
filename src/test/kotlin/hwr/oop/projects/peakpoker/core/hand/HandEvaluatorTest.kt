@@ -208,7 +208,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(DIAMONDS, THREE)),
             dummyPlayer
         )
-        val community = CommunityCards(emptyList(), MockGame) // leer erlaubt
+        val community = CommunityCards(emptyList(), MockGame) // empty possible
 
         assertThatThrownBy { HandEvaluator.evaluateAll(hole, community) }
             .isInstanceOf(IllegalArgumentException::class.java)

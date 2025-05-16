@@ -6,7 +6,7 @@ import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.hand.HandRank
 
-//changed eval logic to adjust ace straight recognition!!
+
 object HandEvaluator {
 
     /**

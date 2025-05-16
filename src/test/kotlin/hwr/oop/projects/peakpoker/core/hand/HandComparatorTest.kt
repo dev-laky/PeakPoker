@@ -122,13 +122,13 @@ class HandComparatorTest: AnnotationSpec() {
     @Test
     fun twoPair_secondPairBreaksTie() {
         // Both share top pair of Kings from the board
-        // h1 makes his second pair with A♣ + A♦
+        // h1 makes his second pair with A + A
         val h1 = HoleCards(listOf(
             Card(CLUBS, ACE),
             Card(DIAMONDS, ACE)
         ), dummyPlayer)
 
-        // h2 makes his second pair with Q♣ + Q♦
+        // h2 makes his second pair with Q + Q
         val h2 = HoleCards(listOf(
             Card(CLUBS, QUEEN),
             Card(DIAMONDS, QUEEN)
@@ -143,7 +143,7 @@ class HandComparatorTest: AnnotationSpec() {
             Card(HEARTS, FOUR)
         ), dummyGame)
 
-        // h1 has K-K & A-A, h2 has K-K & Q-Q → Aces beat Queens
+        // h1 has K-K & A-A, h2 has K-K & Q-Q -> Aces beat Queens
         assertTrue(compareTwoPair(h1, h2, community) > 0)
         assertTrue(compareTwoPair(h2, h1, community) < 0)
     }
@@ -159,13 +159,13 @@ class HandComparatorTest: AnnotationSpec() {
             Card(HEARTS, TWO)
         ), dummyGame)
 
-        // h1’s hole cards: A♣ + 3♦ → kicker = Ace
+        // h1’s hole cards: A + 3 → kicker = Ace
         val h1 = HoleCards(listOf(
             Card(CLUBS, ACE),
             Card(DIAMONDS, THREE)
         ), dummyPlayer)
 
-        // h2’s hole cards: K♣ + 4♦ → kicker = King
+        // h2’s hole cards: K + 4 → kicker = King
         val h2 = HoleCards(listOf(
             Card(CLUBS, KING),
             Card(DIAMONDS, FOUR)
@@ -311,23 +311,21 @@ class HandComparatorTest: AnnotationSpec() {
             Card(CLUBS, TEN),
             Card(DIAMONDS, TEN)
         ), dummyPlayer)
-        // Community liefert das Paar aus Zweien und jeweils einen Jack und einen Ten
         val community = CommunityCards(listOf(
-            Card(HEARTS, JACK),   // sorgt für die dritte Jacke in h1
-            Card(SPADES, TEN),    // sorgt für die dritte Zehn in h2
-            Card(HEARTS, TWO),    // erster Zwei
-            Card(SPADES, TWO),    // zweiter Zwei → das Paar für beide Full Houses
-            Card(HEARTS, THREE)   // Filler-Karte
+            Card(HEARTS, JACK),
+            Card(SPADES, TEN),
+            Card(HEARTS, TWO),
+            Card(SPADES, TWO),
+            Card(HEARTS, THREE)
         ), dummyGame)
 
-        // h1: Full House Jacks over Twos vs. h2: Full House Tens over Twos
         assertTrue(compareFullHouse(h1, h2, community) > 0)
         assertTrue(compareFullHouse(h2, h1, community) < 0)
     }
 
     @Test
     fun fullHouse_pairBreaksTie() {
-        // beide holen sich Trips Jacks vom Board
+        // both get  Trips and Jacks from the Board
         val community = CommunityCards(listOf(
             Card(HEARTS, JACK),
             Card(SPADES,  JACK),
@@ -336,19 +334,19 @@ class HandComparatorTest: AnnotationSpec() {
             Card(SPADES, THREE)  // Filler
         ), dummyGame)
 
-        // h1 hat Paar Kings → Full House JJJ / KK
+
         val h1 = HoleCards(listOf(
             Card(CLUBS, KING),
             Card(DIAMONDS, KING)
         ), dummyPlayer)
 
-        // h2 hat Paar Queens → Full House JJJ / QQ
+
         val h2 = HoleCards(listOf(
             Card(CLUBS, QUEEN),
             Card(DIAMONDS, QUEEN)
         ), dummyPlayer)
 
-        // Trips identisch (Jacks), aber Paar‐Kicker King > Queen
+        // King > Queen
         assertTrue(compareFullHouse(h1, h2, community) > 0)
         assertTrue(compareFullHouse(h2, h1, community) < 0)
     }
@@ -363,7 +361,7 @@ class HandComparatorTest: AnnotationSpec() {
             Card(CLUBS, EIGHT),
             Card(DIAMONDS, EIGHT)
         ), dummyPlayer)
-        // Zwei 9en und zwei 8en auf dem Board, plus ein beliebiger Kicker
+
         val community = CommunityCards(listOf(
             Card(HEARTS, NINE),
             Card(SPADES, NINE),
@@ -372,14 +370,14 @@ class HandComparatorTest: AnnotationSpec() {
             Card(HEARTS, TWO)
         ), dummyGame)
 
-        // h1: Vierling Neunen vs. h2: Vierling Achten
+
         assertTrue(compareFourOfAKind(h1, h2, community) > 0)
         assertTrue(compareFourOfAKind(h2, h1, community) < 0)
     }
 
     @Test
     fun fourOfAKind_kickerBreaksTie() {
-        // Vierling komplett auf dem Board
+
         val community = CommunityCards(listOf(
             Card(CLUBS, SEVEN),
             Card(DIAMONDS, SEVEN),
@@ -388,18 +386,16 @@ class HandComparatorTest: AnnotationSpec() {
             Card(HEARTS, TWO)
         ), dummyGame)
 
-        // h1 hat als Kicker ein Ass
         val h1 = HoleCards(listOf(
             Card(CLUBS, ACE),
             Card(DIAMONDS, THREE)
         ), dummyPlayer)
-        // h2 hat als Kicker ein König
+
         val h2 = HoleCards(listOf(
             Card(CLUBS, KING),
             Card(DIAMONDS, FOUR)
         ), dummyPlayer)
 
-        // Vierling Sieben + Kicker
         assertTrue(compareFourOfAKind(h1, h2, community) > 0)
         assertTrue(compareFourOfAKind(h2, h1, community) < 0)
     }
@@ -427,26 +423,26 @@ class HandComparatorTest: AnnotationSpec() {
             Card(CLUBS, TWO)
         ), dummyGame)
 
-        // h1: ♥A-10-J-Q-K  vs.  h2: ♥9-10-J-Q-K
+        // h1: ♥A-10-J-Q-K  vs  h2: ♥9-10-J-Q-K
         assertTrue(compareStraightFlush(h1, h2, community) > 0)
         assertTrue(compareStraightFlush(h2, h1, community) < 0)
     }
 
     @Test
     fun straightFlush_wheelVsNormal() {
-        // h1 ergänzt mit 6♥+7♥ zum 7-high SF (3-4-5-6-7)
+        // h1 plus 6♥+7♥ to 7-high SF (3-4-5-6-7)
         val h1 = HoleCards(listOf(
             Card(HEARTS, SIX),
             Card(HEARTS, SEVEN)
         ), dummyPlayer)
 
-        // h2 nutzt nur das Board für das Wheel SF A-2-3-4-5
+        // h2 uses Board for Wheel SF A-2-3-4-5
         val h2 = HoleCards(listOf(
             Card(CLUBS, TWO),
             Card(DIAMONDS, THREE)
         ), dummyPlayer)
 
-        // Board mit A♥,2♥,3♥,4♥,5♥
+        // Board A♥,2♥,3♥,4♥,5♥
         val community = CommunityCards(listOf(
             Card(HEARTS, ACE),
             Card(HEARTS, TWO),
@@ -455,7 +451,7 @@ class HandComparatorTest: AnnotationSpec() {
             Card(HEARTS, FIVE)
         ), dummyGame)
 
-        // 7-high SF schlägt Wheel SF
+        // 7-high SF beats Wheel SF
         assertTrue(compareStraightFlush(h1, h2, community) > 0)
         assertTrue(compareStraightFlush(h2, h1, community) < 0)
     }
