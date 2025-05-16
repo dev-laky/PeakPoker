@@ -141,13 +141,13 @@ class Game(
 
     fun allIn(player: Player) {
         val currentPlayer = getCurrentPlayer()
-        val highestBet = getHighestBet()
+
         when {
             currentPlayer != player -> throw IllegalStateException("It's not your turn to all in")
             player.isFolded -> throw IllegalStateException("You can not go all-in after having folded")
             player.isAllIn -> throw IllegalStateException("You have already gone all-in")
         }
-        player.allIn(highestBet)
+        player.allIn()
         makeTurn()
     }
 
