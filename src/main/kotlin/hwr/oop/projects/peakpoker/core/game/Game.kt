@@ -1,6 +1,8 @@
 package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game(
@@ -9,6 +11,19 @@ class Game(
     val bigBlindAmount: Int,
     val playersOnTable: List<Player> = listOf()
 ) : GameInterface {
+
+    // Variable to track the index of the small blind player within PlayersOnTable
+    val smallBlindIndex: Int = 0
+    val deck: Deck = Deck()
+    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+    val gameState = GameState.PRE_FLOP
+
+    // Calculates pot by bets of players
+    val pot get() = calculatePot()
+
+    // Will be = 2 after "blind" init
+    var currentPlayerIndex: Int = 0
+
     init {
         require(smallBlindAmount > 0) { "Small blind amount must be positive" }
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
@@ -18,15 +33,10 @@ class Game(
 
         // Set the blinds for the players at the table
         setBlinds()
+
+        // Deal hole cards to players
+        dealHoleCards()
     }
-
-    // Variable to track the index of the small blind player within PlayersOnTable
-    val smallBlindIndex: Int = 0
-    val pot get() = calculatePot()
-    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
-
-    // Will be = 2 after "blind" init
-    var currentPlayerIndex: Int = 0
 
     fun getSmallBlind(): Int {
         return smallBlindAmount
@@ -67,6 +77,13 @@ class Game(
         }
 
         currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
+    }
+
+    private fun dealHoleCards() {
+        playersOnTable.forEach { player ->
+            val cards = deck.draw(2)
+            player.assignHand(HoleCards(cards, player))
+        }
     }
 
     /**
