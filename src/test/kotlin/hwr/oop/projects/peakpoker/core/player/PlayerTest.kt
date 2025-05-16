@@ -9,18 +9,30 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class PlayerTest : AnnotationSpec() {
+    // Basic initialization tests
     @Test
     fun `Player has name`() {
         val player = Player("Hans")
-        val playerName: String = player.name
-        assertThat(playerName).isEqualTo("Hans")
+        assertThat(player.name).isEqualTo("Hans")
     }
 
     @Test
-    fun `Player's bet can be raised`() {
+    fun `Player initializes with default chip count`() {
         val player = Player("Hans")
-        player.setBetAmount(10)
-        assertThat(player.getBet()).isEqualTo(10)
+        assertThat(player.getChips()).isEqualTo(100) // Default is 100
+    }
+
+    @Test
+    fun `Player initializes with specified chip count`() {
+        val initialChips = 500
+        val player = Player("Hans", initialChips)
+        assertThat(player.getChips()).isEqualTo(initialChips)
+    }
+
+    @Test
+    fun `Player initializes with zero chips`() {
+        val player = Player("Hans", 0)
+        assertThat(player.getChips()).isEqualTo(0)
     }
 
     @Test
@@ -31,16 +43,25 @@ class PlayerTest : AnnotationSpec() {
     }
 
     @Test
-    fun `getChips returns correct initial chip count`() {
-        val initialChips = 500
-        val player = Player("Hans", initialChips)
-        assertThat(player.getChips()).isEqualTo(initialChips)
+    fun `Player cannot have negative chips`() {
+        val exception = shouldThrow<IllegalArgumentException> {
+            Player("Hans", -100)
+        }
+        assertThat(exception.message).isEqualTo("Chips amount must be non-negative")
     }
 
     @Test
+    fun `Player cannot have blank name`() {
+        val exception = shouldThrow<IllegalArgumentException> {
+            Player("")
+        }
+        assertThat(exception.message).isEqualTo("Player name cannot be blank")
+    }
+
+    // Hand assignment tests
+    @Test
     fun `assignHand correctly assigns hole cards to player`() {
         val player = Player("Hans")
-
         val holeCards = HoleCards(
             listOf(
                 Card(Suit.DIAMONDS, Rank.FIVE),
@@ -50,12 +71,27 @@ class PlayerTest : AnnotationSpec() {
         )
 
         player.assignHand(holeCards)
-
         assertThat(player.getHand()).isEqualTo(holeCards)
     }
 
     @Test
-    fun `betting reduces player's chip count`() {
+    fun `assignHand throws exception for hand with wrong number of cards`() {
+        val player = Player("Hans")
+
+        // Test with 1 card
+        val nonCardHand = HoleCards(
+            emptyList(),
+            player
+        )
+        var exception = shouldThrow<IllegalArgumentException> {
+            player.assignHand(nonCardHand)
+        }
+        assertThat(exception.message).isEqualTo("A player must have exactly 2 hole cards")
+    }
+
+    // Core betting functionality tests
+    @Test
+    fun `betting correctly updates player's bet and chip count`() {
         val initialChips = 500
         val betAmount = 100
         val player = Player("Hans", initialChips)
@@ -67,77 +103,47 @@ class PlayerTest : AnnotationSpec() {
     }
 
     @Test
-    fun `multiple bets accumulate correctly`() {
-        val initialChips = 500
-        val player = Player("Hans", initialChips)
-
-        player.setBetAmount(100)
-        player.setBetAmount(150)
-
-        assertThat(player.getBet()).isEqualTo(150)
-        assertThat(player.getChips()).isEqualTo(initialChips - 150)
-    }
-
-    @Test
-    fun `bet validation throws exception for negative amounts`() {
+    fun `setBetAmount only deducts the difference to previous bet`() {
         val player = Player("Hans", 500)
 
-        val exception = shouldThrow<IllegalArgumentException> {
-            player.setBetAmount(-1)
-        }
+        player.setBetAmount(100)
+        assertThat(player.getBet()).isEqualTo(100)
+        assertThat(player.getChips()).isEqualTo(400)
 
-        assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
-        // Verify player's state remains unchanged
-        assertThat(player.getBet()).isEqualTo(0)
-        assertThat(player.getChips()).isEqualTo(500)
+        player.setBetAmount(150)
+        assertThat(player.getBet()).isEqualTo(150)
+        assertThat(player.getChips()).isEqualTo(350)
     }
 
     @Test
-    fun `bet of zero amount is not accepted`() {
+    fun `setBetAmount throws exception for zero amount`() {
         val player = Player("Hans", 500)
 
         val exception = shouldThrow<IllegalArgumentException> {
             player.setBetAmount(0)
         }
-
         assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
-        // Verify player's state remains unchanged
         assertThat(player.getBet()).isEqualTo(0)
         assertThat(player.getChips()).isEqualTo(500)
     }
 
     @Test
-    fun `player cannot have negative chips`() {
-        val exception = shouldThrow<IllegalArgumentException> {
-            Player("Hans", -100)
-        }
+    fun `setBetAmount throws exception for negative amount`() {
+        val player = Player("Hans", 500)
 
-        assertThat(exception.message).isEqualTo("Chips amount must be non-negative")
+        val exception = shouldThrow<IllegalArgumentException> {
+            player.setBetAmount(-10)
+        }
+        assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
+        assertThat(player.getBet()).isEqualTo(0)
+        assertThat(player.getChips()).isEqualTo(500)
     }
 
-    @Test
-    fun `player cannot have blank name`() {
-        val exception = shouldThrow<IllegalArgumentException> {
-            Player("")
-        }
-
-        assertThat(exception.message).isEqualTo("Player name cannot be blank")
-    }
-
+    // All-in and fold tests
     @Test
     fun `allIn sets bet to all remaining chips and chips to zero`() {
         val player = Player("Hans", 500)
-        player.allIn(200)
-
-        assertThat(player.getBet()).isEqualTo(200)
-        assertThat(player.getChips()).isEqualTo(0)
-        assertThat(player.isAllIn).isTrue()
-    }
-
-    @Test
-    fun `allIn sets bet to all chips when allIn amount is greater than chips`() {
-        val player = Player("Hans", 500)
-        player.allIn(600)
+        player.allIn()
 
         assertThat(player.getBet()).isEqualTo(500)
         assertThat(player.getChips()).isEqualTo(0)
@@ -145,33 +151,37 @@ class PlayerTest : AnnotationSpec() {
     }
 
     @Test
-    fun `setBetAmount only deducts the difference to previous bet`() {
-        val player = Player("Hans", 500)
+    fun `allIn with zero chips doesnt work`() {
+        val player = Player("Hans", 0)
 
-        player.setBetAmount(100)
-        assertThat(player.getChips()).isEqualTo(400)
+        val exception = shouldThrow<IllegalArgumentException> {
+            player.allIn()
+        }
 
-        player.setBetAmount(150)
-        assertThat(player.getChips()).isEqualTo(350)
+        assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
+        assertThat(player.getBet()).isEqualTo(0)
+        assertThat(player.getChips()).isEqualTo(0)
+        assertThat(player.isAllIn).isFalse()
     }
 
     @Test
-    fun `assignHand throws exception for invalid hand size`() {
+    fun `fold sets isFolded to true`() {
         val player = Player("Hans")
+        player.fold()
 
-        val exception = shouldThrow<IllegalArgumentException> {
-            player.assignHand(
-                HoleCards(
-                    listOf(
-                        Card(Suit.DIAMONDS, Rank.FIVE),
-                        Card(Suit.DIAMONDS, Rank.SIX),
-                        Card(Suit.DIAMONDS, Rank.SEVEN)
-                    ),
-                    player
-                )
-            )
-        }
+        assertThat(player.isFolded).isTrue()
+    }
 
-        assertThat(exception.message).isEqualTo("Hole cards must be empty or contain exactly two cards.")
+    @Test
+    fun `fold does not affect chips or bet`() {
+        val initialChips = 500
+        val betAmount = 100
+        val player = Player("Hans", initialChips)
+
+        player.setBetAmount(betAmount)
+        player.fold()
+
+        assertThat(player.getBet()).isEqualTo(betAmount)
+        assertThat(player.getChips()).isEqualTo(initialChips - betAmount)
     }
 }
