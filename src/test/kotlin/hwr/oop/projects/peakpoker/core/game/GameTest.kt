@@ -277,7 +277,7 @@ class GameTest : AnnotationSpec() {
         while (testGame.getCurrentPlayer() != player1) {
             testGame.makeTurn()
         }
-        player2.allIn(20)
+        player2.allIn()
 
         // when
         testGame.makeTurn()
@@ -287,7 +287,7 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `makeTurn works correctly with multiple inactive players`() {
+    fun `makeTurn skips folded players with multiple players`() {
         // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
@@ -296,9 +296,30 @@ class GameTest : AnnotationSpec() {
         val testGame = Game(1203, 10, 20, listOf(player1, player2, player3, player4))
 
         player2.fold()
-        player3.allIn(20)
 
         while (testGame.getCurrentPlayer() != player1) {
+            testGame.makeTurn()
+        }
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+    }
+
+    @Test
+    fun `makeTurn skips all-in players with multiple players`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val player4 = Player("Anna")
+        val testGame = Game(1204, 10, 20, listOf(player1, player2, player3, player4))
+
+        player3.allIn()
+
+        while (testGame.getCurrentPlayer() != player2) {
             testGame.makeTurn()
         }
 
@@ -340,7 +361,7 @@ class GameTest : AnnotationSpec() {
             testGame.makeTurn()
         }
         player2.fold()
-        player3.allIn(20)
+        player3.allIn()
 
         // when/then
         testGame.makeTurn()
