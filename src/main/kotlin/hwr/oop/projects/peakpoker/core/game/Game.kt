@@ -59,7 +59,7 @@ class Game(
     fun makeTurn() {
         val nextPlayer = getNextPlayer()
 
-        // skip any folded / all-in players
+        // Skip any folded / all-in players
         if (nextPlayer.isFolded || nextPlayer.isAllIn) {
             currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
             makeTurn()
@@ -77,12 +77,13 @@ class Game(
      *
      * @param player The player who is raising their bet
      * @param chips The total amount to bet (not the additional amount)
-     * @throws IllegalArgumentException if the bet amount is negative
-     * @throws IllegalStateException if: the bet is not higher than current highest bet;
-     *                               it's not the player's turn;
-     *                               the player has already folded;
-     *                               the player has already gone all-in;
-     *                               the player doesn't have enough chips
+     * @throws IllegalArgumentException If the bet amount is negative.
+     * @throws IllegalStateException If any of the following conditions are true:
+     *                               - The bet is not higher than the current highest bet.
+     *                               - It is not the player's turn.
+     *                               - The player has already folded.
+     *                               - The player has already gone all-in.
+     *                               - The player does not have enough chips.
      */
     fun raiseBetTo(player: Player, chips: Int) {
         val currentPlayer = getCurrentPlayer()

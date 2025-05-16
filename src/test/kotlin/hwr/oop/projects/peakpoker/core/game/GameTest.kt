@@ -331,7 +331,7 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `makeTurn wraps around the table`() {
+    fun `makeTurn cycles to first player at the end of table`() {
         // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
