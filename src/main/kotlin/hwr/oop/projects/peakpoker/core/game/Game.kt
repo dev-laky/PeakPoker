@@ -1,6 +1,8 @@
 package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game(
@@ -9,6 +11,19 @@ class Game(
     val bigBlindAmount: Int,
     val playersOnTable: List<Player> = listOf()
 ) : GameInterface {
+
+    // Variable to track the index of the small blind player within PlayersOnTable
+    val smallBlindIndex: Int = 0
+    val deck: Deck = Deck()
+    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+    val gameState = GameState.PRE_FLOP
+
+    // Calculates pot by bets of players
+    val pot get() = calculatePot()
+
+    // Will be = 2 after "blind" init
+    var currentPlayerIndex: Int = 0
+
     init {
         require(smallBlindAmount > 0) { "Small blind amount must be positive" }
         require(bigBlindAmount > 0) { "Big blind amount must be positive" }
@@ -18,15 +33,10 @@ class Game(
 
         // Set the blinds for the players at the table
         setBlinds()
+
+        // Deal hole cards to players
+        dealHoleCards()
     }
-
-    // Variable to track the index of the small blind player within PlayersOnTable
-    val smallBlindIndex: Int = 0
-    var pot: Int = 0
-    val communityCards: CommunityCards = CommunityCards(emptyList(), this)
-
-    // Will be = 2 after "blind" init
-    var currentPlayerIndex: Int = 0
 
     fun getSmallBlind(): Int {
         return smallBlindAmount
@@ -38,6 +48,10 @@ class Game(
 
     fun getCurrentPlayer(): Player {
         return playersOnTable[currentPlayerIndex]
+    }
+
+    fun getNextPlayer(): Player {
+        return playersOnTable[(currentPlayerIndex + 1) % playersOnTable.size]
     }
 
     fun getHighestBet(): Int {
@@ -53,7 +67,23 @@ class Game(
     }
 
     fun makeTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % playersOnTable.size
+        val nextPlayer = getNextPlayer()
+
+        // Skip any folded / all-in players
+        if (nextPlayer.isFolded || nextPlayer.isAllIn) {
+            currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
+            makeTurn()
+            return
+        }
+
+        currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
+    }
+
+    private fun dealHoleCards() {
+        playersOnTable.forEach { player ->
+            val cards = deck.draw(2)
+            player.assignHand(HoleCards(cards, player))
+        }
     }
 
     /**
@@ -64,51 +94,83 @@ class Game(
      *
      * @param player The player who is raising their bet
      * @param chips The total amount to bet (not the additional amount)
-     * @throws IllegalStateException If the bet is not higher than the current highest bet,
-     *                               or if it's not the player's turn
+     * @throws IllegalArgumentException If the bet amount is negative.
+     * @throws IllegalStateException If any of the following conditions are true:
+     *                               - The bet is not higher than the current highest bet.
+     *                               - It is not the player's turn.
+     *                               - The player has already folded.
+     *                               - The player has already gone all-in.
+     *                               - The player does not have enough chips.
      */
     fun raiseBetTo(player: Player, chips: Int) {
         val currentPlayer = getCurrentPlayer()
+        val highestBet = getHighestBet()
         when {
             chips < 0 -> throw IllegalArgumentException("Bet amount must be positive")
-            chips <= getHighestBet() -> throw IllegalStateException("Bet must be higher than the current highest bet")
+            highestBet >= chips -> throw IllegalStateException("Bet must be higher than the current highest bet")
             currentPlayer != player -> throw IllegalStateException("It's not your turn to bet")
             player.isFolded -> throw IllegalStateException("Cannot raise bet after folding")
             player.isAllIn -> throw IllegalStateException("Cannot raise bet after going all-in")
-            chips > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
+
+            // The player needs to go all-in or fold
+            (chips - player.getBet()) > player.getChips() -> throw IllegalStateException("Not enough chips to raise bet")
         }
-        player.raiseBetTo(chips)
+        player.setBetAmount(chips)
+        makeTurn()
     }
 
     fun call(player: Player) {
+        val currentPlayer = getCurrentPlayer()
         val highestBet = getHighestBet()
         when {
-            getCurrentPlayer() != player -> throw IllegalStateException("It's not your turn to call")
-            highestBet <= player.getBet() -> throw IllegalStateException("You are already at the highest bet")
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to call")
+            player.getBet() == highestBet -> throw IllegalStateException("You are already at the highest bet")
             player.isFolded -> throw IllegalStateException("You can not call after having folded")
             player.isAllIn -> throw IllegalStateException("You can not call after having gone all-in")
 
             // The player needs to go all-in or fold
-            player.getChips() < highestBet -> throw IllegalStateException("You do not have enough chips to call.")
+            player.getChips() < (highestBet - player.getBet()) -> throw IllegalStateException("You do not have enough chips to call.")
         }
-        player.call(highestBet)
+        player.setBetAmount(highestBet)
+        makeTurn()
     }
 
     fun check(player: Player) {
-        TODO("The check function is not implemented yet.")
+        val currentPlayer = getCurrentPlayer()
+        when {
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to check")
+            player.isFolded -> throw IllegalStateException("You can not check after having folded")
+            player.isAllIn -> throw IllegalStateException("You can not check after having gone all-in")
+            player.getBet() != getHighestBet() -> throw IllegalStateException("You can not check if you are not at the highest bet")
+        }
+        makeTurn()
     }
 
     fun fold(player: Player) {
-        TODO("The fold function is not implemented yet.")
+        val currentPlayer = getCurrentPlayer()
+        when {
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to fold")
+            player.isFolded -> throw IllegalStateException("You have already folded")
+            player.isAllIn -> throw IllegalStateException("You can not fold after having gone all-in")
+        }
+        player.fold()
+        makeTurn()
     }
 
     fun allIn(player: Player) {
-        TODO("The allIn function is not implemented yet.")
+        val currentPlayer = getCurrentPlayer()
+
+        when {
+            currentPlayer != player -> throw IllegalStateException("It's not your turn to all in")
+            player.isFolded -> throw IllegalStateException("You can not go all-in after having folded")
+            player.isAllIn -> throw IllegalStateException("You have already gone all-in")
+        }
+        player.allIn()
+        makeTurn()
     }
 
     private fun setBlinds() {
         raiseBetTo(getCurrentPlayer(), smallBlindAmount)
-        makeTurn()
 
         // Check for same blind amounts --> call
         if (bigBlindAmount == smallBlindAmount) {
@@ -117,6 +179,5 @@ class Game(
         }
 
         raiseBetTo(getCurrentPlayer(), bigBlindAmount)
-        makeTurn()
     }
 }

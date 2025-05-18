@@ -72,21 +72,6 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `check if highest bet is correct`() {
-        // given
-        val testGame = Game(1005, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
-
-        // when
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(30)
-        testGame.makeTurn()
-        testGame.playersOnTable[testGame.currentPlayerIndex].raiseBetTo(40)
-
-        // then
-        assertThat(testGame.getHighestBet()).isEqualTo(40)
-    }
-
-    @Test
     fun `check if get current player works correctly`() {
         // given
         val testGame = Game(1006, 10, 20,
@@ -121,18 +106,6 @@ class GameTest : AnnotationSpec() {
         }
 
         assertThat(exception.message).isEqualTo("Big blind amount must be greater than or equal to small blind amount")
-    }
-
-    @Test
-    fun `calculatePot returns sum of all player bets`() {
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1031, 10, 20, listOf(player1, player2, player3))
-
-        player3.raiseBetTo(40)
-
-        assertThat(testGame.calculatePot()).isEqualTo(70)
     }
 
     @Test
@@ -251,6 +224,151 @@ class GameTest : AnnotationSpec() {
         assertThat(testGame.smallBlindIndex).isNotEqualTo(-1)
         assertThat(testGame.smallBlindIndex).isLessThan(players.size)
         assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
+    }
+
+    @Test
+    fun `makeTurn advances to next active player`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1200, 10, 20, listOf(player1, player2, player3))
+
+        // Initial state after game creation
+        val initialPlayer = testGame.getCurrentPlayer()
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        val nextPlayer = testGame.getCurrentPlayer()
+        assertThat(nextPlayer).isEqualTo(player1)
+        assertThat(nextPlayer).isNotEqualTo(initialPlayer)
+    }
+
+    @Test
+    fun `makeTurn skips folded players`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1201, 10, 20, listOf(player1, player2, player3))
+
+        while (testGame.getCurrentPlayer() != player1) {
+            testGame.makeTurn()
+        }
+        player2.fold()
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+    }
+
+    @Test
+    fun `makeTurn skips all-in players`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1202, 10, 20, listOf(player1, player2, player3))
+
+        while (testGame.getCurrentPlayer() != player1) {
+            testGame.makeTurn()
+        }
+        player2.allIn()
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+    }
+
+    @Test
+    fun `makeTurn skips folded players with multiple players`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val player4 = Player("Anna")
+        val testGame = Game(1203, 10, 20, listOf(player1, player2, player3, player4))
+
+        player2.fold()
+
+        while (testGame.getCurrentPlayer() != player1) {
+            testGame.makeTurn()
+        }
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+    }
+
+    @Test
+    fun `makeTurn skips all-in players with multiple players`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val player4 = Player("Anna")
+        val testGame = Game(1204, 10, 20, listOf(player1, player2, player3, player4))
+
+        player3.allIn()
+
+        while (testGame.getCurrentPlayer() != player2) {
+            testGame.makeTurn()
+        }
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player4)
+    }
+
+    @Test
+    fun `makeTurn cycles to first player at the end of table`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1204, 10, 20, listOf(player1, player2, player3))
+
+        while (testGame.getCurrentPlayer() != player3) {
+            testGame.makeTurn()
+        }
+
+        // when
+        testGame.makeTurn()
+
+        // then
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+    }
+
+    @Test
+    fun `makeTurn stops when returning to same player with all others inactive`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(1205, 10, 20, listOf(player1, player2, player3))
+
+        while (testGame.getCurrentPlayer() != player1) {
+            testGame.makeTurn()
+        }
+        player2.fold()
+        player3.allIn()
+
+        // when/then
+        testGame.makeTurn()
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+
+        testGame.makeTurn()
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 }
 

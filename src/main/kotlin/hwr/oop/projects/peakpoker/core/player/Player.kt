@@ -34,52 +34,19 @@ class Player(
         hand = cards
     }
 
-    /**
-     * Raises the player's bet to the specified amount.
-     * CAUTION: Should only be called from Game.
-     *
-     * This method increases the player's bet to the given amount, deducting only the difference
-     * between the new bet and current bet from the player's chips.
-     *
-     * @param chips The total amount to bet (not the additional amount)
-     */
-    fun raiseBetTo(chips: Int) {
-        require(chips > 0) { "Bet amount must be greater than zero" }
+    fun setBetAmount(chips: Int) {
+        require(chips > 0) { "Chips amount must be greater than zero" }
 
-        setBetAmount(chips)
-    }
-
-    fun call(chips: Int) {
-        require(chips > 0) { "Call amount must be greater than zero" }
-
-        setBetAmount(chips)
-    }
-
-    private fun setBetAmount(chips: Int) {
         this.chips -= chips - bet
         bet = chips
     }
 
-    fun check() {
-        TODO(
-            """
-            Consider if check is needed inside of Player?
-            What could be the use case for this?
-            Otherwise remove, handle necessary actions in Game. 
-            
-            Quick thought:
-            Since nothing needs to be changed of bet or chips, 
-            all other properties of Player can be accessed through Game.
-            So right know I don't think we need this here.
-            """
-        )
-    }
-
     fun fold() {
-        TODO("The fold function is not implemented yet.")
+        isFolded = true
     }
 
     fun allIn() {
-        TODO("The allIn function is not implemented yet.")
+        setBetAmount(this.chips)
+        isAllIn = true
     }
 }

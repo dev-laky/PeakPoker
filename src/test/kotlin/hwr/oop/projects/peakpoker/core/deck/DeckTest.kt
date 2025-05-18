@@ -1,10 +1,8 @@
 package hwr.oop.projects.peakpoker.core.deck
 
 import io.kotest.core.spec.style.AnnotationSpec
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotSame
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.assertThrows
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class DeckTest : AnnotationSpec() {
     @Test
@@ -16,7 +14,7 @@ class DeckTest : AnnotationSpec() {
         val cards = deck.show()
 
         // then
-        assertEquals(52, cards.size)
+        assertThat(cards).hasSize(52)
     }
 
     @Test
@@ -28,7 +26,7 @@ class DeckTest : AnnotationSpec() {
         val cards = deck.show()
 
         // then
-        assertNotSame(cards, deck.show())
+        assertThat(cards).isNotSameAs(deck.show())
     }
 
     @Test
@@ -38,11 +36,44 @@ class DeckTest : AnnotationSpec() {
         val initialSize = deck.show().size
 
         // when
-        val drawnCard = deck.draw()
+        val drawnCards = deck.draw()
 
         // then
-        assertEquals(initialSize - 1, deck.show().size)
-        assertFalse(deck.show().contains(drawnCard))
+        assertThat(deck.show()).hasSize(initialSize - 1)
+        assertThat(drawnCards).hasSize(1)
+        assertThat(deck.show()).doesNotContain(drawnCards[0])
+    }
+
+    @Test
+    fun `draw multiple cards from the deck`() {
+        // given
+        val deck = Deck()
+        val initialSize = deck.show().size
+        val drawAmount = 5
+
+        // when
+        val drawnCards = deck.draw(drawAmount)
+
+        // then
+        assertThat(drawnCards)
+            .hasSize(drawAmount)
+            .describedAs("Should draw exactly the requested number of cards")
+
+        assertThat(deck.show())
+            .hasSize(initialSize - drawAmount)
+            .describedAs("Deck size should be reduced by drawn amount")
+
+        // Verify none of the drawn cards remain in the deck
+        drawnCards.forEach { card ->
+            assertThat(deck.show())
+                .doesNotContain(card)
+                .describedAs("Drawn card should not remain in the deck")
+        }
+
+        // Verify all drawn cards are unique
+        assertThat(drawnCards)
+            .hasSize(drawnCards.distinct().size)
+            .describedAs("All drawn cards should be unique")
     }
 
     @Test
@@ -52,10 +83,9 @@ class DeckTest : AnnotationSpec() {
         repeat(52) { deck.draw() } // draw all cards
 
         // when & then
-        assertEquals(0, deck.show().size) // Check if the list is actually empty (the size is zero)
-        assertThrows<IllegalStateException> {
-            deck.draw()
-        }
+        assertThat(deck.show()).isEmpty() // Check if the list is actually empty
+
+        assertThatThrownBy { deck.draw() }
+            .isInstanceOf(IllegalStateException::class.java)
     }
 }
-
