@@ -1,14 +1,11 @@
 package hwr.oop.projects.peakpoker.core.hand
 
 import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
-import hwr.oop.projects.peakpoker.core.hand.HandRank
-
 
 object HandEvaluator {
-
     /**
      * Evaluates the best HandRank from exactly five cards.
      */
