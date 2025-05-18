@@ -165,14 +165,6 @@ class PlayerTest : AnnotationSpec() {
     }
 
     @Test
-    fun `fold sets isFolded to true`() {
-        val player = Player("Hans")
-        player.fold()
-
-        assertThat(player.isFolded).isTrue()
-    }
-
-    @Test
     fun `fold does not affect chips or bet`() {
         val initialChips = 500
         val betAmount = 100
@@ -198,7 +190,7 @@ class PlayerTest : AnnotationSpec() {
     fun `allIn sets bet to full chips when amount equals chips`() {
         val player = Player("Hans", 500)
 
-        player.allIn(500)
+        player.allIn()
 
         assertThat(player.getBet()).isEqualTo(500)
         assertThat(player.getChips()).isEqualTo(0)

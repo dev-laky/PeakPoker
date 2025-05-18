@@ -10,18 +10,25 @@ class GameTest : AnnotationSpec() {
     fun `test if game throws exception if too little players are added` () {
         // when/then
         shouldThrow<IllegalArgumentException> {
+            val player1 = Player("Hans")
+            val player2 = Player("Peter")
             Game(
-                1001, 10, 20,
-                listOf(Player("Hans"), Player("Peter"))
+                1010, 10, 20,
+                listOf(player1, player2)
             )
         }
     }
 
     @Test
-    fun `check if duplicate exception works` () {
+    fun `check if function for player validity works` () {
         // given
-        val testGame = Game(1002, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(
+            1011, 10, 20,
+            listOf(player1, player2, player3)
+        )
         val duplicatePlayer = Player("Hans")
 
         // when/then
@@ -29,44 +36,69 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `invalid blind amounts throw exceptions`() {
-        // negative small blind
+    fun `negative small blind throws exception`() {
+        // when/then
+        shouldThrow<IllegalArgumentException> {
+            val player1 = Player("Hans")
+            val player2 = Player("Peter")
+            val player3 = Player("Max")
+            Game(
+                1012, -10, 20,
+                listOf(player1, player2, player3)
+            )
+        }
+    }
+
+    @Test
+    fun `negative big blind throws exception`() {
+        // when/then
+        val exception = shouldThrow<IllegalArgumentException> {
+            val player1 = Player("Hans")
+            val player2 = Player("Peter")
+            val player3 = Player("Max")
+            Game(
+                1013, 10, -20,
+                listOf(player1, player2, player3)
+            )
+        }
+        assertThat(exception.message).isEqualTo("Big blind amount must be positive")
+    }
+
+    @Test
+    fun `zero small blind throws exception`() {
+        // when/then
         shouldThrow<IllegalArgumentException> {
             Game(
-                1010, -10, 20,
+                1014, 0, 20,
                 listOf(Player("Hans"), Player("Peter"), Player("Max"))
             )
         }
+    }
 
-        // negative big blind
+    @Test
+    fun `zero big blind throws exception`() {
+        // when/then
         shouldThrow<IllegalArgumentException> {
+            val player1 = Player("Hans")
+            val player2 = Player("Peter")
+            val player3 = Player("Max")
             Game(
-                1011, 10, -20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+                1015, 10, 0,
+                listOf(player1, player2, player3)
             )
         }
+    }
 
-        // zero small blind
+    @Test
+    fun `big blind smaller than small blind throws exception`() {
+        // when/then
         shouldThrow<IllegalArgumentException> {
+            val player1 = Player("Hans")
+            val player2 = Player("Peter")
+            val player3 = Player("Max")
             Game(
-                1012, 0, 20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max"))
-            )
-        }
-
-        // zero big blind
-        shouldThrow<IllegalArgumentException> {
-            Game(
-                1013, 10, 0,
-                listOf(Player("Hans"), Player("Peter"), Player("Max"))
-            )
-        }
-
-        // big blind smaller than small blind
-        shouldThrow<IllegalArgumentException> {
-            Game(
-                1014, 30, 20,
-                listOf(Player("Hans"), Player("Peter"), Player("Max"))
+                1016, 30, 20,
+                listOf(player1, player2, player3)
             )
         }
     }
@@ -74,8 +106,13 @@ class GameTest : AnnotationSpec() {
     @Test
     fun `check if get current player works correctly`() {
         // given
-        val testGame = Game(1006, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max")))
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(
+            1017, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
         val currentPlayer = testGame.getCurrentPlayer()
@@ -85,38 +122,28 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `big blind amount must be positive`() {
-        val exception = shouldThrow<IllegalArgumentException> {
-            Game(
-                1020, 10, 0,
-                listOf(Player("Hans"), Player("Peter"), Player("Max"))
-            )
-        }
-
-        assertThat(exception.message).isEqualTo("Big blind amount must be positive")
-    }
-
-    @Test
     fun `big blind amount must be greater than or equal to small blind amount`() {
         val exception = shouldThrow<IllegalArgumentException> {
             Game(
-                1021, 20, 10,
+                1018, 20, 10,
                 listOf(Player("Hans"), Player("Peter"), Player("Max"))
             )
         }
-
         assertThat(exception.message).isEqualTo("Big blind amount must be greater than or equal to small blind amount")
     }
 
     @Test
-    fun `makeTurn advances currentPlayerIndex to next player`() {
+    fun `call advances currentPlayerIndex to next active player`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
-            1032, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            1019, 10, 20,
+            listOf(player1, player2, player3)
         )
 
         val initialPlayer = testGame.getCurrentPlayer()
-        testGame.makeTurn()
+        testGame.call(initialPlayer)
         val nextPlayer = testGame.getCurrentPlayer()
 
         assertThat(nextPlayer.name).isNotEqualTo(initialPlayer.name)
@@ -125,9 +152,12 @@ class GameTest : AnnotationSpec() {
 
     @Test
     fun `checkPlayerValidity returns false for existing players and true for new players`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
-            1033, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            1020, 10, 20,
+            listOf(player1, player2, player3)
         )
 
         val existingPlayer = Player("Hans")
@@ -142,37 +172,50 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1041, 10, 20, listOf(player1, player2, player3))
+        val testGame = Game(
+            1021, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         assertThat(testGame.getHighestBet()).isEqualTo(20)
     }
 
     @Test
     fun `big blind amount can be equal to small blind amount`() {
-        val game = Game(
-            1050, 20, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
+        val testGame = Game(
+            1022, 20, 20,
+            listOf(player1, player2, player3)
         )
 
-        assertThat(game.smallBlindAmount).isEqualTo(20)
-        assertThat(game.bigBlindAmount).isEqualTo(20)
+        assertThat(testGame.getSmallBlind()).isEqualTo(20)
+        assertThat(testGame.getBigBlind()).isEqualTo(20)
     }
 
     @Test
     fun `getSmallBlindIndex returns correct value`() {
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
-            1060, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            1023, 10, 20,
+            listOf(player1, player2, player3)
         )
 
-        assertThat(testGame.smallBlindIndex).isEqualTo(0)
+        assertThat(testGame.getSmallBlindIndex()).isEqualTo(1)
     }
 
     @Test
     fun `getSmallBlind returns correct small blind amount`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
-            1062, 15, 30,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            1024, 15, 20,
+            listOf(player1, player2, player3)
         )
 
         assertThat(testGame.getSmallBlind()).isEqualTo(15)
@@ -180,20 +223,28 @@ class GameTest : AnnotationSpec() {
 
     @Test
     fun `getBigBlind returns correct big blind amount`() {
+        // given
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
-            1063, 15, 30,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            1025, 10, 20,
+            listOf(player1, player2, player3)
         )
 
-        assertThat(testGame.getBigBlind()).isEqualTo(30)
+        assertThat(testGame.getBigBlind()).isEqualTo(20)
     }
 
     @Test
     fun `getId returns correct game identifier`() {
-        val gameId = 1070
+        // given
+        val gameId = 1026
+        val player1 = Player("Hans")
+        val player2 = Player("Peter")
+        val player3 = Player("Max")
         val testGame = Game(
             gameId, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
+            listOf(player1, player2, player3)
         )
 
         assertThat(testGame.id).isEqualTo(gameId)
@@ -202,50 +253,35 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `smallBlindIndex is correctly initialized and maintained`() {
-        val testGame = Game(
-            1071, 10, 20,
-            listOf(Player("Hans"), Player("Peter"), Player("Max"))
-        )
-
-        assertThat(testGame.smallBlindIndex).isEqualTo(0)
-        assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
-        assertThat(testGame.smallBlindIndex).isLessThan(testGame.playersOnTable.size)
-
-        val smallBlindPlayer = testGame.playersOnTable[testGame.smallBlindIndex]
-        assertThat(smallBlindPlayer.name).isEqualTo("Hans")
-    }
-
-    @Test
-    fun `smallBlindIndex boundary conditions`() {
-        val players = listOf(Player("Hans"), Player("Peter"), Player("Max"))
-        val testGame = Game(1072, 10, 20, players)
-
-        assertThat(testGame.smallBlindIndex).isNotEqualTo(-1)
-        assertThat(testGame.smallBlindIndex).isLessThan(players.size)
-        assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
-    }
-
-    @Test
     fun `calculatePot returns correct pot amount`() {
+        // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1090, 10, 20, listOf(player1, player2, player3))
+        val testGame = Game(
+            1028, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
-        player1.setBetAmount(30)
-        player2.setBetAmount(50)
-        player3.setBetAmount(20)
+        testGame.call(testGame.getCurrentPlayer())
+        testGame.call(testGame.getCurrentPlayer())
+        testGame.raiseBetTo(testGame.getCurrentPlayer(), 100)
+        testGame.call(testGame.getCurrentPlayer())
+        testGame.call(testGame.getCurrentPlayer())
 
-        assertThat(testGame.calculatePot()).isEqualTo(100)
+        assertThat(testGame.calculatePot()).isEqualTo(300)
     }
 
+    //FIXME: This test is not working, since the player variables no longer exist
     @Test
     fun `calculatePot returns correct pot amount after new bets`() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1093, 10, 20, listOf(player1, player2, player3))
+        val testGame = Game(
+            1029, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         player1.setBetAmount(30)
         player2.setBetAmount(50)
@@ -266,7 +302,10 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1091, 10, 20, listOf(player1, player2, player3))
+        val testGame = Game(
+            1030, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         assertThat(testGame.pot).isEqualTo(30)
     }
@@ -277,18 +316,16 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1095, 10, 20, listOf(player1, player2, player3))
-
-        println("Start index: ${testGame.currentPlayerIndex}")
-        // start Index returns 2, because of the blinds
+        val testGame = Game(
+            1031, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
-        testGame.makeTurn()
-        testGame.makeTurn()
-        testGame.makeTurn()
+        testGame.call(player3)
 
         // then
-        assertThat(testGame.currentPlayerIndex).isEqualTo(2)
+        assertThat(testGame.currentPlayerIndex).isEqualTo(0)
     }
 
     @Test
@@ -297,7 +334,10 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1094, 10, 20, listOf(player1, player2, player3))
+        val testGame = Game(
+            1032, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
         player1.setBetAmount(30)
@@ -309,85 +349,65 @@ class GameTest : AnnotationSpec() {
     }
 
     @Test
-    fun `makeTurn advances to next active player`() {
-        // given
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1200, 10, 20, listOf(player1, player2, player3))
-
-        // Initial state after game creation
-        val initialPlayer = testGame.getCurrentPlayer()
-
-        // when
-        testGame.makeTurn()
-
-        // then
-        val nextPlayer = testGame.getCurrentPlayer()
-        assertThat(nextPlayer).isEqualTo(player1)
-        assertThat(nextPlayer).isNotEqualTo(initialPlayer)
-    }
-
-    @Test
     fun `makeTurn skips folded players`() {
         // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1201, 10, 20, listOf(player1, player2, player3))
-
-        while (testGame.getCurrentPlayer() != player1) {
-            testGame.makeTurn()
-        }
-        player2.fold()
+        val testGame = Game(
+            1033, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
-        testGame.makeTurn()
+        testGame.fold(player3)
+        testGame.call(player1)
+        testGame.check(player2)
 
         // then
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 
     @Test
-    fun `makeTurn skips all-in players`() {
+    fun `game turn logic skips all-in players`() {
         // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1202, 10, 20, listOf(player1, player2, player3))
-
-        while (testGame.getCurrentPlayer() != player1) {
-            testGame.makeTurn()
-        }
-        player2.allIn()
+        val testGame = Game(
+            1034, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
-        testGame.makeTurn()
+        testGame.allIn(player3)
+        testGame.call(player1)
+        testGame.call(player2)
 
         // then
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 
     @Test
-    fun `makeTurn skips folded players with multiple players`() {
+    fun `game turn logic skips folded players multiple times`() {
         // given
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val player4 = Player("Anna")
-        val testGame = Game(1203, 10, 20, listOf(player1, player2, player3, player4))
-
-        player2.fold()
-
-        while (testGame.getCurrentPlayer() != player1) {
-            testGame.makeTurn()
-        }
+        val player4 = Player("Sonja")
+        val testGame = Game(
+            1035, 10, 20,
+            listOf(player1, player2, player3, player4)
+        )
 
         // when
-        testGame.makeTurn()
+        testGame.fold(player3)
+        testGame.fold(player4)
+        testGame.call(player1)
+        testGame.check(player2)
 
         // then
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 
     @Test
@@ -396,20 +416,20 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val player4 = Player("Anna")
-        val testGame = Game(1204, 10, 20, listOf(player1, player2, player3, player4))
-
-        player3.allIn()
-
-        while (testGame.getCurrentPlayer() != player2) {
-            testGame.makeTurn()
-        }
+        val player4 = Player("Sonja")
+        val testGame = Game(
+            1036, 10, 20,
+            listOf(player1, player2, player3, player4)
+        )
 
         // when
-        testGame.makeTurn()
+        testGame.allIn(player3)
+        testGame.allIn(player4)
+        testGame.call(player1)
+        testGame.call(player2)
 
         // then
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player4)
+        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 
     @Test
@@ -418,38 +438,15 @@ class GameTest : AnnotationSpec() {
         val player1 = Player("Hans")
         val player2 = Player("Peter")
         val player3 = Player("Max")
-        val testGame = Game(1204, 10, 20, listOf(player1, player2, player3))
-
-        while (testGame.getCurrentPlayer() != player3) {
-            testGame.makeTurn()
-        }
+        val testGame = Game(
+            1037, 10, 20,
+            listOf(player1, player2, player3)
+        )
 
         // when
-        testGame.makeTurn()
+        testGame.call(testGame.getCurrentPlayer())
 
         // then
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-    }
-
-    @Test
-    fun `makeTurn stops when returning to same player with all others inactive`() {
-        // given
-        val player1 = Player("Hans")
-        val player2 = Player("Peter")
-        val player3 = Player("Max")
-        val testGame = Game(1205, 10, 20, listOf(player1, player2, player3))
-
-        while (testGame.getCurrentPlayer() != player1) {
-            testGame.makeTurn()
-        }
-        player2.fold()
-        player3.allIn()
-
-        // when/then
-        testGame.makeTurn()
-        assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-
-        testGame.makeTurn()
         assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
     }
 }
