@@ -272,7 +272,6 @@ class GameTest : AnnotationSpec() {
         assertThat(testGame.calculatePot()).isEqualTo(300)
     }
 
-    //FIXME: This test is not working, since the player variables no longer exist
     @Test
     fun `calculatePot returns correct pot amount after new bets`() {
         val player1 = Player("Hans")
@@ -283,18 +282,18 @@ class GameTest : AnnotationSpec() {
             listOf(player1, player2, player3)
         )
 
-        player1.setBetAmount(30)
-        player2.setBetAmount(50)
-        player3.setBetAmount(20)
+        testGame.raiseBetTo(player3, 30)
+        testGame.raiseBetTo(player1, 40)
+        testGame.call(player2)
+        testGame.call(player3)
 
-        assertThat(testGame.calculatePot()).isEqualTo(100)
+        assertThat(testGame.calculatePot()).isEqualTo(120)
 
-        // setBetAmount overwrites previous bet
-        player1.setBetAmount(40) // 30 -> 40 (+10)
-        player2.setBetAmount(60) // 50 -> 60 (+10)
-        player3.setBetAmount(30) // 20 -> 30 (+10)
+        testGame.raiseBetTo(player1, 50)
+        testGame.call(player2)
+        testGame.call(player3)
 
-        assertThat(testGame.calculatePot()).isEqualTo(130)
+        assertThat(testGame.calculatePot()).isEqualTo(150)
     }
 
     @Test
@@ -340,9 +339,10 @@ class GameTest : AnnotationSpec() {
         )
 
         // when
-        player1.setBetAmount(30)
-        player2.setBetAmount(40)
-        player3.setBetAmount(50)
+        testGame.raiseBetTo(player3, 50)
+        testGame.call(player1)
+        testGame.call(player2)
+        testGame.check(player3)
 
         // then
         assertThat(testGame.getHighestBet()).isEqualTo(50)
