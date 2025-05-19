@@ -34,7 +34,7 @@ class GameTestThreePlayers : AnnotationSpec() {
   @Test
   fun `makeTurn advances currentPlayerIndex to next player`() {
     val initialPlayer = testGame.getCurrentPlayer()
-    testGame.makeTurn()
+    testGame.call(player3)
     val nextPlayer = testGame.getCurrentPlayer()
 
     assertThat(nextPlayer.name).isNotEqualTo(initialPlayer.name)
@@ -61,11 +61,6 @@ class GameTestThreePlayers : AnnotationSpec() {
   }
 
   @Test
-  fun `getSmallBlindIndex returns correct value`() {
-    assertThat(testGame.smallBlindIndex).isEqualTo(0)
-  }
-
-  @Test
   fun `getSmallBlind returns correct small blind amount`() {
     assertThat(testGame.getSmallBlind()).isEqualTo(10)
   }
@@ -76,91 +71,10 @@ class GameTestThreePlayers : AnnotationSpec() {
   }
 
   @Test
-  fun `smallBlindIndex is correctly initialized and maintained`() {
-    assertThat(testGame.smallBlindIndex).isEqualTo(0)
-    assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
-    assertThat(testGame.smallBlindIndex).isLessThan(testGame.playersOnTable.size)
-
-    val smallBlindPlayer = testGame.playersOnTable[testGame.smallBlindIndex]
-    assertThat(smallBlindPlayer.name).isEqualTo("Hans")
-  }
-
-  @Test
-  fun `smallBlindIndex boundary conditions`() {
-    assertThat(testGame.smallBlindIndex).isNotEqualTo(-1)
-    assertThat(testGame.smallBlindIndex).isLessThan(testGame.playersOnTable.size)
-    assertThat(testGame.smallBlindIndex).isGreaterThanOrEqualTo(0)
-  }
-
-  @Test
-  fun `makeTurn advances to next active player`() {
-    // Initial state after game creation
-    val initialPlayer = testGame.getCurrentPlayer()
-
-    // when
-    testGame.makeTurn()
-
-    // then
-    val nextPlayer = testGame.getCurrentPlayer()
-    assertThat(nextPlayer).isEqualTo(player1)
-    assertThat(nextPlayer).isNotEqualTo(initialPlayer)
-  }
-
-  @Test
-  fun `makeTurn skips folded players`() {
-    while (testGame.getCurrentPlayer() != player1) {
-      testGame.makeTurn()
-    }
-    player2.fold()
-
-    // when
-    testGame.makeTurn()
-
-    // then
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
-  }
-
-  @Test
-  fun `makeTurn skips all-in players`() {
-    while (testGame.getCurrentPlayer() != player1) {
-      testGame.makeTurn()
-    }
-    player2.allIn()
-
-    // when
-    testGame.makeTurn()
-
-    // then
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
-  }
-
-  @Test
   fun `makeTurn cycles to first player at the end of table`() {
-    while (testGame.getCurrentPlayer() != player3) {
-      testGame.makeTurn()
-    }
-
-    // when
-    testGame.makeTurn()
+    testGame.call(player3)
 
     // then
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-  }
-
-  @Test
-  fun `makeTurn stops when returning to same player with all others inactive`() {
-    while (testGame.getCurrentPlayer() != player1) {
-      testGame.makeTurn()
-    }
-    player2.fold()
-    player3.allIn()
-
-    // when/then
-    testGame.makeTurn()
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-
-    testGame.makeTurn()
     assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
   }
 }
-

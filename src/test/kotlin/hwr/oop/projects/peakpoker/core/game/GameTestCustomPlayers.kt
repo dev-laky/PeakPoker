@@ -107,48 +107,44 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
   @Test
   fun `makeTurn skips all-in players with multiple players`() {
-    // given
     val player1 = Player("Hans")
     val player2 = Player("Peter")
     val player3 = Player("Max")
     val player4 = Player("Anna")
     val testGame =
-      Game(10, 20, listOf(player1, player2, player3, player4))
+      Game(
+        10, 20,
+        listOf(player1, player2, player3, player4)
+      )
 
-    player3.allIn()
+    testGame.allIn(player3)
+    testGame.allIn(player4)
 
-    while (testGame.getCurrentPlayer() != player2) {
-      testGame.makeTurn()
-    }
+    testGame.call(player1)
+    testGame.call(player2)
 
-    // when
-    testGame.makeTurn()
-
-    // then
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player4)
+    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
   }
 
   @Test
   fun `makeTurn skips folded players with multiple players`() {
-    // given
     val player1 = Player("Hans")
     val player2 = Player("Peter")
     val player3 = Player("Max")
     val player4 = Player("Anna")
     val testGame =
-      Game(10, 20, listOf(player1, player2, player3, player4))
+      Game(
+        10, 20,
+        listOf(player1, player2, player3, player4)
+      )
 
-    player2.fold()
+    testGame.fold(player3)
+    testGame.fold(player4)
 
-    while (testGame.getCurrentPlayer() != player1) {
-      testGame.makeTurn()
-    }
+    testGame.call(player1)
+    testGame.check(player2)
 
-    // when
-    testGame.makeTurn()
-
-    // then
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player3)
+    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
   }
 
   @Test
