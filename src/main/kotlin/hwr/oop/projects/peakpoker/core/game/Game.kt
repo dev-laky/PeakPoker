@@ -13,7 +13,7 @@ class Game(
 ) : GameInterface {
 
   // Variable to track the index of the small blind player within PlayersOnTable
-  val smallBlindIndex: Int = 0
+  private var smallBlindIndex: Int = 0
   val deck: Deck = Deck()
   val communityCards: CommunityCards = CommunityCards(emptyList(), this)
   val gameState = GameState.PRE_FLOP
@@ -58,15 +58,19 @@ class Game(
     return playersOnTable.maxOf { it.getBet() }
   }
 
+  fun getSmallBlindIndex(): Int {
+    return smallBlindIndex
+  }
+
   fun calculatePot(): Int {
-    return playersOnTable.sumOf { it.getBet() }
+        return playersOnTable.sumOf { it.getBet() }
   }
 
   fun checkPlayerValidity(player: Player): Boolean {
     return playersOnTable.none { it.name == player.name }
   }
 
-  fun makeTurn() {
+  private fun makeTurn() {
     val nextPlayer = getNextPlayer()
 
     // Skip any folded / all-in players
@@ -183,5 +187,6 @@ class Game(
     }
 
     raiseBetTo(getCurrentPlayer(), bigBlindAmount)
+    smallBlindIndex = (smallBlindIndex + 1) % playersOnTable.size
   }
 }
