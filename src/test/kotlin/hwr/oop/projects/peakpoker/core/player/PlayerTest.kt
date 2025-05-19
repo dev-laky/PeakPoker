@@ -139,7 +139,6 @@ class PlayerTest : AnnotationSpec() {
         assertThat(player.getChips()).isEqualTo(500)
     }
 
-    // All-in and fold tests
     @Test
     fun `allIn sets bet to all remaining chips and chips to zero`() {
         val player = Player("Hans", 500)
