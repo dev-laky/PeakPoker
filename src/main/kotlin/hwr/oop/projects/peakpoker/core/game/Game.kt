@@ -28,7 +28,7 @@ class Game(
     require(smallBlindAmount > 0) { "Small blind amount must be positive" }
     require(bigBlindAmount > 0) { "Big blind amount must be positive" }
     require(bigBlindAmount == smallBlindAmount * 2) { "Big blind amount must be exactly double the small blind amount" }
-    require(playersOnTable.size >= 2) { "Minimum number of players is 3" }
+    require(playersOnTable.size >= 2) { "Minimum number of players is 2" }
     require(playersOnTable.distinctBy { it.name }.size == playersOnTable.size) { "All players must be unique" }
 
     // Set the blinds for the players at the table
