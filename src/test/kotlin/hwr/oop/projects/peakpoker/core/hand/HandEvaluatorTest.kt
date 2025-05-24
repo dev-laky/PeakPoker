@@ -41,7 +41,6 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
     private val dummyPlayer = object : PlayerInterface { override val name: String = "dummyPlayer" }
 
-
     @Test
     fun `high card is recognized`() {
         val cards = listOf(
@@ -51,7 +50,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, JACK),
             Card(HEARTS, KING)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.HIGH_CARD
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.HIGH_CARD)
     }
 
     @Test
@@ -63,7 +62,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, SEVEN),
             Card(HEARTS, NINE)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.ONE_PAIR
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.ONE_PAIR)
     }
 
     @Test
@@ -75,7 +74,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, FOUR),
             Card(HEARTS, KING)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.TWO_PAIR
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.TWO_PAIR)
     }
 
     @Test
@@ -87,7 +86,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, KING),
             Card(HEARTS, THREE)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.THREE_OF_A_KIND
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.THREE_OF_A_KIND)
     }
 
     @Test
@@ -99,7 +98,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, SIX),
             Card(HEARTS, SEVEN)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
     }
 
     @Test
@@ -111,7 +110,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, FIVE),
             Card(HEARTS, ACE)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
     }
 
     @Test
@@ -123,9 +122,8 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(CLUBS, JACK),
             Card(CLUBS, KING)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.FLUSH
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FLUSH)
     }
-
     @Test
     fun `full house is recognized`() {
         val cards = listOf(
@@ -135,7 +133,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(DIAMONDS, QUEEN),
             Card(HEARTS, QUEEN)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.FULL_HOUSE
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FULL_HOUSE)
     }
 
     @Test
@@ -147,7 +145,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, KING),
             Card(HEARTS, TWO)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.FOUR_OF_A_KIND
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FOUR_OF_A_KIND)
     }
 
     @Test
@@ -159,7 +157,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, EIGHT),
             Card(SPADES, NINE)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.STRAIGHT_FLUSH
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT_FLUSH)
     }
 
     @Test
@@ -171,24 +169,24 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(HEARTS, KING),
             Card(HEARTS, ACE)
         )
-        HandEvaluator.evaluate(cards) shouldBe HandRank.ROYAL_FLUSH
+        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.ROYAL_FLUSH)
     }
 
     @Test
     fun `evaluate throws exception on invalid list size`() {
-        shouldThrow<IllegalArgumentException> {
+        assertThatThrownBy {
             HandEvaluator.evaluate(
                 listOf(
                     Card(HEARTS, ACE),
                     Card(HEARTS, KING)
                 )
             )
-        }
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
     fun `evaluate throws exception on duplicates`() {
-        shouldThrow<IllegalArgumentException> {
+        assertThatThrownBy {
             HandEvaluator.evaluate(
                 listOf(
                     Card(HEARTS, ACE),
@@ -198,8 +196,12 @@ class HandEvaluatorTest : AnnotationSpec() {
                     Card(SPADES, FOUR)
                 )
             )
-        }
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
+
+
+
+
     @Test
     fun `evaluateAll throws exception if total cards unequal 7`() {
         // get = 2 cards, community = 0 cards -> totalCards = 2 != 7

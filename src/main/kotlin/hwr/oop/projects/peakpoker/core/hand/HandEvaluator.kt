@@ -13,7 +13,7 @@ object HandEvaluator {
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
 
-        val ranks = cards.map { it.rank }.sorted() // omitted it.rank.ordinal
+        val ranks = cards.map { it.rank }.sortedBy { it.value } // explicitly sort by rank value
         val suits = cards.map { it.suit }
         val rankCounts = ranks.groupingBy { it }.eachCount().values.sortedDescending()
         val isFlush = suits.distinct().size == 1
@@ -32,7 +32,9 @@ object HandEvaluator {
         val isStraight = isSequential || isWheel
 
         return when {
-            isStraight && isFlush && ranks.maxOrNull() == Rank.ACE         -> HandRank.ROYAL_FLUSH
+            isStraight && isFlush && ranks == listOf(
+                Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE
+            )                                                              -> HandRank.ROYAL_FLUSH
             isStraight && isFlush                                          -> HandRank.STRAIGHT_FLUSH
             rankCounts[0] == 4                                             -> HandRank.FOUR_OF_A_KIND
             rankCounts[0] == 3 && rankCounts[1] == 2                       -> HandRank.FULL_HOUSE
