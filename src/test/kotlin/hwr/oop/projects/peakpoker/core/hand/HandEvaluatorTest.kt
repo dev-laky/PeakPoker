@@ -304,13 +304,12 @@ class HandEvaluatorTest : AnnotationSpec() {
         ).isEqualTo(tripletsHand)
     }
 
-    // NEW SECTION: Additional Tests for evaluateAll
+    // SECTION: Additional Tests for evaluateAll
 
     /*
-     * These tests cover various scenarios for the updated(25.05.2025) evaluateAll function,since
-     * in the past it couldn't decide between two of the same hand ranks which
-     * one to return, so I added the logic for it to always return the one with the
-     * higher kicker.
+     * These tests cover various scenarios for the evaluateAll function,
+     * ensuring it correctly selects the hand with the higher kicker when
+     * two hands have the same rank.
      */
 
     /**
