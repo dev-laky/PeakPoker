@@ -20,22 +20,23 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
+import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import io.kotest.core.spec.style.AnnotationSpec
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 
 class HandComparatorTest : AnnotationSpec() {
-
     private val mockPlayer = object : PlayerInterface {
         override val name = "dummy"
     }
+
     private val mockGame = object : GameInterface {
-        override val id = 0
+        override val id: GameId = GameId("dummyId")
     }
 
     @Test
-    fun highCard_secondKickerWins() {
+    fun `high card with higher second kicker wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, ACE),
@@ -58,12 +59,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareHighCard(h1, h2, community) > 0)
-        assertTrue(compareHighCard(h2, h1, community) < 0)
+        assertThat(compareHighCard(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareHighCard(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun onePair_higherPairWins() {
+    fun `one pair with higher pair value wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, ACE),
@@ -86,12 +87,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareOnePair(h1, h2, community) > 0)
-        assertTrue(compareOnePair(h2, h1, community) < 0)
+        assertThat(compareOnePair(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareOnePair(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun onePair_kickerBreaksTie() {
+    fun `one pair with same value uses kicker to break tie`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, ACE),
@@ -114,12 +115,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareOnePair(h1, h2, community) > 0)
-        assertTrue(compareOnePair(h2, h1, community) < 0)
+        assertThat(compareOnePair(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareOnePair(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun twoPair_higherTopPairWins() {
+    fun `two pair with higher top pair wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, ACE),
@@ -142,12 +143,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareTwoPair(h1, h2, community) > 0)
-        assertTrue(compareTwoPair(h2, h1, community) < 0)
+        assertThat(compareTwoPair(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareTwoPair(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun twoPair_secondPairBreaksTie() {
+    fun `two pair with same top pair uses second pair to break tie`() {
         // Both share top pair of Kings from the board
         // h1 makes his second pair with A + A
         val h1 = HoleCards(
@@ -177,12 +178,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // h1 has K-K & A-A, h2 has K-K & Q-Q -> Aces beat Queens
-        assertTrue(compareTwoPair(h1, h2, community) > 0)
-        assertTrue(compareTwoPair(h2, h1, community) < 0)
+        assertThat(compareTwoPair(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareTwoPair(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun twoPair_kickerBreaksTie() {
+    fun `two pair with identical pairs uses kicker to break tie`() {
         // Both share Q-Q and J-J from the board…
         val community = CommunityCards(
             listOf(
@@ -211,12 +212,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // h1 has two‐pair (Qs & Js) with A kicker; h2 has same two‐pair with K kicker
-        assertTrue(compareTwoPair(h1, h2, community) > 0)
-        assertTrue(compareTwoPair(h2, h1, community) < 0)
+        assertThat(compareTwoPair(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareTwoPair(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun threeOfAKind_tripsRankWins() {
+    fun `three of a kind with higher trips rank wins`() {
         // h1: one Queen in the hole + TWO Queens on board → exactly three Queens
         val h1 = HoleCards(
             listOf(
@@ -245,12 +246,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // Three Queens > three Jacks
-        assertTrue(compareThreeOfAKind(h1, h2, community) > 0)
-        assertTrue(compareThreeOfAKind(h2, h1, community) < 0)
+        assertThat(compareThreeOfAKind(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareThreeOfAKind(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun threeOfAKind_kickerBreaksTie() {
+    fun `three of a kind with same trips uses kicker to break tie`() {
         // both make exactly three Tens
         // h1’s hole cards give him an Ace kicker
         val h1 = HoleCards(
@@ -280,12 +281,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // trips(T) + {A,9}  vs. trips(T) + {K,9}
-        assertTrue(compareThreeOfAKind(h1, h2, community) > 0)
-        assertTrue(compareThreeOfAKind(h2, h1, community) < 0)
+        assertThat(compareThreeOfAKind(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareThreeOfAKind(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun straight_normalHighWins() {
+    fun `straight with higher top card wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, SIX),
@@ -308,11 +309,11 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareStraight(h1, h2, community) > 0)
+        assertThat(compareStraight(h1, h2, community)).isGreaterThan(0)
     }
 
     @Test
-    fun straight_wheelVsNormal() {
+    fun `straight wheel ranks lower than normal straight`() {
         // P1 makes the wheel:  A-2-3-4-5
         val h1 = HoleCards(
             listOf(
@@ -341,12 +342,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // Now 6-high > 5-high
-        assertTrue(compareStraight(h1, h2, community) < 0)
-        assertTrue(compareStraight(h2, h1, community) > 0)
+        assertThat(compareStraight(h1, h2, community)).isLessThan(0)
+        assertThat(compareStraight(h2, h1, community)).isGreaterThan(0)
     }
 
     @Test
-    fun flush_highestFlushWins() {
+    fun `flush with higher top card wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(HEARTS, ACE),
@@ -369,11 +370,11 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareFlush(h1, h2, community) > 0)
+        assertThat(compareFlush(h1,h2, community)).isGreaterThan(0)
     }
 
     @Test
-    fun fullHouse_tripsBreaksTie() {
+    fun `full house with higher three of a kind wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, JACK),
@@ -396,12 +397,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-        assertTrue(compareFullHouse(h1, h2, community) > 0)
-        assertTrue(compareFullHouse(h2, h1, community) < 0)
+        assertThat(compareFullHouse(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareFullHouse(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun fullHouse_pairBreaksTie() {
+    fun `full house with same trips uses pair to break tie`() {
         // both get  Trips and Jacks from the Board
         val community = CommunityCards(
             listOf(
@@ -430,12 +431,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // King > Queen
-        assertTrue(compareFullHouse(h1, h2, community) > 0)
-        assertTrue(compareFullHouse(h2, h1, community) < 0)
+        assertThat(compareFullHouse(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareFullHouse(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun fourOfAKind_quadRankWins() {
+    fun `four of a kind with higher quad rank wins`() {
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, NINE),
@@ -459,14 +460,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-
-        assertTrue(compareFourOfAKind(h1, h2, community) > 0)
-        assertTrue(compareFourOfAKind(h2, h1, community) < 0)
+        assertThat(compareFourOfAKind(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareFourOfAKind(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun fourOfAKind_kickerBreaksTie() {
-
+    fun `four of a kind with same quads uses kicker to break tie`() {
         val community = CommunityCards(
             listOf(
                 Card(CLUBS, SEVEN),
@@ -491,12 +490,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockPlayer
         )
 
-        assertTrue(compareFourOfAKind(h1, h2, community) > 0)
-        assertTrue(compareFourOfAKind(h2, h1, community) < 0)
+        assertThat(compareFourOfAKind(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareFourOfAKind(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun straightFlush_highWins() {
+    fun `straight flush with higher top card wins`() {
         // h1 makes the A-high SF: A♠ + {10♥, J♥, Q♥, K♥} from the board
         val h1 = HoleCards(
             listOf(
@@ -525,12 +524,12 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // h1: ♥A-10-J-Q-K  vs  h2: ♥9-10-J-Q-K
-        assertTrue(compareStraightFlush(h1, h2, community) > 0)
-        assertTrue(compareStraightFlush(h2, h1, community) < 0)
+        assertThat(compareStraightFlush(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareStraightFlush(h2, h1, community)).isLessThan(0)
     }
 
     @Test
-    fun straightFlush_wheelVsNormal() {
+    fun `straight flush wheel ranks lower than normal straight flush`() {
         // h1 plus 6♥+7♥ to 7-high SF (3-4-5-6-7)
         val h1 = HoleCards(
             listOf(
@@ -559,7 +558,7 @@ class HandComparatorTest : AnnotationSpec() {
         )
 
         // 7-high SF beats Wheel SF
-        assertTrue(compareStraightFlush(h1, h2, community) > 0)
-        assertTrue(compareStraightFlush(h2, h1, community) < 0)
+        assertThat(compareStraightFlush(h1, h2, community)).isGreaterThan(0)
+        assertThat(compareStraightFlush(h2, h1, community)).isLessThan(0)
     }
 }

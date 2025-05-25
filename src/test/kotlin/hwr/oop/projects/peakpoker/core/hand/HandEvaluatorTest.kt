@@ -22,19 +22,17 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
+import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluate
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluateAll
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.getBestCombo
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
-
 
 class HandEvaluatorTest : AnnotationSpec() {
     private val mockGame = object : GameInterface {
-        override val id: Int = 0
-        //override val name: String = "dummyGame"
+        override val id: GameId = GameId("dummyGameId")
     }
     private val dummyPlayer = object : PlayerInterface { override val name: String = "dummyPlayer" }
 
@@ -171,19 +169,19 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     @Test
     fun `evaluate throws exception on invalid list size`() {
-        assertThatThrownBy {
+        shouldThrow<IllegalArgumentException> {
             HandEvaluator.evaluate(
                 listOf(
                     Card(HEARTS, ACE),
                     Card(HEARTS, KING)
                 )
             )
-        }.isInstanceOf(IllegalArgumentException::class.java)
+        }
     }
 
     @Test
     fun `evaluate throws exception on duplicates`() {
-        assertThatThrownBy {
+        shouldThrow<IllegalArgumentException> {
             HandEvaluator.evaluate(
                 listOf(
                     Card(HEARTS, ACE),
@@ -193,11 +191,8 @@ class HandEvaluatorTest : AnnotationSpec() {
                     Card(SPADES, FOUR)
                 )
             )
-        }.isInstanceOf(IllegalArgumentException::class.java)
+        }
     }
-
-
-
 
     @Test
     fun `evaluateAll throws exception if total cards unequal 7`() {
@@ -209,11 +204,11 @@ class HandEvaluatorTest : AnnotationSpec() {
         )
         val community = CommunityCards(emptyList(), mockGame) // empty possible
 
-        assertThatThrownBy { evaluateAll(hole, community) }
-            .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("Total cards must be 7")
+        val exception = shouldThrow<IllegalArgumentException> {
+            evaluateAll(hole, community)
+        }
+        assertThat(exception.message).contains("Total cards must be 7")
     }
-
 
     @Test
     fun `evaluateAll recognizes four of a kind`() {
