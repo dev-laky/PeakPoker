@@ -3,83 +3,97 @@ package hwr.oop.projects.peakpoker.core.hand
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
-import hwr.oop.projects.peakpoker.core.card.Rank
 
 object HandEvaluator {
     /**
      * Evaluates the best HandRank from exactly five cards.
      */
-    internal fun evaluate(cards: List<Card>): HandRank {
+    fun evaluate(cards: List<Card>): HandRank {
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
 
-        val ranks = cards.map { it.rank }.sortedBy { it.value } // explicitly sort by rank value
+        val ranks = cards.map { it.rank }
         val suits = cards.map { it.suit }
         val rankCounts = ranks.groupingBy { it }.eachCount().values.sortedDescending()
         val isFlush = suits.distinct().size == 1
 
-        // Straight detection (including wheel A-2-3-4-5)
-        val sortedValues = ranks.map { it.value }.sorted()
-        val isSequential = sortedValues.zipWithNext().all { (a, b) -> b == a + 1 }
-        // special case: 2,3,4,5,A (where A has value==13)
-        val isWheel = sortedValues == listOf(
-            Rank.TWO.value,
-            Rank.THREE.value,
-            Rank.FOUR.value,
-            Rank.FIVE.value,
-            Rank.ACE.value
-        )
-        val isStraight = isSequential || isWheel
+        val values = ranks.map { it.value }.sorted()
+        val isWheel = values == listOf(1, 2, 3, 4, 13)
+        val isSequential = values.zipWithNext().all { (a, b) -> b == a + 1 }
+        val isStraight = isWheel || isSequential
+        val isRoyal = values == listOf(9, 10, 11, 12, 13)
 
         return when {
-            isStraight && isFlush && ranks == listOf(
-                Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE
-            )                                                              -> HandRank.ROYAL_FLUSH
-            isStraight && isFlush                                          -> HandRank.STRAIGHT_FLUSH
-            rankCounts[0] == 4                                             -> HandRank.FOUR_OF_A_KIND
-            rankCounts[0] == 3 && rankCounts[1] == 2                       -> HandRank.FULL_HOUSE
-            isFlush                                                        -> HandRank.FLUSH
-            isStraight                                                     -> HandRank.STRAIGHT
-            rankCounts[0] == 3                                             -> HandRank.THREE_OF_A_KIND
-            rankCounts[0] == 2 && rankCounts[1] == 2                       -> HandRank.TWO_PAIR
-            rankCounts[0] == 2                                             -> HandRank.ONE_PAIR
-            else                                                           -> HandRank.HIGH_CARD
+            isRoyal && isFlush -> HandRank.ROYAL_FLUSH
+            isStraight && isFlush -> HandRank.STRAIGHT_FLUSH
+            rankCounts[0] == 4 -> HandRank.FOUR_OF_A_KIND
+            rankCounts[0] == 3 && rankCounts[1] == 2 -> HandRank.FULL_HOUSE
+            isFlush -> HandRank.FLUSH
+            isStraight -> HandRank.STRAIGHT
+            rankCounts[0] == 3 -> HandRank.THREE_OF_A_KIND
+            rankCounts[0] == 2 && rankCounts[1] == 2 -> HandRank.TWO_PAIR
+            rankCounts[0] == 2 -> HandRank.ONE_PAIR
+            else -> HandRank.HIGH_CARD
         }
     }
 
-    /**
-     * Combines hole cards and community cards, evaluates all 5-card combinations,
-     * and returns the highest HandRank.
-     */
     fun evaluateAll(hole: HoleCards, community: CommunityCards): HandRank {
+        return evaluate(getBestCombo(hole, community))
+    }
+
+    fun compareHands(h1: List<Card>, h2: List<Card>): Int {
+        val rank1 = evaluate(h1)
+        val rank2 = evaluate(h2)
+
+        if (rank1 != rank2) {
+            return rank1.ordinal.compareTo(rank2.ordinal)
+        }
+
+        val v1 = h1.map { it.rank.value }.sortedDescending()
+        val v2 = h2.map { it.rank.value }.sortedDescending()
+
+        for (i in v1.indices) {
+            val cmp = v1[i].compareTo(v2[i])
+            if (cmp != 0) return cmp
+        }
+
+        return 0
+    }
+
+    fun getBestCombo(hole: HoleCards, community: CommunityCards): List<Card> {
         val allCards = hole.cards + community.cards
         require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 
-        var bestRank = HandRank.HIGH_CARD               // default
-        val n = allCards.size                           // will be 7 anyway
-        val totalMasks = 1 shl n                        // 128 = 2^7 -> possible subsets
+        var bestCombo: List<Card>? = null
+        var bestRank = HandRank.HIGH_CARD
+        val n = allCards.size
+        val totalMasks = 1 shl n
+
         for (mask in 0 until totalMasks) {
-            if (Integer.bitCount(mask) == 5) {          // look at every 5-card combo
+            if (Integer.bitCount(mask) == 5) {
                 val combo = mutableListOf<Card>()
                 for (i in 0 until n) {
-                    if (mask shr i and 1 == 1) combo += allCards[i]
+                    if ((mask shr i) and 1 == 1) combo += allCards[i]
                 }
                 val rank = evaluate(combo)
                 if (rank.ordinal > bestRank.ordinal) {
                     bestRank = rank
+                    bestCombo = combo
+                } else if (rank.ordinal == bestRank.ordinal) {
+                    if (bestCombo == null || compareHands(combo, bestCombo) > 0) {
+                        bestCombo = combo
+                    }
                 }
             }
         }
-        return bestRank
+        return bestCombo ?: emptyList()
     }
 
-    /**
-     * Determines the HoleCards with the strongest 5-card HandRank
-     * by evaluating all possible combinations with the community cards.
-     */
     fun getHighestHandRank(hands: List<HoleCards>, community: CommunityCards): HoleCards {
         return hands.maxByOrNull { hand ->
             evaluateAll(hand, community).ordinal
         } ?: throw IllegalStateException("No hands to evaluate")
     }
+
 }
+

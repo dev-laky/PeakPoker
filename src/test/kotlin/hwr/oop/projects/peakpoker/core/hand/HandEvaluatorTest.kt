@@ -1,18 +1,16 @@
 package hwr.oop.projects.peakpoker.core.hand
 
 import io.kotest.core.spec.style.AnnotationSpec
-import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
-import hwr.oop.projects.peakpoker.core.card.Rank
+
 import hwr.oop.projects.peakpoker.core.card.Suit.CLUBS
 import hwr.oop.projects.peakpoker.core.card.Suit.HEARTS
 import hwr.oop.projects.peakpoker.core.card.Suit.DIAMONDS
 import hwr.oop.projects.peakpoker.core.card.Suit.SPADES
-
 import hwr.oop.projects.peakpoker.core.card.Rank.TWO
 import hwr.oop.projects.peakpoker.core.card.Rank.THREE
 import hwr.oop.projects.peakpoker.core.card.Rank.FOUR
@@ -26,8 +24,10 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
-import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.game.GameInterface
+import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluate
+import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluateAll
+import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.getBestCombo
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -35,7 +35,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HandEvaluatorTest : AnnotationSpec() {
 
-    private val MockGame = object : GameInterface {
+    private val mockGame = object : GameInterface {
         override val id: Int = 0
         //override val name: String = "dummyGame"
     }
@@ -50,7 +50,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, JACK),
             Card(HEARTS, KING)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.HIGH_CARD)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.HIGH_CARD)
     }
 
     @Test
@@ -62,7 +62,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, SEVEN),
             Card(HEARTS, NINE)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.ONE_PAIR)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.ONE_PAIR)
     }
 
     @Test
@@ -74,7 +74,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, FOUR),
             Card(HEARTS, KING)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.TWO_PAIR)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.TWO_PAIR)
     }
 
     @Test
@@ -86,7 +86,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, KING),
             Card(HEARTS, THREE)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.THREE_OF_A_KIND)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.THREE_OF_A_KIND)
     }
 
     @Test
@@ -98,19 +98,19 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, SIX),
             Card(HEARTS, SEVEN)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
     }
 
     @Test
     fun `wheel straight is recognized`() {
         val cards = listOf(
-            Card(HEARTS, TWO),
+            Card(SPADES, FIVE),
             Card(DIAMONDS, THREE),
             Card(CLUBS, FOUR),
-            Card(SPADES, FIVE),
-            Card(HEARTS, ACE)
+            Card(HEARTS, TWO),
+            Card(SPADES, ACE)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
     }
 
     @Test
@@ -122,7 +122,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(CLUBS, JACK),
             Card(CLUBS, KING)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FLUSH)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.FLUSH)
     }
     @Test
     fun `full house is recognized`() {
@@ -133,7 +133,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(DIAMONDS, QUEEN),
             Card(HEARTS, QUEEN)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FULL_HOUSE)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.FULL_HOUSE)
     }
 
     @Test
@@ -145,7 +145,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, KING),
             Card(HEARTS, TWO)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.FOUR_OF_A_KIND)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.FOUR_OF_A_KIND)
     }
 
     @Test
@@ -157,7 +157,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(SPADES, EIGHT),
             Card(SPADES, NINE)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.STRAIGHT_FLUSH)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT_FLUSH)
     }
 
     @Test
@@ -169,7 +169,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(HEARTS, KING),
             Card(HEARTS, ACE)
         )
-        assertThat(HandEvaluator.evaluate(cards)).isEqualTo(HandRank.ROYAL_FLUSH)
+        assertThat(evaluate(cards)).isEqualTo(HandRank.ROYAL_FLUSH)
     }
 
     @Test
@@ -210,9 +210,9 @@ class HandEvaluatorTest : AnnotationSpec() {
             Card(DIAMONDS, THREE)),
             dummyPlayer
         )
-        val community = CommunityCards(emptyList(), MockGame) // empty possible
+        val community = CommunityCards(emptyList(), mockGame) // empty possible
 
-        assertThatThrownBy { HandEvaluator.evaluateAll(hole, community) }
+        assertThatThrownBy { evaluateAll(hole, community) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Total cards must be 7")
     }
@@ -228,7 +228,7 @@ class HandEvaluatorTest : AnnotationSpec() {
                 Card(DIAMONDS, TWO),
                 Card(HEARTS, THREE)
             ),
-            MockGame
+            mockGame
         )
         val hole = HoleCards(
             listOf(
@@ -237,7 +237,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             dummyPlayer
         )
 
-        assertThat(HandEvaluator.evaluateAll(hole, community))
+        assertThat(evaluateAll(hole, community))
             .isEqualTo(HandRank.FOUR_OF_A_KIND)
     }
 
@@ -251,7 +251,7 @@ class HandEvaluatorTest : AnnotationSpec() {
                 Card(HEARTS, NINE),
                 Card(HEARTS, JACK)
             ),
-            MockGame
+            mockGame
         )
         val hole = HoleCards(
             listOf(
@@ -260,7 +260,7 @@ class HandEvaluatorTest : AnnotationSpec() {
             dummyPlayer
         )
 
-        assertThat(HandEvaluator.evaluateAll(hole, community))
+        assertThat(evaluateAll(hole, community))
             .isEqualTo(HandRank.STRAIGHT_FLUSH)
     }
 
@@ -273,7 +273,7 @@ class HandEvaluatorTest : AnnotationSpec() {
                 Card(CLUBS, FOUR),
                 Card(SPADES, FIVE),
                 Card(HEARTS, SIX)),
-            MockGame
+            mockGame
         )
         shouldThrow<IllegalStateException> {
             HandEvaluator.getHighestHandRank(emptyList(), community)
@@ -290,7 +290,7 @@ class HandEvaluatorTest : AnnotationSpec() {
                 Card(SPADES, KING),
                 Card(HEARTS, TWO)
             ),
-            MockGame
+            mockGame
         )
 
         val twoPairHand  = HoleCards(listOf(
@@ -310,6 +310,110 @@ class HandEvaluatorTest : AnnotationSpec() {
                 community
             )
         ).isEqualTo(tripletsHand)
+    }
+
+    // NEW SECTION: Additional Tests for evaluateAll
+
+    /*
+     * These tests cover various scenarios for the updated(25.05.2025) evaluateAll function,since
+     * in the past it couldn't decide between two of the same hand ranks which
+     * one to return, so I added the logic for it to always return the one with the
+     * higher kicker.
+     */
+
+    /**
+     * Ensures that when two different three-of-a-kind combinations are possible,
+     * the evaluator correctly selects the one that forms a full house with the higher triplet.
+     * In this case, trips of 3 and trips of 4 are both present, so the best hand is 4♣ 4♦ 4♥ 3♠ 3♥.
+     */
+    @Test
+    fun `detects best of two three-of-a-kinds`() {
+        val hole = HoleCards(
+            player = dummyPlayer,
+            cards = listOf(Card(HEARTS, THREE), Card(SPADES, THREE))
+        )
+        val community = CommunityCards(
+            game = mockGame,
+            cards = listOf(
+                Card(CLUBS, THREE),
+                Card(DIAMONDS, FOUR),
+                Card(HEARTS, FOUR),
+                Card(CLUBS, FOUR),
+                Card(SPADES, SEVEN)
+            )
+        )
+
+        val rank = evaluateAll(hole, community)
+        assertThat(rank).isEqualTo(HandRank.FULL_HOUSE)
+
+        val bestCombo = getBestCombo(hole, community)
+        val grouped = bestCombo.groupBy { it.rank }
+        assertThat(grouped.filter { it.value.size == 3 }.keys).contains(FOUR)
+        assertThat(grouped.filter { it.value.size == 2 }.keys).contains(THREE)
+    }
+
+    /**
+     * Verifies that when no pairs or combinations exist, the hand rank is High Card,
+     * and the highest kicker (KING) is correctly recognized in the best hand.
+     */
+    @Test
+    fun `selects correct kicker in tie high card hands`() {
+        val hole = HoleCards(
+            player = dummyPlayer,
+            cards = listOf(Card(CLUBS, TWO), Card(HEARTS, FIVE))
+        )
+        val community = CommunityCards(
+            game = mockGame,
+            cards = listOf(
+                Card(SPADES, NINE),
+                Card(DIAMONDS, JACK),
+                Card(HEARTS, KING),
+                Card(HEARTS, THREE),
+                Card(CLUBS, FOUR)
+            )
+        )
+
+        val rank = evaluateAll(hole, community)
+        assertThat(rank).isEqualTo(HandRank.HIGH_CARD)
+
+        val bestCombo = getBestCombo(hole, community).map { it.rank.value }.sortedDescending()
+        assertThat(bestCombo.first()).isEqualTo(KING.value)
+        assertThat(bestCombo).containsAll(listOf(KING.value, JACK.value, NINE.value, FIVE.value, FOUR.value).map { it })
+    }
+
+    /**
+     * Confirms that in a one-pair scenario with tied pair values (pair of FIVES),
+     * the evaluator uses kickers to determine the stronger hand.
+     * Here, the hole card ACE should be included as the highest kicker.
+     */
+    @Test
+    fun `correctly resolves tie with better kickers in one pair`() {
+        val hole = HoleCards(
+            player = dummyPlayer,
+            cards = listOf(Card(CLUBS, ACE), Card(HEARTS, FIVE))
+        )
+        val community = CommunityCards(
+            game = mockGame,
+            cards = listOf(
+                Card(DIAMONDS, FIVE),
+                Card(SPADES, SEVEN),
+                Card(CLUBS, EIGHT),
+                Card(HEARTS, TEN),
+                Card(CLUBS, QUEEN)
+            )
+        )
+
+        val rank = evaluateAll(hole, community)
+        assertThat(rank).isEqualTo(HandRank.ONE_PAIR)
+
+        val bestCombo = getBestCombo(hole, community)
+        val groupedRanks = bestCombo.groupBy { it.rank }
+
+        assertThat(groupedRanks.filter { it.value.size == 2 }.keys).containsOnly(FIVE)
+
+        val kickerRanks = groupedRanks.filter { it.value.size == 1 }.keys.map { it.value }
+        assertThat(kickerRanks).contains(ACE.value)
+        assertThat(kickerRanks.maxOrNull()).isEqualTo(ACE.value)
     }
 }
 
