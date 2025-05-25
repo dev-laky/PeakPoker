@@ -2,11 +2,9 @@ package hwr.oop.projects.peakpoker.core.hand
 
 import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.assertions.throwables.shouldThrow
-
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
-
 import hwr.oop.projects.peakpoker.core.card.Suit.CLUBS
 import hwr.oop.projects.peakpoker.core.card.Suit.HEARTS
 import hwr.oop.projects.peakpoker.core.card.Suit.DIAMONDS
@@ -34,7 +32,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 
 
 class HandEvaluatorTest : AnnotationSpec() {
-
     private val mockGame = object : GameInterface {
         override val id: Int = 0
         //override val name: String = "dummyGame"
@@ -416,5 +413,3 @@ class HandEvaluatorTest : AnnotationSpec() {
         assertThat(kickerRanks.maxOrNull()).isEqualTo(ACE.value)
     }
 }
-
-

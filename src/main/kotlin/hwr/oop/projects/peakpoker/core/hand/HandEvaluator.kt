@@ -5,9 +5,6 @@ import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 object HandEvaluator {
-    /**
-     * Evaluates the best HandRank from exactly five cards.
-     */
     fun evaluate(cards: List<Card>): HandRank {
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
@@ -94,6 +91,5 @@ object HandEvaluator {
             evaluateAll(hand, community).ordinal
         } ?: throw IllegalStateException("No hands to evaluate")
     }
-
 }
 
