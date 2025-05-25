@@ -414,14 +414,12 @@ class HandComparatorTest : AnnotationSpec() {
             ), mockGame
         )
 
-
         val h1 = HoleCards(
             listOf(
                 Card(CLUBS, KING),
                 Card(DIAMONDS, KING)
             ), mockPlayer
         )
-
 
         val h2 = HoleCards(
             listOf(
