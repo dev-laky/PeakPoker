@@ -63,7 +63,7 @@ class Game(
   }
 
   fun calculatePot(): Int {
-        return playersOnTable.sumOf { it.getBet() }
+    return playersOnTable.sumOf { it.getBet() }
   }
 
   fun checkPlayerValidity(player: Player): Boolean {
