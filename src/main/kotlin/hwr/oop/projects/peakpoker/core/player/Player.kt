@@ -37,13 +37,15 @@ class Player(
   }
 
   fun assignHand(cards: HoleCards) {
-//    This check is already happening in the HoleCards constructor
-//    if (cards.cards.size != 2) {
-//      throw InvalidGameConfigurationException("A player must have exactly 2 hole cards")
-//    }
     hand = cards
   }
 
+  /**
+   * Sets the bet amount for the player.
+   *
+   * @param chips The amount of chips to bet
+   * @throws InvalidBetAmountException If the chips amount is not greater than zero
+   */
   fun setBetAmount(chips: Int) {
     if (chips <= 0) {
       throw InvalidBetAmountException("Chips amount must be greater than zero")
