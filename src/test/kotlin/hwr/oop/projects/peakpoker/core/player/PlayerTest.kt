@@ -5,6 +5,8 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
+import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -101,5 +103,45 @@ class PlayerTest : AnnotationSpec() {
 
     assertThat(player.getBet()).isEqualTo(0)
     assertThat(player.getChips()).isEqualTo(500)
+  }
+
+  @Test
+  fun `player creation with negative chips throws exception`() {
+    assertThatThrownBy {
+      Player("TestPlayer", -100)
+    }
+      .isExactlyInstanceOf(InsufficientChipsException::class.java)
+      .hasMessageContaining("Chips amount must be non-negative")
+  }
+
+  @Test
+  fun `player creation with zero chips is valid`() {
+    val player = Player("ZeroChipsPlayer", 0)
+    assertThat(player.getChips()).isEqualTo(0)
+  }
+
+  @Test
+  fun `player creation with positive chips is valid`() {
+    val chips = 150
+    val player = Player("TestPlayer", chips)
+    assertThat(player.getChips()).isEqualTo(chips)
+  }
+
+  @Test
+  fun `player creation with blank name throws exception`() {
+    assertThatThrownBy {
+      Player("", 100)
+    }
+      .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+      .hasMessageContaining("Player name cannot be blank")
+  }
+
+  @Test
+  fun `player creation with whitespace name throws exception`() {
+    assertThatThrownBy {
+      Player("   ", 100)
+    }
+      .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+      .hasMessageContaining("Player name cannot be blank")
   }
 }

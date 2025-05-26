@@ -59,7 +59,9 @@ class Player(
   }
 
   fun allIn() {
-    setBetAmount(this.chips)
+    val totalBet = chips + bet
+    chips = 0
+    setBetAmount(totalBet)
     isAllIn = true
   }
 }

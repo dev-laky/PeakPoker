@@ -3,6 +3,7 @@ package hwr.oop.projects.peakpoker.core.game
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
+import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -170,5 +171,76 @@ class GameTestCustomPlayers : AnnotationSpec() {
     )
 
     assertThat(testGame.id).isEqualTo(testGameId)
+  }
+
+  @Test
+  fun `game creation with empty player list throws exception`() {
+    assertThatThrownBy {
+      Game(
+        10, 20,
+        emptyList()
+      )
+    }
+      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .hasMessageContaining("Minimum number of players is 2")
+  }
+
+  @Test
+  fun `game creation with one player list throws exception`() {
+    assertThatThrownBy {
+      Game(
+        10, 20,
+        listOf(Player("Hans"))
+      )
+    }
+      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .hasMessageContaining("Minimum number of players is 2")
+  }
+
+  @Test
+  fun `getHighestBet updates when player goes all-in with higher amount`() {
+    // given
+    val player1 = Player("Hans", 100)
+    val player2 = Player("Peter", 200)
+    val richPlayer = Player("Rich", 500)
+    val customGame = Game(10, 20, listOf(player1, player2, richPlayer))
+
+    // when
+    customGame.allIn(richPlayer)
+
+    // then
+    assertThat(customGame.getHighestBet()).isEqualTo(500)
+    assertThat(richPlayer.isAllIn).isTrue()
+  }
+
+  @Test
+  fun `pot includes bets from all-in players`() {
+    val player1 = Player("Hans", 100)
+    val player2 = Player("Peter", 200)
+    val smallStackPlayer = Player("Poor", 40)
+    val customGame = Game(10, 20, listOf(player1, player2, smallStackPlayer))
+
+    customGame.allIn(smallStackPlayer)
+
+    assertThat(customGame.pot).isEqualTo(70) // 10 + 20 + 40
+    assertThat(smallStackPlayer.isAllIn).isTrue()
+  }
+
+  @Test
+  fun `pot is calculated correctly with multiple different bet amounts`() {
+    // given
+    val richPlayer = Player("Rich", 200)
+    val poorPlayer = Player("Poor", 50)
+    val mediumPlayer = Player("Medium", 100)
+    val customGame = Game(10, 20, listOf(richPlayer, poorPlayer, mediumPlayer))
+
+    // when
+    customGame.call(mediumPlayer) // Calls to 20
+    customGame.raiseBetTo(richPlayer, 40) // Raises to 40
+    customGame.allIn(poorPlayer) // All-in with 50
+
+    // then
+    assertThat(customGame.pot).isEqualTo(110) // 40 + 50 + 20
+    assertThat(customGame.pot).isEqualTo(richPlayer.getBet() + poorPlayer.getBet() + mediumPlayer.getBet())
   }
 }
