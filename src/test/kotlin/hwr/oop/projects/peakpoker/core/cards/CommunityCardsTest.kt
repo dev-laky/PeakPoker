@@ -4,6 +4,8 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
 import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
 import io.kotest.core.spec.style.AnnotationSpec
@@ -28,7 +30,7 @@ class CommunityCardsTest : AnnotationSpec() {
 
     val communityCards = CommunityCards(cards, mockGame)
 
-    assert(communityCards.cards.size == 5) { "Community cards should contain exactly five cards." }
+    assertThat(communityCards.cards).hasSize(5)
   }
 
   @Test
@@ -41,7 +43,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards, mockGame) }
-      .isInstanceOf(IllegalArgumentException::class.java)
+      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly five cards")
   }
 
@@ -57,7 +59,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards, mockGame) }
-      .isInstanceOf(IllegalArgumentException::class.java)
+      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly five cards")
   }
 
@@ -73,7 +75,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards, mockGame) }
-      .isInstanceOf(IllegalArgumentException::class.java)
+      .isExactlyInstanceOf(DuplicateCardException::class.java)
       .hasMessageContaining("duplicates")
   }
 

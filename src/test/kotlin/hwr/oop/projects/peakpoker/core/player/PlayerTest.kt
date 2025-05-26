@@ -4,9 +4,10 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import io.kotest.assertions.throwables.shouldThrow
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class PlayerTest : AnnotationSpec() {
   @Test
@@ -82,11 +83,10 @@ class PlayerTest : AnnotationSpec() {
   fun `bet validation throws exception for negative amounts`() {
     val player = Player("Hans", 500)
 
-    val exception = shouldThrow<IllegalArgumentException> {
-      player.setBetAmount(-1)
-    }
+    assertThatThrownBy { player.setBetAmount(-1) }
+      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
     assertThat(player.getBet()).isEqualTo(0)
     assertThat(player.getChips()).isEqualTo(500)
   }
@@ -95,11 +95,10 @@ class PlayerTest : AnnotationSpec() {
   fun `bet of zero amount is not accepted`() {
     val player = Player("Hans", 500)
 
-    val exception = shouldThrow<IllegalArgumentException> {
-      player.setBetAmount(0)
-    }
+    assertThatThrownBy { player.setBetAmount(0) }
+      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(exception.message).isEqualTo("Chips amount must be greater than zero")
     assertThat(player.getBet()).isEqualTo(0)
     assertThat(player.getChips()).isEqualTo(500)
   }

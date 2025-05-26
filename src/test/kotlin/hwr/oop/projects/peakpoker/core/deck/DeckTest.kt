@@ -86,6 +86,6 @@ class DeckTest : AnnotationSpec() {
     assertThat(deck.show()).isEmpty() // Check if the list is actually empty
 
     assertThatThrownBy { deck.draw() }
-      .isInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(IllegalStateException::class.java)
   }
 }

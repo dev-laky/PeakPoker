@@ -3,6 +3,9 @@ package hwr.oop.projects.peakpoker.core.game
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.deck.Deck
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
+import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game(
@@ -25,11 +28,21 @@ class Game(
   var currentPlayerIndex: Int = 0
 
   init {
-    require(smallBlindAmount > 0) { "Small blind amount must be positive" }
-    require(bigBlindAmount > 0) { "Big blind amount must be positive" }
-    require(bigBlindAmount == smallBlindAmount * 2) { "Big blind amount must be exactly double the small blind amount" }
-    require(playersOnTable.size >= 2) { "Minimum number of players is 2" }
-    require(playersOnTable.distinctBy { it.name }.size == playersOnTable.size) { "All players must be unique" }
+    if (smallBlindAmount <= 0) {
+      throw InvalidBlindConfigurationException("Small blind amount must be positive")
+    }
+    if (bigBlindAmount <= 0) {
+      throw InvalidBlindConfigurationException("Big blind amount must be positive")
+    }
+    if (bigBlindAmount != smallBlindAmount * 2) {
+      throw InvalidBlindConfigurationException("Big blind amount must be exactly double the small blind amount")
+    }
+    if (playersOnTable.size < 2) {
+      throw MinimumPlayersException("Minimum number of players is 2")
+    }
+    if (playersOnTable.distinctBy { it.name }.size != playersOnTable.size) {
+      throw DuplicatePlayerException("All players must be unique")
+    }
 
     // Set the blinds for the players at the table
     setBlinds()
@@ -63,7 +76,7 @@ class Game(
   }
 
   fun calculatePot(): Int {
-        return playersOnTable.sumOf { it.getBet() }
+    return playersOnTable.sumOf { it.getBet() }
   }
 
   fun checkPlayerValidity(player: Player): Boolean {

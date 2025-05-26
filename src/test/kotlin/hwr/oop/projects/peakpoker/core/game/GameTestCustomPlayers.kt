@@ -1,9 +1,11 @@
 package hwr.oop.projects.peakpoker.core.game
 
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.Player
-import io.kotest.assertions.throwables.shouldThrow
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class GameTestCustomPlayers : AnnotationSpec() {
   @Test
@@ -21,88 +23,99 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
   @Test
   fun `check if duplicate exception works`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         10, 20,
         listOf(Player("Hans"), Player("Hans"))
       )
     }
+      .isExactlyInstanceOf(DuplicatePlayerException::class.java)
+      .hasMessageContaining("All players must be unique")
   }
 
   @Test
   fun `negative small blind amount throws exceptions`() {
-    // negative small blind
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         -10, 20,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
   fun `negative big blind amount throws exceptions`() {
     // negative big blind
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         10, -20,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `zero small blind amount throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         0, 20,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
   fun `zero big blind amount throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         10, 0,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `big blind smaller than small blind throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         30, 20,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be exactly double")
   }
 
   @Test
   fun `big blind amount must be positive`() {
-    val exception = shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         10, 0,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
-
-    assertThat(exception.message).isEqualTo("Big blind amount must be positive")
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `big blind amount must be greater than or equal to small blind amount`() {
-    val exception = shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       Game(
         20, 10,
         listOf(Player("Hans"), Player("Peter"), Player("Max"))
       )
     }
-
-    assertThat(exception.message).isEqualTo("Big blind amount must be exactly double the small blind amount")
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be exactly double")
   }
 
   @Test
