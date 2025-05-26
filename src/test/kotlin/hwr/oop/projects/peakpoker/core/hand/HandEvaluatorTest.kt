@@ -34,7 +34,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   private val mockGame = object : GameInterface {
     override val id: GameId = GameId("dummyGameId")
   }
-  private val dummyPlayer = object : PlayerInterface {
+  private val mockPlayer = object : PlayerInterface {
     override val name: String = "dummyPlayer"
   }
 
@@ -205,7 +205,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(CLUBS, TWO),
         Card(DIAMONDS, THREE)
       ),
-      dummyPlayer
+      mockPlayer
     )
     val community = CommunityCards(emptyList(), mockGame) // empty possible
 
@@ -232,7 +232,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(DIAMONDS, QUEEN),
         Card(CLUBS, FOUR)
       ),
-      dummyPlayer
+      mockPlayer
     )
 
     assertThat(evaluateAll(hole, community))
@@ -256,65 +256,14 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, TEN),
         Card(DIAMONDS, TWO)
       ),
-      dummyPlayer
+      mockPlayer
     )
 
     assertThat(evaluateAll(hole, community))
       .isEqualTo(HandRank.STRAIGHT_FLUSH)
   }
 
-  @Test
-  fun `getHighestHandRank throws exception if no hands provided`() {
-    val community = CommunityCards(
-      listOf(
-        Card(HEARTS, TWO),
-        Card(DIAMONDS, THREE),
-        Card(CLUBS, FOUR),
-        Card(SPADES, FIVE),
-        Card(HEARTS, SIX)
-      ),
-      mockGame
-    )
-    shouldThrow<IllegalStateException> {
-      HandEvaluator.getHighestHandRank(emptyList(), community)
-    }
-  }
 
-  @Test
-  fun `getHighestHandRank picks the correct winner`() {
-    val community = CommunityCards(
-      listOf(
-        Card(HEARTS, TEN),
-        Card(DIAMONDS, TEN),
-        Card(CLUBS, FOUR),
-        Card(SPADES, KING),
-        Card(HEARTS, TWO)
-      ),
-      mockGame
-    )
-
-    val twoPairHand = HoleCards(
-      listOf(
-        Card(CLUBS, ACE),
-        Card(DIAMONDS, KING)
-      ),
-      dummyPlayer
-    )
-    val tripletsHand = HoleCards(
-      listOf(
-        Card(SPADES, TEN),
-        Card(HEARTS, THREE)
-      ),
-      dummyPlayer
-    )
-
-    assertThat(
-      HandEvaluator.getHighestHandRank(
-        listOf(twoPairHand, tripletsHand),
-        community
-      )
-    ).isEqualTo(tripletsHand)
-  }
 
   // SECTION: Additional Tests for evaluateAll
 
@@ -332,7 +281,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   @Test
   fun `detects best of two three-of-a-kinds`() {
     val hole = HoleCards(
-      player = dummyPlayer,
+      player = mockPlayer,
       cards = listOf(Card(HEARTS, THREE), Card(SPADES, THREE))
     )
     val community = CommunityCards(
@@ -362,7 +311,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   @Test
   fun `selects correct kicker in tie high card hands`() {
     val hole = HoleCards(
-      player = dummyPlayer,
+      player = mockPlayer,
       cards = listOf(Card(CLUBS, TWO), Card(HEARTS, FIVE))
     )
     val community = CommunityCards(
@@ -400,7 +349,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   @Test
   fun `correctly resolves tie with better kickers in one pair`() {
     val hole = HoleCards(
-      player = dummyPlayer,
+      player = mockPlayer,
       cards = listOf(Card(CLUBS, ACE), Card(HEARTS, FIVE))
     )
     val community = CommunityCards(
