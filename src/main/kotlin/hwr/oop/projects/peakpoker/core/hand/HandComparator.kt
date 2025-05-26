@@ -1,6 +1,10 @@
 package hwr.oop.projects.peakpoker.core.hand
 
-import hwr.oop.projects.peakpoker.core.card.*
+import hwr.oop.projects.peakpoker.core.card.Card
+import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.card.CommunityCards
+import hwr.oop.projects.peakpoker.core.card.Rank
+import hwr.oop.projects.peakpoker.core.card.Suit
 
 /** Help function to find the highest straight value in a set of ranks.
  * Returns the highest rank of a straight (5-14), or null if no straight is possible.
