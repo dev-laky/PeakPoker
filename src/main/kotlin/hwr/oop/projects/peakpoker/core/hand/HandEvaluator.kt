@@ -6,10 +6,38 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 object HandEvaluator {
 
-    fun determineHighestHand(HoleCardsList: List<HoleCards>, community: CommunityCards): HoleCards {
-        TODO("Implement")
+
+    /**
+     * Determines the player with the highest hand among a list of players.
+     *
+     * @param holeCardsList A list of `HoleCards` representing each player's cards.
+     * @param community The `CommunityCards` shared by all players.
+     * @return The `HoleCards` of the player with the highest hand.
+     * @throws IllegalArgumentException If the list of players is empty.
+     */
+    fun determineHighestHand(holeCardsList: List<HoleCards>, community: CommunityCards): HoleCards {
+        require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
+
+        var bestPlayer = holeCardsList.first()
+        var bestHand = getBestCombo(bestPlayer, community)
+
+        for (player in holeCardsList.drop(1)) {
+            val currentHand = getBestCombo(player, community)
+            if (compareHands(currentHand, bestHand) > 0) {
+                bestHand = currentHand
+                bestPlayer = player
+            }
+        }
+        return bestPlayer
     }
 
+    /**
+     * Evaluates the rank of a given hand of cards.
+     *
+     * @param cards A list of `Card` objects representing the hand to evaluate.
+     * @return The `HandRank` of the evaluated hand.
+     * @throws IllegalArgumentException If the hand does not contain exactly 5 unique cards.
+     */
     fun evaluate(cards: List<Card>): HandRank {
         require(cards.size == 5) { "Hand must contain exactly 5 cards" }
         require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
@@ -29,23 +57,28 @@ object HandEvaluator {
         val isRoyal = values == listOf(9, 10, 11, 12, 13)
 
         return when {
-            isRoyal && isFlush -> HandRank.ROYAL_FLUSH
-            isStraight && isFlush -> HandRank.STRAIGHT_FLUSH
-            rankCounts[0] == 4 -> HandRank.FOUR_OF_A_KIND
-            rankCounts[0] == 3 && rankCounts[1] == 2 -> HandRank.FULL_HOUSE
-            isFlush -> HandRank.FLUSH
-            isStraight -> HandRank.STRAIGHT
-            rankCounts[0] == 3 -> HandRank.THREE_OF_A_KIND
-            rankCounts[0] == 2 && rankCounts[1] == 2 -> HandRank.TWO_PAIR
-            rankCounts[0] == 2 -> HandRank.ONE_PAIR
-            else -> HandRank.HIGH_CARD
+            isRoyal && isFlush                          -> HandRank.ROYAL_FLUSH
+            isStraight && isFlush                       -> HandRank.STRAIGHT_FLUSH
+            rankCounts[0] == 4                          -> HandRank.FOUR_OF_A_KIND
+            rankCounts[0] == 3 && rankCounts[1] == 2    -> HandRank.FULL_HOUSE
+            isFlush                                     -> HandRank.FLUSH
+            isStraight                                  -> HandRank.STRAIGHT
+            rankCounts[0] == 3                          -> HandRank.THREE_OF_A_KIND
+            rankCounts[0] == 2 && rankCounts[1] == 2    -> HandRank.TWO_PAIR
+            rankCounts[0] == 2                          -> HandRank.ONE_PAIR
+            else                                        -> HandRank.HIGH_CARD
         }
     }
 
-    fun evaluateAll(hole: HoleCards, community: CommunityCards): HandRank {
-        return evaluate(getBestCombo(hole, community))
-    }
+    //deleted evaluate all, logic already in evaluate
 
+    /**
+     * Compares two hands of cards to determine which is stronger.
+     *
+     * @param h1 A list of `Card` objects representing the first hand.
+     * @param h2 A list of `Card` objects representing the second hand.
+     * @return An integer: positive if `h1` is stronger, negative if `h2` is stronger, or zero if they are equal.
+     */
     fun compareHands(h1: List<Card>, h2: List<Card>): Int {
         val rank1 = evaluate(h1)
         val rank2 = evaluate(h2)
@@ -65,6 +98,15 @@ object HandEvaluator {
         return 0
     }
 
+
+    /**
+     * Finds the best combination of 5 cards from a player's hole cards and the community cards.
+     *
+     * @param hole The `HoleCards` of the player.
+     * @param community The `CommunityCards` shared by all players.
+     * @return A list of `Card` objects representing the best combination of 5 cards.
+     * @throws IllegalArgumentException If the total number of cards is not 7.
+     */
     fun getBestCombo(hole: HoleCards, community: CommunityCards): List<Card> {
         val allCards = hole.cards + community.cards
         require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
@@ -102,7 +144,5 @@ object HandEvaluator {
 
         return bestCombo
     }
-
-
 }
 

@@ -25,17 +25,17 @@ import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluate
-import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluateAll
-import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.getBestCombo
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import org.assertj.core.api.Assertions.assertThat
 
 class HandEvaluatorTest : AnnotationSpec() {
+  private val mockPlayer = object : PlayerInterface {
+    override val name: String = "dummy"
+    val id: String = "dummyId"
+  }
+
   private val mockGame = object : GameInterface {
     override val id: GameId = GameId("dummyGameId")
-  }
-  private val mockPlayer = object : PlayerInterface {
-    override val name: String = "dummyPlayer"
   }
 
   @Test
@@ -197,185 +197,331 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
   }
 
+  //SECTION: HandEvaluator.determineHighestHand
+
+  /**
+   * Verifies that a single player wins by default when no competition exists.
+   */
   @Test
-  fun `evaluateAll throws exception if total cards unequal 7`() {
-    // get = 2 cards, community = 0 cards -> totalCards = 2 != 7
-    val hole = HoleCards(
+  fun `single player wins by default`() {
+    val holeCards = HoleCards(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, KING)
+      ), mockPlayer
+    )
+
+    val community = CommunityCards(
       listOf(
         Card(CLUBS, TWO),
-        Card(DIAMONDS, THREE)
-      ),
-      mockPlayer
-    )
-    val community = CommunityCards(emptyList(), mockGame) // empty possible
-
-    val exception = shouldThrow<IllegalArgumentException> {
-      evaluateAll(hole, community)
-    }
-    assertThat(exception.message).contains("Total cards must be 7")
-  }
-
-  @Test
-  fun `evaluateAll recognizes four of a kind`() {
-    val community = CommunityCards(
-      listOf(
-        Card(CLUBS, QUEEN),
-        Card(HEARTS, QUEEN),
-        Card(SPADES, QUEEN),
-        Card(DIAMONDS, TWO),
-        Card(HEARTS, THREE)
-      ),
-      mockGame
-    )
-    val hole = HoleCards(
-      listOf(
-        Card(DIAMONDS, QUEEN),
-        Card(CLUBS, FOUR)
-      ),
-      mockPlayer
-    )
-
-    assertThat(evaluateAll(hole, community))
-      .isEqualTo(HandRank.FOUR_OF_A_KIND)
-  }
-
-  @Test
-  fun `evaluateAll recognizes straight flush`() {
-    val community = CommunityCards(
-      listOf(
-        Card(HEARTS, SIX),
-        Card(HEARTS, SEVEN),
-        Card(HEARTS, EIGHT),
-        Card(HEARTS, NINE),
-        Card(HEARTS, JACK)
-      ),
-      mockGame
-    )
-    val hole = HoleCards(
-      listOf(
-        Card(HEARTS, TEN),
-        Card(DIAMONDS, TWO)
-      ),
-      mockPlayer
-    )
-
-    assertThat(evaluateAll(hole, community))
-      .isEqualTo(HandRank.STRAIGHT_FLUSH)
-  }
-
-
-
-  // SECTION: Additional Tests for evaluateAll
-
-  /*
-   * These tests cover various scenarios for the evaluateAll function,
-   * ensuring it correctly selects the hand with the higher kicker when
-   * two hands have the same rank.
-   */
-
-  /**
-   * Ensures that when two different three-of-a-kind combinations are possible,
-   * the evaluator correctly selects the one that forms a full house with the higher triplet.
-   * In this case, trips of 3 and trips of 4 are both present, so the best hand is 4♣ 4♦ 4♥ 3♠ 3♥.
-   */
-  @Test
-  fun `detects best of two three-of-a-kinds`() {
-    val hole = HoleCards(
-      player = mockPlayer,
-      cards = listOf(Card(HEARTS, THREE), Card(SPADES, THREE))
-    )
-    val community = CommunityCards(
-      game = mockGame,
-      cards = listOf(
-        Card(CLUBS, THREE),
-        Card(DIAMONDS, FOUR),
+        Card(DIAMONDS, THREE),
         Card(HEARTS, FOUR),
-        Card(CLUBS, FOUR),
-        Card(SPADES, SEVEN)
-      )
+        Card(SPADES, FIVE),
+        Card(CLUBS, SIX)
+      ), mockGame
     )
 
-    val rank = evaluateAll(hole, community)
-    assertThat(rank).isEqualTo(HandRank.FULL_HOUSE)
-
-    val bestCombo = getBestCombo(hole, community)
-    val grouped = bestCombo.groupBy { it.rank }
-    assertThat(grouped.filter { it.value.size == 3 }.keys).contains(FOUR)
-    assertThat(grouped.filter { it.value.size == 2 }.keys).contains(THREE)
+    val winner = HandEvaluator.determineHighestHand(listOf(holeCards), community)
+    assertThat(winner.player).isEqualTo(mockPlayer)
   }
 
   /**
-   * Verifies that when no pairs or combinations exist, the hand rank is High Card,
-   * and the highest kicker (KING) is correctly recognized in the best hand.
+   * Verifies that a single player wins by default when no competition exists.
    */
   @Test
-  fun `selects correct kicker in tie high card hands`() {
-    val hole = HoleCards(
-      player = mockPlayer,
-      cards = listOf(Card(CLUBS, TWO), Card(HEARTS, FIVE))
+  fun `higher pair wins between two players`() {
+    val player1 = object : PlayerInterface {
+      override val name = "Alice"
+      val id = "1"
+    }
+    val player2 = object : PlayerInterface {
+      override val name = "Bob"
+      val id = "2"
+    }
+
+    // Alice has pair of Aces
+    val hole1 = HoleCards(
+      listOf(Card(HEARTS, ACE),
+                    Card(SPADES, ACE)),
+      player1
     )
+
+    // Bob has pair of Kings
+    val hole2 = HoleCards(
+      listOf(Card(DIAMONDS, KING),
+                    Card(CLUBS, KING)),
+      player2
+    )
+
     val community = CommunityCards(
-      game = mockGame,
-      cards = listOf(
-        Card(SPADES, NINE),
-        Card(DIAMONDS, JACK),
-        Card(HEARTS, KING),
-        Card(HEARTS, THREE),
-        Card(CLUBS, FOUR)
-      )
-    )
-
-    val rank = evaluateAll(hole, community)
-    assertThat(rank).isEqualTo(HandRank.HIGH_CARD)
-
-    val bestCombo =
-      getBestCombo(hole, community).map { it.rank.value }.sortedDescending()
-    assertThat(bestCombo.first()).isEqualTo(KING.value)
-    assertThat(bestCombo).containsAll(
       listOf(
-        KING.value,
-        JACK.value,
-        NINE.value,
-        FIVE.value,
-        FOUR.value
-      ).map { it })
+        Card(CLUBS, TWO),
+        Card(DIAMONDS, THREE),
+        Card(HEARTS, FOUR),
+        Card(SPADES, FIVE),
+        Card(CLUBS, SIX)
+      ), mockGame
+    )
+
+    val winner = HandEvaluator.determineHighestHand(listOf(hole1, hole2), community)
+    assertThat(winner.player.name).isEqualTo("Alice")
   }
 
   /**
-   * Confirms that in a one-pair scenario with tied pair values (pair of FIVES),
-   * the evaluator uses kickers to determine the stronger hand.
-   * Here, the hole card ACE should be included as the highest kicker.
+   * Confirms that a straight hand beats a pair hand.
    */
   @Test
-  fun `correctly resolves tie with better kickers in one pair`() {
-    val hole = HoleCards(
-      player = mockPlayer,
-      cards = listOf(Card(CLUBS, ACE), Card(HEARTS, FIVE))
+  fun `straight beats pair`() {
+    val straightPlayer = object : PlayerInterface {
+      override val name = "Straight"
+      val id = "1"
+    }
+    val pairPlayer = object : PlayerInterface {
+      override val name = "Pair"
+      val id = "2"
+    }
+
+    // Player can make straight (3-7)
+    val holeStraight = HoleCards(
+      listOf(Card(HEARTS, THREE),
+                    Card(SPADES, SEVEN)),
+      straightPlayer
     )
+
+    // Player has pair
+    val holePair = HoleCards(
+      listOf(Card(DIAMONDS, ACE),
+                    Card(CLUBS, ACE)),
+      pairPlayer
+    )
+
     val community = CommunityCards(
-      game = mockGame,
-      cards = listOf(
+      listOf(
+        Card(CLUBS, FOUR),
         Card(DIAMONDS, FIVE),
+        Card(HEARTS, SIX),
+        Card(SPADES, TEN),
+        Card(CLUBS, JACK)
+      ), mockGame
+    )
+
+    val winner = HandEvaluator.determineHighestHand(
+      listOf(holeStraight, holePair), community
+    )
+    assertThat(winner.player.name).isEqualTo("Straight")
+  }
+
+  /**
+   * Checks that a tie returns the first player with the best hand.
+   */
+  @Test
+  fun `tie returns first player with best hand`() {
+    val player1 = object : PlayerInterface {
+      override val name = "First"
+      val id = "1"
+    }
+    val player2 = object : PlayerInterface {
+      override val name = "Second"
+      val id = "2"
+    }
+
+    // Both have same hand (Ace-high)
+    val hole1 = HoleCards(
+      listOf(Card(HEARTS, ACE),
+                    Card(SPADES, TWO)),
+      player1
+    )
+
+    val hole2 = HoleCards(
+      listOf(Card(DIAMONDS, ACE),
+                    Card(CLUBS, THREE)),
+      player2
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(CLUBS, FOUR),
+        Card(DIAMONDS, FIVE),
+        Card(HEARTS, SIX),
         Card(SPADES, SEVEN),
-        Card(CLUBS, EIGHT),
-        Card(HEARTS, TEN),
-        Card(CLUBS, QUEEN)
-      )
+        Card(CLUBS, EIGHT)
+      ), mockGame
     )
 
-    val rank = evaluateAll(hole, community)
-    assertThat(rank).isEqualTo(HandRank.ONE_PAIR)
+    val winner = HandEvaluator.determineHighestHand(
+      listOf(hole1, hole2), community
+    )
+    assertThat(winner.player.name).isEqualTo("First")
+  }
 
-    val bestCombo = getBestCombo(hole, community)
-    val groupedRanks = bestCombo.groupBy { it.rank }
+  /**
+   * Validates that a flush hand beats a straight hand.
+   */
+  @Test
+  fun `flush beats straight`() {
+    val flushPlayer = object : PlayerInterface {
+      override val name = "Flush"
+      val id = "1"
+    }
+    val straightPlayer = object : PlayerInterface {
+      override val name = "Straight"
+      val id = "2"
+    }
 
-    assertThat(groupedRanks.filter { it.value.size == 2 }.keys).containsOnly(
-      FIVE
+    // Flush player has two hearts
+    val holeFlush = HoleCards(
+      listOf(Card(HEARTS, TEN),
+                    Card(HEARTS, JACK)),
+      flushPlayer
     )
 
-    val kickerRanks =
-      groupedRanks.filter { it.value.size == 1 }.keys.map { it.value }
-    assertThat(kickerRanks).contains(ACE.value)
-    assertThat(kickerRanks.maxOrNull()).isEqualTo(ACE.value)
+    // Straight player
+    val holeStraight = HoleCards(
+      listOf(Card(CLUBS, NINE),
+                    Card(DIAMONDS, EIGHT)),
+      straightPlayer
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(HEARTS, ACE),  // Flush uses these
+        Card(HEARTS, KING),
+        Card(HEARTS, QUEEN),
+        Card(SPADES, SEVEN),  // Straight uses these
+        Card(CLUBS, SIX)
+      ), mockGame
+    )
+
+    val winner = HandEvaluator.determineHighestHand(
+      listOf(holeFlush, holeStraight), community
+    )
+    assertThat(winner.player.name).isEqualTo("Flush")
+  }
+
+  /**
+   * Ensures that a royal flush beats a straight flush.
+   */
+  @Test
+  fun `royal flush beats straight flush`() {
+    val royalPlayer = object : PlayerInterface {
+      override val name = "Royal"
+      val id = "1"
+    }
+    val straightFlushPlayer = object : PlayerInterface {
+      override val name = "StraightFlush"
+      val id = "2"
+    }
+
+    // Royal flush player
+    val holeRoyal = HoleCards(
+      listOf(Card(SPADES, ACE),
+                    Card(SPADES, KING)),
+      royalPlayer
+    )
+
+    // Straight flush player (7-high)
+    val holeStraightFlush = HoleCards(
+      listOf(Card(HEARTS, SIX),
+                    Card(HEARTS, SEVEN)),
+      straightFlushPlayer
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(SPADES, QUEEN),  // Royal flush
+        Card(SPADES, JACK),
+        Card(SPADES, TEN),
+        Card(HEARTS, FIVE),   // Straight flush
+        Card(HEARTS, FOUR)
+      ), mockGame
+    )
+
+    val winner = HandEvaluator.determineHighestHand(
+      listOf(holeRoyal, holeStraightFlush), community
+    )
+    assertThat(winner.player.name).isEqualTo("Royal")
+  }
+
+  /**
+   * Verifies that an exception is thrown when the player list is empty.
+   */
+  @Test(expected = IllegalArgumentException::class)
+  fun `empty player list throws exception`() {
+    val community = CommunityCards(
+      listOf(
+        Card(CLUBS, ACE),
+        Card(DIAMONDS, KING),
+        Card(HEARTS, QUEEN),
+        Card(SPADES, JACK),
+        Card(CLUBS, TEN)
+      ), mockGame
+    )
+
+    HandEvaluator.determineHighestHand(emptyList(), community)
+  }
+
+  /**
+   * Confirms the correct winner is determined out of four players.
+   */
+  @Test
+  fun `Gives the correct winner out of 4 players`() {
+    val flushPlayer = object : PlayerInterface {
+      override val name = "Flush"
+      val id = "1"
+    }
+    val straightPlayer = object : PlayerInterface {
+      override val name = "Straight"
+      val id = "2"
+    }
+    val pairPlayer = object : PlayerInterface {
+      override val name = "Pair"
+      val id = "3"
+    }
+    val highCardPlayer = object : PlayerInterface {
+      override val name = "HighCard"
+      val id = "4"
+    }
+
+    // Flush player has two hearts
+    val holeFlush = HoleCards(
+      listOf(Card(HEARTS, TEN),
+                    Card(HEARTS, JACK)),
+      flushPlayer
+    )
+
+    // Straight player
+    val holeStraight = HoleCards(
+      listOf(Card(CLUBS, NINE),
+        Card(DIAMONDS, EIGHT)),
+      straightPlayer
+    )
+    // Pair player
+    val holePair = HoleCards(
+      listOf(Card(CLUBS, TWO),
+                    Card(DIAMONDS, TWO)),
+      pairPlayer
+    )
+
+    // High card player
+    val holeHighCard = HoleCards(
+      listOf(Card(SPADES, THREE),
+                    Card(CLUBS, FOUR)),
+      highCardPlayer
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(HEARTS, ACE),  // Flush uses these
+        Card(HEARTS, KING),
+        Card(HEARTS, QUEEN),
+        Card(SPADES, SEVEN),  // Straight uses these
+        Card(CLUBS, SIX)
+      ), mockGame
+    )
+
+    val winner = HandEvaluator.determineHighestHand(
+      listOf(holeFlush, holeStraight), community
+    )
+    assertThat(winner.player.name).isEqualTo("Flush")
   }
 }
