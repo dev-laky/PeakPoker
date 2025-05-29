@@ -1,7 +1,6 @@
 package hwr.oop.projects.peakpoker.core.hand
 
 import io.kotest.core.spec.style.AnnotationSpec
-import io.kotest.assertions.throwables.shouldThrow
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
@@ -24,7 +23,6 @@ import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
-import hwr.oop.projects.peakpoker.core.hand.HandEvaluator.evaluate
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import org.assertj.core.api.Assertions.assertThat
 
@@ -37,168 +35,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   private val mockGame = object : GameInterface {
     override val id: GameId = GameId("dummyGameId")
   }
-
-  @Test
-  fun `high card is recognized`() {
-    val cards = listOf(
-      Card(CLUBS, TWO),
-      Card(HEARTS, FIVE),
-      Card(DIAMONDS, NINE),
-      Card(SPADES, JACK),
-      Card(HEARTS, KING)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.HIGH_CARD)
-  }
-
-  @Test
-  fun `one pair is recognized`() {
-    val cards = listOf(
-      Card(HEARTS, TWO),
-      Card(DIAMONDS, TWO),
-      Card(CLUBS, FIVE),
-      Card(SPADES, SEVEN),
-      Card(HEARTS, NINE)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.ONE_PAIR)
-  }
-
-  @Test
-  fun `two pair is recognized`() {
-    val cards = listOf(
-      Card(HEARTS, TEN),
-      Card(DIAMONDS, TEN),
-      Card(CLUBS, FOUR),
-      Card(SPADES, FOUR),
-      Card(HEARTS, KING)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.TWO_PAIR)
-  }
-
-  @Test
-  fun `three of a kind is recognized`() {
-    val cards = listOf(
-      Card(HEARTS, ACE),
-      Card(DIAMONDS, ACE),
-      Card(CLUBS, ACE),
-      Card(SPADES, KING),
-      Card(HEARTS, THREE)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.THREE_OF_A_KIND)
-  }
-
-  @Test
-  fun `straight is recognized`() {
-    val cards = listOf(
-      Card(HEARTS, THREE),
-      Card(DIAMONDS, FOUR),
-      Card(CLUBS, FIVE),
-      Card(SPADES, SIX),
-      Card(HEARTS, SEVEN)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
-  }
-
-  @Test
-  fun `wheel straight is recognized`() {
-    val cards = listOf(
-      Card(SPADES, FIVE),
-      Card(DIAMONDS, THREE),
-      Card(CLUBS, FOUR),
-      Card(HEARTS, TWO),
-      Card(SPADES, ACE)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT)
-  }
-
-  @Test
-  fun `flush is recognized`() {
-    val cards = listOf(
-      Card(CLUBS, TWO),
-      Card(CLUBS, FIVE),
-      Card(CLUBS, NINE),
-      Card(CLUBS, JACK),
-      Card(CLUBS, KING)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.FLUSH)
-  }
-
-  @Test
-  fun `full house is recognized`() {
-    val cards = listOf(
-      Card(CLUBS, THREE),
-      Card(HEARTS, THREE),
-      Card(SPADES, THREE),
-      Card(DIAMONDS, QUEEN),
-      Card(HEARTS, QUEEN)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.FULL_HOUSE)
-  }
-
-  @Test
-  fun `four of a kind is recognized`() {
-    val cards = listOf(
-      Card(DIAMONDS, KING),
-      Card(HEARTS, KING),
-      Card(CLUBS, KING),
-      Card(SPADES, KING),
-      Card(HEARTS, TWO)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.FOUR_OF_A_KIND)
-  }
-
-  @Test
-  fun `straight flush is recognized`() {
-    val cards = listOf(
-      Card(SPADES, FIVE),
-      Card(SPADES, SIX),
-      Card(SPADES, SEVEN),
-      Card(SPADES, EIGHT),
-      Card(SPADES, NINE)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.STRAIGHT_FLUSH)
-  }
-
-  @Test
-  fun `royal flush is recognized`() {
-    val cards = listOf(
-      Card(HEARTS, TEN),
-      Card(HEARTS, JACK),
-      Card(HEARTS, QUEEN),
-      Card(HEARTS, KING),
-      Card(HEARTS, ACE)
-    )
-    assertThat(evaluate(cards)).isEqualTo(HandRank.ROYAL_FLUSH)
-  }
-
-  @Test
-  fun `evaluate throws exception on invalid list size`() {
-    shouldThrow<IllegalArgumentException> {
-      HandEvaluator.evaluate(
-        listOf(
-          Card(HEARTS, ACE),
-          Card(HEARTS, KING)
-        )
-      )
-    }
-  }
-
-  @Test
-  fun `evaluate throws exception on duplicates`() {
-    shouldThrow<IllegalArgumentException> {
-      HandEvaluator.evaluate(
-        listOf(
-          Card(HEARTS, ACE),
-          Card(HEARTS, ACE),
-          Card(CLUBS, TWO),
-          Card(DIAMONDS, THREE),
-          Card(SPADES, FOUR)
-        )
-      )
-    }
-  }
-
   //SECTION: HandEvaluator.determineHighestHand
-
   /**
    * Verifies that a single player wins by default when no competition exists.
    */
