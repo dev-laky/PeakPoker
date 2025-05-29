@@ -1,14 +1,21 @@
 package hwr.oop.projects.peakpoker.core.player
 
 import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 
 class Player(
   override val name: String,
   private var chips: Int = 100,
 ) : PlayerInterface {
   init {
-    require(chips >= 0) { "Chips amount must be non-negative" }
-    require(name.isNotBlank()) { "Player name cannot be blank" }
+    if (chips < 0) {
+      throw InsufficientChipsException("Chips amount must be non-negative")
+    }
+    if (name.isBlank()) {
+      throw InvalidPlayerStateException("Player name cannot be blank")
+    }
   }
 
   var isFolded: Boolean = false
@@ -30,13 +37,19 @@ class Player(
   }
 
   fun assignHand(cards: HoleCards) {
-    require(cards.cards.size == 2) { "A player must have exactly 2 hole cards" }
     hand = cards
   }
 
+  /**
+   * Sets the bet amount for the player.
+   *
+   * @param chips The amount of chips to bet
+   * @throws InvalidBetAmountException If the chips amount is not greater than zero
+   */
   fun setBetAmount(chips: Int) {
-    require(chips > 0) { "Chips amount must be greater than zero" }
-
+    if (chips <= 0) {
+      throw InvalidBetAmountException("Chips amount must be greater than zero")
+    }
     this.chips -= chips - bet
     bet = chips
   }
@@ -46,7 +59,9 @@ class Player(
   }
 
   fun allIn() {
-    setBetAmount(this.chips)
+    val totalBet = chips + bet
+    chips = 0
+    setBetAmount(totalBet)
     isAllIn = true
   }
 }

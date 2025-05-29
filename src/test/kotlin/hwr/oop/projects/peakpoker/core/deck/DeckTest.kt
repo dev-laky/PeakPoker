@@ -1,5 +1,6 @@
 package hwr.oop.projects.peakpoker.core.deck
 
+import hwr.oop.projects.peakpoker.core.exceptions.InsufficientCardsException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -86,6 +87,6 @@ class DeckTest : AnnotationSpec() {
     assertThat(deck.show()).isEmpty() // Check if the list is actually empty
 
     assertThatThrownBy { deck.draw() }
-      .isInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(InsufficientCardsException::class.java)
   }
 }

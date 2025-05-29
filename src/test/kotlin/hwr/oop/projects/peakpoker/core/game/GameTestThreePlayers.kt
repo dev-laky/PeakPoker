@@ -56,6 +56,43 @@ class GameTestThreePlayers : AnnotationSpec() {
   }
 
   @Test
+  fun `getHighestBet returns updated value when player raises`() {
+    // when
+    testGame.call(player3)
+    testGame.raiseBetTo(player1, 50)
+
+    // then
+    assertThat(testGame.getHighestBet()).isEqualTo(50)
+  }
+
+  @Test
+  fun `getHighestBet returns highest bet when multiple players have different bets`() {
+    // when
+    testGame.call(player3)
+    testGame.raiseBetTo(player1, 40)
+    testGame.call(player2)
+
+    // then
+    assertThat(testGame.getHighestBet()).isEqualTo(40)
+    assertThat(player1.getBet()).isEqualTo(40)
+    assertThat(player2.getBet()).isEqualTo(40)
+    assertThat(player3.getBet()).isEqualTo(20)
+  }
+
+  @Test
+  fun `getHighestBet still counts folded player bets`() {
+    // when
+    testGame.call(player3)
+    testGame.raiseBetTo(player1, 50)
+    testGame.fold(player2)
+
+    // then
+    assertThat(testGame.getHighestBet()).isEqualTo(50)
+    assertThat(player2.isFolded).isTrue()
+    assertThat(player2.getBet()).isEqualTo(20) // Player keeps their bet even when folded
+  }
+
+  @Test
   fun `big blind amount must be twice the smallBlind amount`() {
     assertThat(testGame.bigBlindAmount).isEqualTo(testGame.smallBlindAmount * 2)
   }
@@ -74,7 +111,67 @@ class GameTestThreePlayers : AnnotationSpec() {
   fun `makeTurn cycles to first player at the end of table`() {
     testGame.call(player3)
 
-    // then
     assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+  }
+
+  @Test
+  fun `makeTurn correctly sets currentPlayerIndex`() {
+    testGame.call(player3)
+    testGame.raiseBetTo(player1, 100)
+
+    assertThat(testGame.currentPlayerIndex).isEqualTo(1)
+  }
+
+  @Test
+  fun `dealHoleCards correctly assigns 2 cards to each player during initialization`() {
+    assertThat(player1.getHand().cards).hasSize(2)
+    assertThat(player2.getHand().cards).hasSize(2)
+    assertThat(player3.getHand().cards).hasSize(2)
+  }
+
+  @Test
+  fun `dealHoleCards removes correct number of cards from the deck`() {
+    val playerCount = testGame.playersOnTable.size
+
+    assertThat(testGame.deck.show()).hasSize(52 - (2 * playerCount))
+  }
+
+  @Test
+  fun `dealHoleCards assigns unique cards to each player`() {
+    // then - collect all cards from players' hands and check for uniqueness
+    val allCards = player1.getHand().cards + player2.getHand().cards + player3.getHand().cards
+    assertThat(allCards).hasSize(6) // 3 players * 2 cards
+    assertThat(allCards.distinct()).hasSize(6) // All cards should be unique
+  }
+
+  // POT TESTS
+  @Test
+  fun `initial pot equals sum of blinds`() {
+    // then
+    assertThat(testGame.pot).isEqualTo(30) // Small blind(10) + Big blind(20)
+    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+  }
+
+  @Test
+  fun `pot increases when players bet or raise`() {
+    // when
+    testGame.call(player3) // Player3 calls big blind (20)
+    testGame.raiseBetTo(player1, 50) // Player1 raises to 50
+
+    // then
+    assertThat(testGame.pot).isEqualTo(90) // 20 + 20 + 50
+  }
+
+  @Test
+  fun `pot includes bets from folded players`() {
+    // when
+    testGame.call(player3) // Player3 calls to 20
+    testGame.raiseBetTo(player1, 50) // Player1 raises to 50
+    testGame.fold(player2) // Player2 folds (still has 20 in pot)
+
+    // then
+    assertThat(testGame.pot).isEqualTo(90) // 50 + 20 + 20
+    assertThat(player2.isFolded).isTrue()
+    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
   }
 }
