@@ -7,6 +7,11 @@ data class GameId(private val value: String) {
     }
   }
 
+    /**
+     * Returns a string representation of the GameId.
+     *
+     * @return The string value of this game identifier
+     */
     override fun toString(): String {
         return value
     }
