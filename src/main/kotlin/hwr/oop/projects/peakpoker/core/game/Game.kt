@@ -52,9 +52,6 @@ class Game(
     dealHoleCards()
   }
 
-  // Calculates pot by bets of players
-  fun getPot(): Int = calculatePot()
-
   fun getDeck(): Deck {
     return deck
   }
