@@ -23,7 +23,7 @@ class PokerHand(private val cards: List<Card>) {
      * @throws IllegalStateException if the hand doesn't meet validation criteria
      */
     private fun evaluate(): HandRank {
-        // Dieselbe Logik wie vorher
+
         val ranks = cards.map { it.rank }
         val suits = cards.map { it.suit }
         val rankCounts = ranks.groupingBy { it }.eachCount().values.sortedDescending()

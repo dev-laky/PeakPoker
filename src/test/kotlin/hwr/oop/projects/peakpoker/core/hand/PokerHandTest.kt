@@ -2,8 +2,23 @@ package hwr.oop.projects.peakpoker.core.hand
 
 import io.kotest.core.spec.style.AnnotationSpec
 import hwr.oop.projects.peakpoker.core.card.Card
-import hwr.oop.projects.peakpoker.core.card.Rank.*
-import hwr.oop.projects.peakpoker.core.card.Suit.*
+import hwr.oop.projects.peakpoker.core.card.Suit.CLUBS
+import hwr.oop.projects.peakpoker.core.card.Suit.HEARTS
+import hwr.oop.projects.peakpoker.core.card.Suit.DIAMONDS
+import hwr.oop.projects.peakpoker.core.card.Suit.SPADES
+import hwr.oop.projects.peakpoker.core.card.Rank.TWO
+import hwr.oop.projects.peakpoker.core.card.Rank.THREE
+import hwr.oop.projects.peakpoker.core.card.Rank.FOUR
+import hwr.oop.projects.peakpoker.core.card.Rank.FIVE
+import hwr.oop.projects.peakpoker.core.card.Rank.SIX
+import hwr.oop.projects.peakpoker.core.card.Rank.SEVEN
+import hwr.oop.projects.peakpoker.core.card.Rank.EIGHT
+import hwr.oop.projects.peakpoker.core.card.Rank.NINE
+import hwr.oop.projects.peakpoker.core.card.Rank.TEN
+import hwr.oop.projects.peakpoker.core.card.Rank.JACK
+import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
+import hwr.oop.projects.peakpoker.core.card.Rank.KING
+import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import org.assertj.core.api.Assertions.assertThat
 
 class PokerHandTest : AnnotationSpec() {
