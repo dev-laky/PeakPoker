@@ -5,7 +5,7 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationExcept
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 
 class HoleCards(
-  val cards: List<Card>,
+  private val cards: List<Card>,
   val player: PlayerInterface,
 ) : Iterable<Card> by cards {
   init {
@@ -16,4 +16,8 @@ class HoleCards(
       throw DuplicateCardException("Hole cards must not contain duplicates.")
     }
   }
+
+    fun getCards(): List<Card> {
+        return cards
+    }
 }
