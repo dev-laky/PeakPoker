@@ -13,6 +13,21 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
+/**
+ * Represents a poker game with players, cards, and game mechanics.
+ *
+ * This class implements the core poker game logic including betting rounds,
+ * player turns, and hand management. It enforces poker rules such as
+ * betting order, blind requirements, and valid player actions.
+ *
+ * @property smallBlindAmount The amount required for the small blind
+ * @property bigBlindAmount The amount required for the big blind
+ * @property playersOnTable List of players participating in this game
+ * @property id Unique identifier for this game instance
+ * @throws InvalidBlindConfigurationException If blind amounts are invalid
+ * @throws MinimumPlayersException If there are fewer than 2 players
+ * @throws DuplicatePlayerException If there are duplicate players
+ */
 class PokerGame(
   val smallBlindAmount: Int,
   val bigBlindAmount: Int,
@@ -20,13 +35,30 @@ class PokerGame(
   override val id: GameId = GameId.generate(),
 ) : Game {
 
-  // Variable to track the index of the small blind player within PlayersOnTable
+  /**
+   * Index of the small blind player within playersOnTable.
+   */
   private var smallBlindIndex: Int = 0
+
+  /**
+   * The card deck used for this game.
+   */
   val deck: Deck = Deck()
+
+  /**
+   * The community cards shared by all players.
+   */
   val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+
+  /**
+   * The current state of the game (pre-flop, flop, turn, river).
+   */
   val gameState = GameState.PRE_FLOP
 
-  // Will be = 2 after "blind" init
+  /**
+   * Index of the current active player within playersOnTable.
+   * Will be = 2 after "blind" init.
+   */
   var currentPlayerIndex: Int = 0
 
   init {
@@ -53,42 +85,99 @@ class PokerGame(
     dealHoleCards()
   }
 
+  /**
+   * Returns the small blind amount for this game.
+   *
+   * @return The small blind amount in chips
+   */
   fun getSmallBlind(): Int {
     return smallBlindAmount
   }
 
+  /**
+   * Returns the big blind amount for this game.
+   *
+   * @return The big blind amount in chips
+   */
   fun getBigBlind(): Int {
     return bigBlindAmount
   }
 
+  /**
+   * Returns the player whose turn it currently is.
+   *
+   * @return The currently active player
+   */
   fun getCurrentPlayer(): PokerPlayer {
     return playersOnTable[currentPlayerIndex]
   }
 
+  /**
+   * Returns the player who will act next after the current player.
+   *
+   * @return The next player in the turn order
+   */
   fun getNextPlayer(): PokerPlayer {
     return playersOnTable[(currentPlayerIndex + 1) % playersOnTable.size]
   }
 
+  /**
+   * Returns the highest bet amount currently on the table.
+   *
+   * @return The highest bet amount among all players
+   */
   fun getHighestBet(): Int {
     return playersOnTable.maxOf { it.getBet() }
   }
 
+  /**
+   * Returns the index of the small blind player.
+   *
+   * @return The index position of the small blind player
+   */
   fun getSmallBlindIndex(): Int {
     return smallBlindIndex
   }
 
+  /**
+   * Calculates the total amount of chips in the pot.
+   *
+   * @return The sum of all player bets
+   */
   fun calculatePot(): Int {
     return playersOnTable.sumOf { it.getBet() }
   }
 
+  /**
+   * Checks if a player with the same name exists in the game.
+   *
+   * @param pokerPlayer The player to check
+   * @return true if no player with the same name exists, false otherwise
+   */
   fun checkPlayerValidity(pokerPlayer: PokerPlayer): Boolean {
     return playersOnTable.none { it.name == pokerPlayer.name }
   }
 
+  /**
+   * Checks if the provided player is a participant in this game instance.
+   *
+   * This method validates whether a player is actually registered in the current game
+   * by checking if the player object exists in the playersOnTable list. This is an identity check,
+   * not just a name comparison, so two different player objects with the same name will be
+   * treated as different players.
+   *
+   * @param player The PokerPlayer to check
+   * @return true if the player is a participant in this game, false otherwise
+   */
   private fun isPlayerInThisGame(player: PokerPlayer): Boolean {
     return playersOnTable.contains(player)
   }
 
+  /**
+   * Advances the turn to the next active player.
+   *
+   * This method skips players who have folded or gone all-in.
+   */
   private fun makeTurn() {
     val nextPlayer = getNextPlayer()
 
@@ -102,6 +191,9 @@ class PokerGame(
     currentPlayerIndex = (playersOnTable.indexOf(nextPlayer))
   }
 
+  /**
+   * Deals two hole cards to each player from the deck.
+   */
   private fun dealHoleCards() {
     playersOnTable.forEach { player ->
       val cards = deck.draw(2)
@@ -227,6 +319,12 @@ class PokerGame(
     makeTurn()
   }
 
+  /**
+   * Sets the blind bets for the first two players.
+   *
+   * This method places the initial small and big blind bets and adjusts
+   * the small blind index for the next round.
+   */
   private fun setBlinds() {
     raiseBetTo(getCurrentPlayer(), smallBlindAmount)
 
