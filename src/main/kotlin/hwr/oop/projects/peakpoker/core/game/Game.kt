@@ -80,7 +80,7 @@ class Game(
     return smallBlindIndex
   }
 
-  private fun calculatePot(): Int {
+  fun calculatePot(): Int {
     return playersOnTable.sumOf { it.getBet() }
   }
 

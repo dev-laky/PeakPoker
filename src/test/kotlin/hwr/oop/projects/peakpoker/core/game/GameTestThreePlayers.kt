@@ -148,8 +148,8 @@ class GameTestThreePlayers : AnnotationSpec() {
   @Test
   fun `initial pot equals sum of blinds`() {
     // then
-    assertThat(testGame.getPot()).isEqualTo(30) // Small blind(10) + Big blind(20)
-    assertThat(testGame.getPot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testGame.calculatePot()).isEqualTo(30) // Small blind(10) + Big blind(20)
+    assertThat(testGame.calculatePot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
   }
 
   @Test
@@ -159,7 +159,7 @@ class GameTestThreePlayers : AnnotationSpec() {
     testGame.raiseBetTo(player1, 50) // Player1 raises to 50
 
     // then
-    assertThat(testGame.getPot()).isEqualTo(90) // 20 + 20 + 50
+    assertThat(testGame.calculatePot()).isEqualTo(90) // 20 + 20 + 50
   }
 
   @Test
@@ -170,8 +170,8 @@ class GameTestThreePlayers : AnnotationSpec() {
     testGame.fold(player2) // Player2 folds (still has 20 in pot)
 
     // then
-    assertThat(testGame.getPot()).isEqualTo(90) // 50 + 20 + 20
+    assertThat(testGame.calculatePot()).isEqualTo(90) // 50 + 20 + 20
     assertThat(player2.isFolded).isTrue()
-    assertThat(testGame.getPot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testGame.calculatePot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
   }
 }
