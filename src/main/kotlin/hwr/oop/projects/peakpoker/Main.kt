@@ -12,20 +12,20 @@ import hwr.oop.projects.peakpoker.commands.game.GameNew
 import hwr.oop.projects.peakpoker.commands.hand.HandCommand
 
 fun main(args: Array<String>) {
-  val command = PokerCommand().subcommands(
-    DbCommand().subcommands(
-      DbInit(),
-      DbConnect()
-    ),
-    GameCommand().subcommands(
-      GameNew()
-    ),
-    HandCommand()
-  )
+    val command = PokerCommand().subcommands(
+        DbCommand().subcommands(
+            DbInit(),
+            DbConnect()
+        ),
+        GameCommand().subcommands(
+            GameNew()
+        ),
+        HandCommand()
+    )
 
-  try {
-    command.parse(args)
-  } catch (_: CliktError) {
-    println(command.getFormattedHelp())
-  }
+    try {
+        command.parse(args)
+    } catch (_: CliktError) {
+        println(command.getFormattedHelp())
+    }
 }
