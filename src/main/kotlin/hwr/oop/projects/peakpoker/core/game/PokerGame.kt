@@ -85,6 +85,10 @@ class PokerGame(
     return playersOnTable.none { it.name == pokerPlayer.name }
   }
 
+  private fun isPlayerInThisGame(player: PokerPlayer): Boolean {
+    return playersOnTable.contains(player)
+  }
+
   private fun makeTurn() {
     val nextPlayer = getNextPlayer()
 
@@ -120,6 +124,10 @@ class PokerGame(
    * @throws InsufficientChipsException If the player does not have enough chips
    */
   fun raiseBetTo(pokerPlayer: PokerPlayer, chips: Int) {
+    if (!isPlayerInThisGame(pokerPlayer)) {
+      throw InvalidPlayerStateException("Player is not part of this game")
+    }
+
     val currentPlayer = getCurrentPlayer()
     val highestBet = getHighestBet()
     when {

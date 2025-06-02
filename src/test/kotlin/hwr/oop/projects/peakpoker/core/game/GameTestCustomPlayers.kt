@@ -4,8 +4,10 @@ import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class GameTestCustomPlayers : AnnotationSpec() {
@@ -242,5 +244,69 @@ class GameTestCustomPlayers : AnnotationSpec() {
     // then
     assertThat(customPokerGame.calculatePot()).isEqualTo(110) // 40 + 50 + 20
     assertThat(customPokerGame.calculatePot()).isEqualTo(richPokerPlayer.getBet() + poorPokerPlayer.getBet() + mediumPokerPlayer.getBet())
+  }
+
+  @Test
+  fun `raiseBetTo rejects player not in game`() {
+      // given
+      val player1 = PokerPlayer("Alice", 100)
+      val player2 = PokerPlayer("Bob", 100)
+      val outsidePlayer = PokerPlayer("Charlie", 100)
+      val game = PokerGame(10, 20, listOf(player1, player2))
+
+      // when/then
+      assertThatThrownBy {
+          game.raiseBetTo(outsidePlayer, 30)
+      }
+          .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+          .hasMessageContaining("Player is not part of this game")
+  }
+
+  @Test
+  fun `player with same name but different instance is rejected`() {
+      // given
+      val player1 = PokerPlayer("Alice", 100)
+      val player2 = PokerPlayer("Bob", 100)
+      val sameNameDifferentInstance = PokerPlayer("Alice", 100)
+      val game = PokerGame(10, 20, listOf(player1, player2))
+
+      // when/then
+      assertThatThrownBy {
+          game.raiseBetTo(sameNameDifferentInstance, 30)
+      }
+          .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+          .hasMessageContaining("Player is not part of this game")
+  }
+
+  @Test
+  fun `player validation happens before other validations`() {
+      // given
+      val player1 = PokerPlayer("Alice", 100)
+      val player2 = PokerPlayer("Bob", 100)
+      val outsidePlayer = PokerPlayer("Charlie", 100)
+      val game = PokerGame(10, 20, listOf(player1, player2))
+
+      // Pass an invalid bet amount which would normally trigger different exception
+      // But player validation should happen first
+      assertThatThrownBy {
+          game.raiseBetTo(outsidePlayer, -30)
+      }
+          .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+          .hasMessageContaining("Player is not part of this game")
+  }
+
+  @Test
+  fun `valid player in game can raise bet`() {
+      // given
+      val player1 = PokerPlayer("Alice", 100)
+      val player2 = PokerPlayer("Bob", 100)
+      val game = PokerGame(10, 20, listOf(player1, player2))
+
+      // Player1 should be the current player after initialization
+
+      // when/then - no exception should be thrown
+      assertThatCode {
+          game.raiseBetTo(player1, 40)
+      }.doesNotThrowAnyException()
   }
 }
