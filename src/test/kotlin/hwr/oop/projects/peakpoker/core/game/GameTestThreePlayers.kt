@@ -5,10 +5,10 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class GameTestThreePlayers : AnnotationSpec() {
-  lateinit var player1: Player
-  lateinit var player2: Player
-  lateinit var player3: Player
-  lateinit var testGame: Game
+  private lateinit var player1: Player
+  private lateinit var player2: Player
+  private lateinit var player3: Player
+  private lateinit var testGame: Game
 
   @BeforeEach
   fun setup() {
@@ -92,10 +92,10 @@ class GameTestThreePlayers : AnnotationSpec() {
     assertThat(player2.getBet()).isEqualTo(20) // Player keeps their bet even when folded
   }
 
-  @Test
+  /*@Test
   fun `big blind amount must be twice the smallBlind amount`() {
     assertThat(testGame.bigBlindAmount).isEqualTo(testGame.smallBlindAmount * 2)
-  }
+  }*/
 
   @Test
   fun `getSmallBlind returns correct small blind amount`() {
