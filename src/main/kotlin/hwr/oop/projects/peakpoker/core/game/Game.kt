@@ -14,16 +14,20 @@ import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.Player
 
 class Game(
-  private val smallBlindAmount: Int,
-  private val bigBlindAmount: Int,
+  val smallBlindAmount: Int,
+  val bigBlindAmount: Int,
   val playersOnTable: List<Player> = listOf(),
   override val id: GameId = GameId.generate(),
 ) : GameInterface {
 
   // Variable to track the index of the small blind player within PlayersOnTable
   private var smallBlindIndex: Int = 0
-  private val deck: Deck = Deck()
+  val deck: Deck = Deck()
+  val communityCards: CommunityCards = CommunityCards(emptyList(), this)
+  val gameState = GameState.PRE_FLOP
 
+  // Calculates pot by bets of players
+  val pot get() = calculatePot()
 
   // Will be = 2 after "blind" init
   var currentPlayerIndex: Int = 0
@@ -52,10 +56,6 @@ class Game(
     dealHoleCards()
   }
 
-  fun getDeck(): Deck {
-    return deck
-  }
-
   fun getSmallBlind(): Int {
     return smallBlindAmount
   }
@@ -68,7 +68,7 @@ class Game(
     return playersOnTable[currentPlayerIndex]
   }
 
-  private fun getNextPlayer(): Player {
+  fun getNextPlayer(): Player {
     return playersOnTable[(currentPlayerIndex + 1) % playersOnTable.size]
   }
 

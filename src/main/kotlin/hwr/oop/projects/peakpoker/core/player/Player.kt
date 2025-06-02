@@ -19,9 +19,7 @@ class Player(
   }
 
   var isFolded: Boolean = false
-    private set
   var isAllIn: Boolean = false
-    private set
 
   private var hand: HoleCards = HoleCards(emptyList(), this)
   private var bet: Int = 0
