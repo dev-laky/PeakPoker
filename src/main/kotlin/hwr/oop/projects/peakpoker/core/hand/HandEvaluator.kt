@@ -106,7 +106,7 @@ object HandEvaluator {
      * @throws IllegalArgumentException If the total number of cards is not 7.
      */
     private fun getBestCombo(hole: HoleCards, community: CommunityCards): List<Card> {
-        val allCards = hole.cards + community.cards
+        val allCards = hole.getCards() + community.cards
         require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 
         var bestCombo: List<Card> = emptyList()
