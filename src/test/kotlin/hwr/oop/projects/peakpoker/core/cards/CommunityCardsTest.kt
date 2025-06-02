@@ -4,21 +4,26 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.game.GameId
-import hwr.oop.projects.peakpoker.core.game.GameInterface
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.round.PokerRound
+import hwr.oop.projects.peakpoker.core.round.Round
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class CommunityCardsTest : AnnotationSpec() {
 
-  private val mockGame = object : GameInterface {
-    override val id: GameId = GameId("mockGame")
+  private val mockRound = object : Round {
+    override fun raiseBetTo(player: PokerPlayer, chips: Int) {}
+    override fun call(player: PokerPlayer) {}
+    override fun check(player: PokerPlayer) {}
+    override fun fold(player: PokerPlayer) {}
+    override fun allIn(player: PokerPlayer) {}
   }
 
   @Test
   fun `CommunityCards should contain exactly five cards`() {
-    val cards = listOf(
+    val cards = mutableListOf(
       Card(Suit.DIAMONDS, Rank.FIVE),
       Card(Suit.DIAMONDS, Rank.TEN),
       Card(Suit.SPADES, Rank.ACE),
@@ -26,28 +31,28 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.QUEEN)
     )
 
-    val communityCards = CommunityCards(cards, mockGame)
+    val communityCards = CommunityCards(cards, mockRound)
 
     assert(communityCards.cards.size == 5) { "Community cards should contain exactly five cards." }
   }
 
   @Test
   fun `CommunityCards should throw exception when less than 5 cards are provided`() {
-    val cards = listOf(
+    val cards = mutableListOf(
       Card(Suit.DIAMONDS, Rank.FIVE),
       Card(Suit.DIAMONDS, Rank.TEN),
       Card(Suit.SPADES, Rank.ACE),
       Card(Suit.CLUBS, Rank.KING)
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockGame) }
+    assertThatThrownBy { CommunityCards(cards, mockRound) }
       .isInstanceOf(IllegalArgumentException::class.java)
       .hasMessageContaining("exactly five cards")
   }
 
   @Test
   fun `CommunityCards should throw exception when more than 5 cards are provided`() {
-    val cards = listOf(
+    val cards = mutableListOf(
       Card(Suit.DIAMONDS, Rank.FIVE),
       Card(Suit.DIAMONDS, Rank.TEN),
       Card(Suit.SPADES, Rank.ACE),
@@ -56,7 +61,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.JACK)
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockGame) }
+    assertThatThrownBy { CommunityCards(cards, mockRound) }
       .isInstanceOf(IllegalArgumentException::class.java)
       .hasMessageContaining("exactly five cards")
   }
@@ -64,7 +69,7 @@ class CommunityCardsTest : AnnotationSpec() {
   @Test
   fun `CommunityCards should not allow duplicate cards`() {
     val duplicateCard = Card(Suit.DIAMONDS, Rank.FIVE)
-    val cards = listOf(
+    val cards = mutableListOf(
       duplicateCard,
       Card(Suit.DIAMONDS, Rank.TEN),
       Card(Suit.SPADES, Rank.ACE),
@@ -72,21 +77,21 @@ class CommunityCardsTest : AnnotationSpec() {
       duplicateCard
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockGame) }
+    assertThatThrownBy { CommunityCards(cards, mockRound) }
       .isInstanceOf(IllegalArgumentException::class.java)
       .hasMessageContaining("duplicates")
   }
 
   @Test
   fun `CommunityCards should work with empty list initialization`() {
-    val communityCards = CommunityCards(emptyList(), mockGame)
+    val communityCards = CommunityCards(mutableListOf(), mockRound)
 
     assertThat(communityCards.cards).isEmpty()
   }
 
   @Test
   fun `CommunityCards should implement Iterable interface correctly`() {
-    val cards = listOf(
+    val cards = mutableListOf(
       Card(Suit.DIAMONDS, Rank.FIVE),
       Card(Suit.DIAMONDS, Rank.TEN),
       Card(Suit.SPADES, Rank.ACE),
@@ -94,7 +99,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.QUEEN)
     )
 
-    val communityCards = CommunityCards(cards, mockGame)
+    val communityCards = CommunityCards(cards, mockRound)
     val iteratedCards = communityCards.toList()
 
     assertThat(iteratedCards).containsExactlyElementsOf(cards)

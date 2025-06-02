@@ -6,16 +6,16 @@ import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 class HandCommand : CliktCommand(name = "hand") {
-  override fun help(context: Context) = "Create a new Game."
+  override fun help(context: Context) = "Create a new PokerGame."
 
   val playerName: String? by option("--player")
     .help("Colon-separated list of player names")
   val gameId: Int? by option("--gameID").int()
-    .help("Game ID")
-    .check("Game ID must be greater than 0") { it > 0 }
+    .help("PokerGame ID")
+    .check("PokerGame ID must be greater than 0") { it > 0 }
 
   override fun run() {
     if (gameId == null) {
@@ -28,17 +28,17 @@ class HandCommand : CliktCommand(name = "hand") {
       return
     }
 
-    // TODO: Players needs to be loaded here with Player by Game ID...
+    // TODO: Players needs to be loaded here with PokerPlayer by PokerGame ID...
 
     // Mock data for demonstration
-    val player = Player(name = playerName!!, chips = 100)
-    val game = hwr.oop.projects.peakpoker.core.game.Game(
+    val player = PokerPlayer(name = playerName!!, chips = 100)
+    val game = hwr.oop.projects.peakpoker.core.game.PokerGame(
       smallBlindAmount = 10,
       bigBlindAmount = 20,
-      playersOnTable = listOf(
+      players = listOf(
         player,
-        Player(name = "Player2", chips = 100),
-        Player(name = "Player3", chips = 100)
+        PokerPlayer(name = "Player2", chips = 100),
+        PokerPlayer(name = "Player3", chips = 100)
       )
     )
 
@@ -50,8 +50,8 @@ class HandCommand : CliktCommand(name = "hand") {
       "${card.suit}, ${card.rank}"
     }
 
-    echo("Game ID: ${game.id}")
-    echo("Player: ${player.name}")
+    echo("PokerGame ID: ${game.id}")
+    echo("PokerPlayer: ${player.name}")
     echo("Hand: $cardDisplay")
   }
 }

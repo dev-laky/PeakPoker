@@ -11,21 +11,21 @@ import org.assertj.core.api.Assertions.assertThat
 class PlayerTest : AnnotationSpec() {
   @Test
   fun `player has name`() {
-    val player = Player("Hans")
+    val player = PokerPlayer("Hans")
     val playerName: String = player.name
     assertThat(playerName).isEqualTo("Hans")
   }
 
   @Test
   fun `player bet can be raised`() {
-    val player = Player("Hans")
+    val player = PokerPlayer("Hans")
     player.setBetAmount(10)
     assertThat(player.getBet()).isEqualTo(10)
   }
 
   @Test
   fun `player initializes with isFolded and isAllIn as false`() {
-    val player = Player("Hans")
+    val player = PokerPlayer("Hans")
     assertThat(player.isFolded).isFalse()
     assertThat(player.isAllIn).isFalse()
   }
@@ -33,13 +33,13 @@ class PlayerTest : AnnotationSpec() {
   @Test
   fun `getChips returns correct initial chip count`() {
     val initialChips = 500
-    val player = Player("Hans", initialChips)
+    val player = PokerPlayer("Hans", initialChips)
     assertThat(player.getChips()).isEqualTo(initialChips)
   }
 
   @Test
   fun `assignHand correctly assigns hole cards to player`() {
-    val player = Player("Hans")
+    val player = PokerPlayer("Hans")
 
     val holeCards = HoleCards(
       listOf(
@@ -58,7 +58,7 @@ class PlayerTest : AnnotationSpec() {
   fun `betting reduces player chip count`() {
     val initialChips = 500
     val betAmount = 100
-    val player = Player("Hans", initialChips)
+    val player = PokerPlayer("Hans", initialChips)
 
     player.setBetAmount(betAmount)
 
@@ -69,7 +69,7 @@ class PlayerTest : AnnotationSpec() {
   @Test
   fun `multiple bets accumulate correctly`() {
     val initialChips = 500
-    val player = Player("Hans", initialChips)
+    val player = PokerPlayer("Hans", initialChips)
 
     player.setBetAmount(100)
     player.setBetAmount(150)
@@ -80,7 +80,7 @@ class PlayerTest : AnnotationSpec() {
 
   @Test
   fun `bet validation throws exception for negative amounts`() {
-    val player = Player("Hans", 500)
+    val player = PokerPlayer("Hans", 500)
 
     val exception = shouldThrow<IllegalArgumentException> {
       player.setBetAmount(-1)
@@ -93,7 +93,7 @@ class PlayerTest : AnnotationSpec() {
 
   @Test
   fun `bet of zero amount is not accepted`() {
-    val player = Player("Hans", 500)
+    val player = PokerPlayer("Hans", 500)
 
     val exception = shouldThrow<IllegalArgumentException> {
       player.setBetAmount(0)
