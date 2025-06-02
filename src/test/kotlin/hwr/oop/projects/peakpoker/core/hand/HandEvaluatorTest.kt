@@ -21,10 +21,12 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
+import hwr.oop.projects.peakpoker.core.exceptions.EmptyPlayerListException
 import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.Game
 import hwr.oop.projects.peakpoker.core.player.Player
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HandEvaluatorTest : AnnotationSpec() {
   private val mockPlayer = object : Player {
@@ -35,7 +37,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   private val mockGame = object : Game {
     override val id: GameId = GameId("dummyGameId")
   }
-  //SECTION: HandEvaluator.determineHighestHand
+
   /**
    * Verifies that a single player wins by default when no competition exists.
    */
@@ -282,7 +284,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   /**
    * Verifies that an exception is thrown when the player list is empty.
    */
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun `empty player list throws exception`() {
     val community = CommunityCards(
       listOf(
@@ -294,14 +296,18 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), mockGame
     )
 
-    HandEvaluator.determineHighestHand(emptyList(), community)
+    assertThatThrownBy {
+      HandEvaluator.determineHighestHand(emptyList(), community)
+    }
+      .isExactlyInstanceOf(EmptyPlayerListException::class.java)
+      .hasMessageContaining("Cannot determine highest hand with empty player list")
   }
 
   /**
    * Confirms the correct winner is determined out of four players.
    */
   @Test
-  fun `gives the correct winner out of 4 players`() {
+  fun `gives the correct winner out of four players`() {
     val flushPlayer = object : Player {
       override val name = "Flush"
       val id = "1"

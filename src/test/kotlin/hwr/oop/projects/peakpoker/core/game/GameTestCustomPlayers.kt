@@ -35,7 +35,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
   }
 
   @Test
-  fun `negative small blind amount throws exceptions`() {
+  fun `negative small blind amount throws exception`() {
     assertThatThrownBy {
       PokerGame(
         -10, 20,
@@ -47,7 +47,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
   }
 
   @Test
-  fun `negative big blind amount throws exceptions`() {
+  fun `negative big blind amount throws exception`() {
     // negative big blind
     assertThatThrownBy {
       PokerGame(
