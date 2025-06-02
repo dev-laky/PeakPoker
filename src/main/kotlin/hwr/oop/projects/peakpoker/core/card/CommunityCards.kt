@@ -1,12 +1,12 @@
 package hwr.oop.projects.peakpoker.core.card
 
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
-import hwr.oop.projects.peakpoker.core.game.GameInterface
+import hwr.oop.projects.peakpoker.core.game.Game
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 
 class CommunityCards(
   val cards: List<Card>,
-  val game: GameInterface,
+  val game: Game,
 ) : Iterable<Card> by cards {
   init {
     if (cards.isNotEmpty() && cards.size != 5) {

@@ -14,101 +14,101 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 class PlayerTest : AnnotationSpec() {
   @Test
   fun `player has name`() {
-    val player = Player("Hans")
-    val playerName: String = player.name
+    val pokerPlayer = PokerPlayer("Hans")
+    val playerName: String = pokerPlayer.name
     assertThat(playerName).isEqualTo("Hans")
   }
 
   @Test
   fun `player bet can be raised`() {
-    val player = Player("Hans")
-    player.setBetAmount(10)
-    assertThat(player.getBet()).isEqualTo(10)
+    val pokerPlayer = PokerPlayer("Hans")
+    pokerPlayer.setBetAmount(10)
+    assertThat(pokerPlayer.getBet()).isEqualTo(10)
   }
 
   @Test
   fun `player initializes with isFolded and isAllIn as false`() {
-    val player = Player("Hans")
-    assertThat(player.isFolded).isFalse()
-    assertThat(player.isAllIn).isFalse()
+    val pokerPlayer = PokerPlayer("Hans")
+    assertThat(pokerPlayer.isFolded).isFalse()
+    assertThat(pokerPlayer.isAllIn).isFalse()
   }
 
   @Test
   fun `getChips returns correct initial chip count`() {
     val initialChips = 500
-    val player = Player("Hans", initialChips)
-    assertThat(player.getChips()).isEqualTo(initialChips)
+    val pokerPlayer = PokerPlayer("Hans", initialChips)
+    assertThat(pokerPlayer.getChips()).isEqualTo(initialChips)
   }
 
   @Test
   fun `assignHand correctly assigns hole cards to player`() {
-    val player = Player("Hans")
+    val pokerPlayer = PokerPlayer("Hans")
 
     val holeCards = HoleCards(
       listOf(
         Card(Suit.DIAMONDS, Rank.FIVE),
         Card(Suit.DIAMONDS, Rank.SIX)
       ),
-      player
+      pokerPlayer
     )
 
-    player.assignHand(holeCards)
+    pokerPlayer.assignHand(holeCards)
 
-    assertThat(player.getHand()).isEqualTo(holeCards)
+    assertThat(pokerPlayer.getHand()).isEqualTo(holeCards)
   }
 
   @Test
   fun `betting reduces player chip count`() {
     val initialChips = 500
     val betAmount = 100
-    val player = Player("Hans", initialChips)
+    val pokerPlayer = PokerPlayer("Hans", initialChips)
 
-    player.setBetAmount(betAmount)
+    pokerPlayer.setBetAmount(betAmount)
 
-    assertThat(player.getChips()).isEqualTo(initialChips - betAmount)
-    assertThat(player.getBet()).isEqualTo(betAmount)
+    assertThat(pokerPlayer.getChips()).isEqualTo(initialChips - betAmount)
+    assertThat(pokerPlayer.getBet()).isEqualTo(betAmount)
   }
 
   @Test
   fun `multiple bets accumulate correctly`() {
     val initialChips = 500
-    val player = Player("Hans", initialChips)
+    val pokerPlayer = PokerPlayer("Hans", initialChips)
 
-    player.setBetAmount(100)
-    player.setBetAmount(150)
+    pokerPlayer.setBetAmount(100)
+    pokerPlayer.setBetAmount(150)
 
-    assertThat(player.getBet()).isEqualTo(150)
-    assertThat(player.getChips()).isEqualTo(initialChips - 150)
+    assertThat(pokerPlayer.getBet()).isEqualTo(150)
+    assertThat(pokerPlayer.getChips()).isEqualTo(initialChips - 150)
   }
 
   @Test
   fun `bet validation throws exception for negative amounts`() {
-    val player = Player("Hans", 500)
+    val pokerPlayer = PokerPlayer("Hans", 500)
 
-    assertThatThrownBy { player.setBetAmount(-1) }
+    assertThatThrownBy { pokerPlayer.setBetAmount(-1) }
       .isExactlyInstanceOf(InvalidBetAmountException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(player.getBet()).isEqualTo(0)
-    assertThat(player.getChips()).isEqualTo(500)
+    assertThat(pokerPlayer.getBet()).isEqualTo(0)
+    assertThat(pokerPlayer.getChips()).isEqualTo(500)
   }
 
   @Test
   fun `bet of zero amount is not accepted`() {
-    val player = Player("Hans", 500)
+    val pokerPlayer = PokerPlayer("Hans", 500)
 
-    assertThatThrownBy { player.setBetAmount(0) }
+    assertThatThrownBy { pokerPlayer.setBetAmount(0) }
       .isExactlyInstanceOf(InvalidBetAmountException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(player.getBet()).isEqualTo(0)
-    assertThat(player.getChips()).isEqualTo(500)
+    assertThat(pokerPlayer.getBet()).isEqualTo(0)
+    assertThat(pokerPlayer.getChips()).isEqualTo(500)
   }
 
   @Test
   fun `player creation with negative chips throws exception`() {
     assertThatThrownBy {
-      Player("TestPlayer", -100)
+      PokerPlayer("TestPlayer", -100)
     }
       .isExactlyInstanceOf(InsufficientChipsException::class.java)
       .hasMessageContaining("Chips amount must be non-negative")
@@ -116,21 +116,21 @@ class PlayerTest : AnnotationSpec() {
 
   @Test
   fun `player creation with zero chips is valid`() {
-    val player = Player("ZeroChipsPlayer", 0)
-    assertThat(player.getChips()).isEqualTo(0)
+    val pokerPlayer = PokerPlayer("ZeroChipsPlayer", 0)
+    assertThat(pokerPlayer.getChips()).isEqualTo(0)
   }
 
   @Test
   fun `player creation with positive chips is valid`() {
     val chips = 150
-    val player = Player("TestPlayer", chips)
-    assertThat(player.getChips()).isEqualTo(chips)
+    val pokerPlayer = PokerPlayer("TestPlayer", chips)
+    assertThat(pokerPlayer.getChips()).isEqualTo(chips)
   }
 
   @Test
   fun `player creation with blank name throws exception`() {
     assertThatThrownBy {
-      Player("", 100)
+      PokerPlayer("", 100)
     }
       .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
       .hasMessageContaining("Player name cannot be blank")
@@ -139,7 +139,7 @@ class PlayerTest : AnnotationSpec() {
   @Test
   fun `player creation with whitespace name throws exception`() {
     assertThatThrownBy {
-      Player("   ", 100)
+      PokerPlayer("   ", 100)
     }
       .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
       .hasMessageContaining("Player name cannot be blank")

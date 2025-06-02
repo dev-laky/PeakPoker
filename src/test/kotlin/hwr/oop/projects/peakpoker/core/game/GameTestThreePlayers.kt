@@ -1,23 +1,23 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class GameTestThreePlayers : AnnotationSpec() {
-  lateinit var player1: Player
-  lateinit var player2: Player
-  lateinit var player3: Player
-  lateinit var testGame: Game
+  lateinit var pokerPlayer1: PokerPlayer
+  lateinit var pokerPlayer2: PokerPlayer
+  lateinit var pokerPlayer3: PokerPlayer
+  lateinit var testPokerGame: PokerGame
 
   @BeforeEach
   fun setup() {
-    player1 = Player("Hans")
-    player2 = Player("Peter")
-    player3 = Player("Max")
-    testGame = Game(
+    pokerPlayer1 = PokerPlayer("Hans")
+    pokerPlayer2 = PokerPlayer("Peter")
+    pokerPlayer3 = PokerPlayer("Max")
+    testPokerGame = PokerGame(
       10, 20,
-      listOf(player1, player2, player3),
+      listOf(pokerPlayer1, pokerPlayer2, pokerPlayer3),
       GameId("testGame100")
     )
   }
@@ -25,7 +25,7 @@ class GameTestThreePlayers : AnnotationSpec() {
   @Test
   fun `check if get current player works correctly`() {
     // when
-    val currentPlayer = testGame.getCurrentPlayer()
+    val currentPlayer = testPokerGame.getCurrentPlayer()
 
     // then
     assertThat(currentPlayer.name).isEqualTo("Max")
@@ -33,145 +33,144 @@ class GameTestThreePlayers : AnnotationSpec() {
 
   @Test
   fun `makeTurn advances currentPlayerIndex to next player`() {
-    val initialPlayer = testGame.getCurrentPlayer()
-    testGame.call(player3)
-    val nextPlayer = testGame.getCurrentPlayer()
+    val initialPlayer = testPokerGame.getCurrentPlayer()
+    testPokerGame.call(pokerPlayer3)
+    val nextPlayer = testPokerGame.getCurrentPlayer()
 
     assertThat(nextPlayer.name).isNotEqualTo(initialPlayer.name)
-    assertThat(testGame.currentPlayerIndex).isEqualTo(0)
+    assertThat(testPokerGame.currentPlayerIndex).isEqualTo(0)
   }
 
   @Test
   fun `checkPlayerValidity returns false for existing players and true for new players`() {
-    val existingPlayer = Player("Hans")
-    val newPlayer = Player("Sara")
+    val existingPokerPlayer = PokerPlayer("Hans")
+    val newPokerPlayer = PokerPlayer("Sara")
 
-    assertThat(testGame.checkPlayerValidity(existingPlayer)).isFalse()
-    assertThat(testGame.checkPlayerValidity(newPlayer)).isTrue()
+    assertThat(testPokerGame.checkPlayerValidity(existingPokerPlayer)).isFalse()
+    assertThat(testPokerGame.checkPlayerValidity(newPokerPlayer)).isTrue()
   }
 
   @Test
   fun `getHighestBet is equal to big blind amount on init`() {
-    assertThat(testGame.getHighestBet()).isEqualTo(20)
+    assertThat(testPokerGame.getHighestBet()).isEqualTo(20)
   }
 
   @Test
   fun `getHighestBet returns updated value when player raises`() {
     // when
-    testGame.call(player3)
-    testGame.raiseBetTo(player1, 50)
+    testPokerGame.call(pokerPlayer3)
+    testPokerGame.raiseBetTo(pokerPlayer1, 50)
 
     // then
-    assertThat(testGame.getHighestBet()).isEqualTo(50)
+    assertThat(testPokerGame.getHighestBet()).isEqualTo(50)
   }
 
   @Test
   fun `getHighestBet returns highest bet when multiple players have different bets`() {
     // when
-    testGame.call(player3)
-    testGame.raiseBetTo(player1, 40)
-    testGame.call(player2)
+    testPokerGame.call(pokerPlayer3)
+    testPokerGame.raiseBetTo(pokerPlayer1, 40)
+    testPokerGame.call(pokerPlayer2)
 
     // then
-    assertThat(testGame.getHighestBet()).isEqualTo(40)
-    assertThat(player1.getBet()).isEqualTo(40)
-    assertThat(player2.getBet()).isEqualTo(40)
-    assertThat(player3.getBet()).isEqualTo(20)
+    assertThat(testPokerGame.getHighestBet()).isEqualTo(40)
+    assertThat(pokerPlayer1.getBet()).isEqualTo(40)
+    assertThat(pokerPlayer2.getBet()).isEqualTo(40)
+    assertThat(pokerPlayer3.getBet()).isEqualTo(20)
   }
 
   @Test
   fun `getHighestBet still counts folded player bets`() {
     // when
-    testGame.call(player3)
-    testGame.raiseBetTo(player1, 50)
-    testGame.fold(player2)
+    testPokerGame.call(pokerPlayer3)
+    testPokerGame.raiseBetTo(pokerPlayer1, 50)
+    testPokerGame.fold(pokerPlayer2)
 
     // then
-    assertThat(testGame.getHighestBet()).isEqualTo(50)
-    assertThat(player2.isFolded).isTrue()
-    assertThat(player2.getBet()).isEqualTo(20) // Player keeps their bet even when folded
+    assertThat(testPokerGame.getHighestBet()).isEqualTo(50)
+    assertThat(pokerPlayer2.isFolded).isTrue()
+    assertThat(pokerPlayer2.getBet()).isEqualTo(20) // Player keeps their bet even when folded
   }
 
   @Test
   fun `big blind amount must be twice the smallBlind amount`() {
-    assertThat(testGame.bigBlindAmount).isEqualTo(testGame.smallBlindAmount * 2)
+    assertThat(testPokerGame.bigBlindAmount).isEqualTo(testPokerGame.smallBlindAmount * 2)
   }
 
   @Test
   fun `getSmallBlind returns correct small blind amount`() {
-    assertThat(testGame.getSmallBlind()).isEqualTo(10)
+    assertThat(testPokerGame.getSmallBlind()).isEqualTo(10)
   }
 
   @Test
   fun `getBigBlind returns correct big blind amount`() {
-    assertThat(testGame.getBigBlind()).isEqualTo(20)
+    assertThat(testPokerGame.getBigBlind()).isEqualTo(20)
   }
 
   @Test
   fun `makeTurn cycles to first player at the end of table`() {
-    testGame.call(player3)
+    testPokerGame.call(pokerPlayer3)
 
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+    assertThat(testPokerGame.getCurrentPlayer()).isEqualTo(pokerPlayer1)
   }
 
   @Test
   fun `makeTurn correctly sets currentPlayerIndex`() {
-    testGame.call(player3)
-    testGame.raiseBetTo(player1, 100)
+    testPokerGame.call(pokerPlayer3)
+    testPokerGame.raiseBetTo(pokerPlayer1, 100)
 
-    assertThat(testGame.currentPlayerIndex).isEqualTo(1)
+    assertThat(testPokerGame.currentPlayerIndex).isEqualTo(1)
   }
 
   @Test
   fun `dealHoleCards correctly assigns 2 cards to each player during initialization`() {
-    assertThat(player1.getHand().cards).hasSize(2)
-    assertThat(player2.getHand().cards).hasSize(2)
-    assertThat(player3.getHand().cards).hasSize(2)
+    assertThat(pokerPlayer1.getHand().cards).hasSize(2)
+    assertThat(pokerPlayer2.getHand().cards).hasSize(2)
+    assertThat(pokerPlayer3.getHand().cards).hasSize(2)
   }
 
   @Test
   fun `dealHoleCards removes correct number of cards from the deck`() {
-    val playerCount = testGame.playersOnTable.size
+    val playerCount = testPokerGame.playersOnTable.size
 
-    assertThat(testGame.deck.show()).hasSize(52 - (2 * playerCount))
+    assertThat(testPokerGame.deck.show()).hasSize(52 - (2 * playerCount))
   }
 
   @Test
   fun `dealHoleCards assigns unique cards to each player`() {
     // then - collect all cards from players' hands and check for uniqueness
-    val allCards = player1.getHand().cards + player2.getHand().cards + player3.getHand().cards
+    val allCards = pokerPlayer1.getHand().cards + pokerPlayer2.getHand().cards + pokerPlayer3.getHand().cards
     assertThat(allCards).hasSize(6) // 3 players * 2 cards
     assertThat(allCards.distinct()).hasSize(6) // All cards should be unique
   }
 
-  // POT TESTS
   @Test
   fun `initial pot equals sum of blinds`() {
     // then
-    assertThat(testGame.pot).isEqualTo(30) // Small blind(10) + Big blind(20)
-    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testPokerGame.calculatePot()).isEqualTo(30) // Small blind(10) + Big blind(20)
+    assertThat(testPokerGame.calculatePot()).isEqualTo(pokerPlayer1.getBet() + pokerPlayer2.getBet() + pokerPlayer3.getBet())
   }
 
   @Test
   fun `pot increases when players bet or raise`() {
     // when
-    testGame.call(player3) // Player3 calls big blind (20)
-    testGame.raiseBetTo(player1, 50) // Player1 raises to 50
+    testPokerGame.call(pokerPlayer3) // Player3 calls big blind (20)
+    testPokerGame.raiseBetTo(pokerPlayer1, 50) // Player1 raises to 50
 
     // then
-    assertThat(testGame.pot).isEqualTo(90) // 20 + 20 + 50
+    assertThat(testPokerGame.calculatePot()).isEqualTo(90) // 20 + 20 + 50
   }
 
   @Test
   fun `pot includes bets from folded players`() {
     // when
-    testGame.call(player3) // Player3 calls to 20
-    testGame.raiseBetTo(player1, 50) // Player1 raises to 50
-    testGame.fold(player2) // Player2 folds (still has 20 in pot)
+    testPokerGame.call(pokerPlayer3) // Player3 calls to 20
+    testPokerGame.raiseBetTo(pokerPlayer1, 50) // Player1 raises to 50
+    testPokerGame.fold(pokerPlayer2) // Player2 folds (still has 20 in pot)
 
     // then
-    assertThat(testGame.pot).isEqualTo(90) // 50 + 20 + 20
-    assertThat(player2.isFolded).isTrue()
-    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testPokerGame.calculatePot()).isEqualTo(90) // 50 + 20 + 20
+    assertThat(pokerPlayer2.isFolded).isTrue()
+    assertThat(testPokerGame.calculatePot()).isEqualTo(pokerPlayer1.getBet() + pokerPlayer2.getBet() + pokerPlayer3.getBet())
   }
 }

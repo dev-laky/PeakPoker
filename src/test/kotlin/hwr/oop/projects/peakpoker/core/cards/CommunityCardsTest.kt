@@ -7,14 +7,14 @@ import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
 import hwr.oop.projects.peakpoker.core.game.GameId
-import hwr.oop.projects.peakpoker.core.game.GameInterface
+import hwr.oop.projects.peakpoker.core.game.Game
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class CommunityCardsTest : AnnotationSpec() {
 
-  private val mockGame = object : GameInterface {
+  private val mockGame = object : Game {
     override val id: GameId = GameId("mockGame")
   }
 

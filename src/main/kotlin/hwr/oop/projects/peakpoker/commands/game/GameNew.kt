@@ -6,8 +6,8 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import hwr.oop.projects.peakpoker.core.exceptions.GameException
-import hwr.oop.projects.peakpoker.core.game.Game
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.game.PokerGame
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 class GameNew : CliktCommand(name = "new") {
   override fun help(context: Context) = "Create a new Game."
@@ -23,15 +23,15 @@ class GameNew : CliktCommand(name = "new") {
     }
 
     try {
-      val game = Game(
+      val pokerGame = PokerGame(
         smallBlindAmount = 10,
         bigBlindAmount = 20,
-        playersOnTable = players!!.map { Player(name = it, chips = 100) })
+        playersOnTable = players!!.map { PokerPlayer(name = it, chips = 100) })
 
       // TODO: Save game to file
 
-      echo("Game ID: ${game.id}")
-      echo("New game created with players: ${game.playersOnTable.joinToString(", ") { it.name }}")
+      echo("Game ID: ${pokerGame.id}")
+      echo("New game created with players: ${pokerGame.playersOnTable.joinToString(", ") { it.name }}")
     } catch (e: GameException) {
       echo("Error creating game: ${e.message}")
     }

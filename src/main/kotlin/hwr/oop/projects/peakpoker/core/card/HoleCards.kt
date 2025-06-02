@@ -2,11 +2,11 @@ package hwr.oop.projects.peakpoker.core.card
 
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
-import hwr.oop.projects.peakpoker.core.player.PlayerInterface
+import hwr.oop.projects.peakpoker.core.player.Player
 
 class HoleCards(
   val cards: List<Card>,
-  val player: PlayerInterface,
+  val player: Player,
 ) : Iterable<Card> by cards {
   init {
     if (cards.isNotEmpty() && cards.size != 2) {

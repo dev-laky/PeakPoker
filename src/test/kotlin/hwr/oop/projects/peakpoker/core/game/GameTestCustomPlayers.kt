@@ -1,7 +1,7 @@
 package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import io.kotest.core.spec.style.AnnotationSpec
@@ -12,22 +12,22 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `check if player validity function returns correct boolean`() {
     // given
-    val testGame = Game(
+    val testPokerGame = PokerGame(
       10, 20,
-      listOf(Player("Hans"), Player("Peter"))
+      listOf(PokerPlayer("Hans"), PokerPlayer("Peter"))
     )
-    val duplicatePlayer = Player("Hans")
+    val duplicatePokerPlayer = PokerPlayer("Hans")
 
     // when/then
-    assertThat(testGame.checkPlayerValidity(duplicatePlayer)).isFalse()
+    assertThat(testPokerGame.checkPlayerValidity(duplicatePokerPlayer)).isFalse()
   }
 
   @Test
   fun `check if duplicate exception works`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, 20,
-        listOf(Player("Hans"), Player("Hans"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Hans"))
       )
     }
       .isExactlyInstanceOf(DuplicatePlayerException::class.java)
@@ -37,9 +37,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `negative small blind amount throws exceptions`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         -10, 20,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -50,9 +50,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   fun `negative big blind amount throws exceptions`() {
     // negative big blind
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, -20,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -62,9 +62,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `zero small blind amount throws exception`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         0, 20,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -74,9 +74,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `zero big blind amount throws exception`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, 0,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -86,9 +86,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `big blind smaller than small blind throws exception`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         30, 20,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -98,9 +98,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `big blind amount must be positive`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, 0,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -110,9 +110,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `big blind amount must be greater than or equal to small blind amount`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         20, 10,
-        listOf(Player("Hans"), Player("Peter"), Player("Max"))
+        listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
       .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
@@ -121,62 +121,62 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
   @Test
   fun `makeTurn skips all-in players with multiple players`() {
-    val player1 = Player("Hans")
-    val player2 = Player("Peter")
-    val player3 = Player("Max")
-    val player4 = Player("Anna")
-    val testGame =
-      Game(
+    val pokerPlayer1 = PokerPlayer("Hans")
+    val pokerPlayer2 = PokerPlayer("Peter")
+    val pokerPlayer3 = PokerPlayer("Max")
+    val pokerPlayer4 = PokerPlayer("Anna")
+    val testPokerGame =
+      PokerGame(
         10, 20,
-        listOf(player1, player2, player3, player4)
+        listOf(pokerPlayer1, pokerPlayer2, pokerPlayer3, pokerPlayer4)
       )
 
-    testGame.allIn(player3)
-    testGame.allIn(player4)
+    testPokerGame.allIn(pokerPlayer3)
+    testPokerGame.allIn(pokerPlayer4)
 
-    testGame.call(player1)
-    testGame.call(player2)
+    testPokerGame.call(pokerPlayer1)
+    testPokerGame.call(pokerPlayer2)
 
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+    assertThat(testPokerGame.getCurrentPlayer()).isEqualTo(pokerPlayer1)
   }
 
   @Test
   fun `makeTurn skips folded players with multiple players`() {
-    val player1 = Player("Hans")
-    val player2 = Player("Peter")
-    val player3 = Player("Max")
-    val player4 = Player("Anna")
-    val testGame =
-      Game(
+    val pokerPlayer1 = PokerPlayer("Hans")
+    val pokerPlayer2 = PokerPlayer("Peter")
+    val pokerPlayer3 = PokerPlayer("Max")
+    val pokerPlayer4 = PokerPlayer("Anna")
+    val testPokerGame =
+      PokerGame(
         10, 20,
-        listOf(player1, player2, player3, player4)
+        listOf(pokerPlayer1, pokerPlayer2, pokerPlayer3, pokerPlayer4)
       )
 
-    testGame.fold(player3)
-    testGame.fold(player4)
+    testPokerGame.fold(pokerPlayer3)
+    testPokerGame.fold(pokerPlayer4)
 
-    testGame.call(player1)
-    testGame.check(player2)
+    testPokerGame.call(pokerPlayer1)
+    testPokerGame.check(pokerPlayer2)
 
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
+    assertThat(testPokerGame.getCurrentPlayer()).isEqualTo(pokerPlayer1)
   }
 
   @Test
   fun `getId returns correct game identifier`() {
     val testGameId = GameId("testGame100")
-    val testGame = Game(
+    val testPokerGame = PokerGame(
       10, 20,
-      listOf(Player("Hans"), Player("Peter"), Player("Max")),
+      listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max")),
       testGameId
     )
 
-    assertThat(testGame.id).isEqualTo(testGameId)
+    assertThat(testPokerGame.id).isEqualTo(testGameId)
   }
 
   @Test
   fun `game creation with empty player list throws exception`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, 20,
         emptyList()
       )
@@ -188,9 +188,9 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `game creation with one player list throws exception`() {
     assertThatThrownBy {
-      Game(
+      PokerGame(
         10, 20,
-        listOf(Player("Hans"))
+        listOf(PokerPlayer("Hans"))
       )
     }
       .isExactlyInstanceOf(MinimumPlayersException::class.java)
@@ -200,47 +200,47 @@ class GameTestCustomPlayers : AnnotationSpec() {
   @Test
   fun `getHighestBet updates when player goes all-in with higher amount`() {
     // given
-    val player1 = Player("Hans", 100)
-    val player2 = Player("Peter", 200)
-    val richPlayer = Player("Rich", 500)
-    val customGame = Game(10, 20, listOf(player1, player2, richPlayer))
+    val pokerPlayer1 = PokerPlayer("Hans", 100)
+    val pokerPlayer2 = PokerPlayer("Peter", 200)
+    val richPokerPlayer = PokerPlayer("Rich", 500)
+    val customPokerGame = PokerGame(10, 20, listOf(pokerPlayer1, pokerPlayer2, richPokerPlayer))
 
     // when
-    customGame.allIn(richPlayer)
+    customPokerGame.allIn(richPokerPlayer)
 
     // then
-    assertThat(customGame.getHighestBet()).isEqualTo(500)
-    assertThat(richPlayer.isAllIn).isTrue()
+    assertThat(customPokerGame.getHighestBet()).isEqualTo(500)
+    assertThat(richPokerPlayer.isAllIn).isTrue()
   }
 
   @Test
   fun `pot includes bets from all-in players`() {
-    val player1 = Player("Hans", 100)
-    val player2 = Player("Peter", 200)
-    val smallStackPlayer = Player("Poor", 40)
-    val customGame = Game(10, 20, listOf(player1, player2, smallStackPlayer))
+    val pokerPlayer1 = PokerPlayer("Hans", 100)
+    val pokerPlayer2 = PokerPlayer("Peter", 200)
+    val smallStackPokerPlayer = PokerPlayer("Poor", 40)
+    val customPokerGame = PokerGame(10, 20, listOf(pokerPlayer1, pokerPlayer2, smallStackPokerPlayer))
 
-    customGame.allIn(smallStackPlayer)
+    customPokerGame.allIn(smallStackPokerPlayer)
 
-    assertThat(customGame.pot).isEqualTo(70) // 10 + 20 + 40
-    assertThat(smallStackPlayer.isAllIn).isTrue()
+    assertThat(customPokerGame.calculatePot()).isEqualTo(70) // 10 + 20 + 40
+    assertThat(smallStackPokerPlayer.isAllIn).isTrue()
   }
 
   @Test
   fun `pot is calculated correctly with multiple different bet amounts`() {
     // given
-    val richPlayer = Player("Rich", 200)
-    val poorPlayer = Player("Poor", 50)
-    val mediumPlayer = Player("Medium", 100)
-    val customGame = Game(10, 20, listOf(richPlayer, poorPlayer, mediumPlayer))
+    val richPokerPlayer = PokerPlayer("Rich", 200)
+    val poorPokerPlayer = PokerPlayer("Poor", 50)
+    val mediumPokerPlayer = PokerPlayer("Medium", 100)
+    val customPokerGame = PokerGame(10, 20, listOf(richPokerPlayer, poorPokerPlayer, mediumPokerPlayer))
 
     // when
-    customGame.call(mediumPlayer) // Calls to 20
-    customGame.raiseBetTo(richPlayer, 40) // Raises to 40
-    customGame.allIn(poorPlayer) // All-in with 50
+    customPokerGame.call(mediumPokerPlayer) // Calls to 20
+    customPokerGame.raiseBetTo(richPokerPlayer, 40) // Raises to 40
+    customPokerGame.allIn(poorPokerPlayer) // All-in with 50
 
     // then
-    assertThat(customGame.pot).isEqualTo(110) // 40 + 50 + 20
-    assertThat(customGame.pot).isEqualTo(richPlayer.getBet() + poorPlayer.getBet() + mediumPlayer.getBet())
+    assertThat(customPokerGame.calculatePot()).isEqualTo(110) // 40 + 50 + 20
+    assertThat(customPokerGame.calculatePot()).isEqualTo(richPokerPlayer.getBet() + poorPokerPlayer.getBet() + mediumPokerPlayer.getBet())
   }
 }
