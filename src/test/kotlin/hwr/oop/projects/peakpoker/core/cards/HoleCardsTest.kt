@@ -11,88 +11,88 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HoleCardsTest : AnnotationSpec() {
 
-  private val mockPlayer = object : Player {
-    override val name: String = "TestPlayer"
-  }
+    private val mockPlayer = object : Player {
+        override val name: String = "TestPlayer"
+    }
 
-  @Test
-  fun `HoleCards should contain exactly two cards`() {
-    val cards = listOf(
-      Card(Suit.DIAMONDS, Rank.FIVE),
-      Card(Suit.HEARTS, Rank.ACE)
-    )
+    @Test
+    fun `HoleCards should contain exactly two cards`() {
+        val cards = listOf(
+            Card(Suit.DIAMONDS, Rank.FIVE),
+            Card(Suit.HEARTS, Rank.ACE)
+        )
 
-    val holeCards = HoleCards(cards, mockPlayer)
+        val holeCards = HoleCards(cards, mockPlayer)
 
-    assertThat(holeCards.cards).hasSize(2)
-  }
+        assertThat(holeCards.cards).hasSize(2)
+    }
 
-  @Test
-  fun `HoleCards should throw exception when less than 2 cards are provided`() {
-    val cards = listOf(
-      Card(Suit.DIAMONDS, Rank.FIVE)
-    )
+    @Test
+    fun `HoleCards should throw exception when less than 2 cards are provided`() {
+        val cards = listOf(
+            Card(Suit.DIAMONDS, Rank.FIVE)
+        )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
-      .isInstanceOf(IllegalArgumentException::class.java)
-      .hasMessageContaining("exactly two cards")
-  }
+        assertThatThrownBy { HoleCards(cards, mockPlayer) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("exactly two cards")
+    }
 
-  @Test
-  fun `HoleCards should throw exception when more than 2 cards are provided`() {
-    val cards = listOf(
-      Card(Suit.DIAMONDS, Rank.FIVE),
-      Card(Suit.HEARTS, Rank.ACE),
-      Card(Suit.SPADES, Rank.KING)
-    )
+    @Test
+    fun `HoleCards should throw exception when more than 2 cards are provided`() {
+        val cards = listOf(
+            Card(Suit.DIAMONDS, Rank.FIVE),
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.SPADES, Rank.KING)
+        )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
-      .isInstanceOf(IllegalArgumentException::class.java)
-      .hasMessageContaining("exactly two cards")
-  }
+        assertThatThrownBy { HoleCards(cards, mockPlayer) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("exactly two cards")
+    }
 
-  @Test
-  fun `HoleCards should return the correct cards`() {
-    val card1 = Card(Suit.DIAMONDS, Rank.FIVE)
-    val card2 = Card(Suit.HEARTS, Rank.ACE)
+    @Test
+    fun `HoleCards should return the correct cards`() {
+        val card1 = Card(Suit.DIAMONDS, Rank.FIVE)
+        val card2 = Card(Suit.HEARTS, Rank.ACE)
 
-    val inputCards = listOf(card1, card2)
-    val holeCards = HoleCards(inputCards, mockPlayer)
+        val inputCards = listOf(card1, card2)
+        val holeCards = HoleCards(inputCards, mockPlayer)
 
-    assertThat(holeCards.cards).containsExactly(card1, card2)
-  }
+        assertThat(holeCards.cards).containsExactly(card1, card2)
+    }
 
-  @Test
-  fun `HoleCards should not allow duplicate cards`() {
-    val duplicateCard = Card(Suit.DIAMONDS, Rank.FIVE)
-    val cards = listOf(
-      duplicateCard,
-      duplicateCard
-    )
+    @Test
+    fun `HoleCards should not allow duplicate cards`() {
+        val duplicateCard = Card(Suit.DIAMONDS, Rank.FIVE)
+        val cards = listOf(
+            duplicateCard,
+            duplicateCard
+        )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
-      .isInstanceOf(IllegalArgumentException::class.java)
-      .hasMessageContaining("duplicates")
-  }
+        assertThatThrownBy { HoleCards(cards, mockPlayer) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("duplicates")
+    }
 
-  @Test
-  fun `HoleCards should work with empty list initialization`() {
-    val holeCards = HoleCards(emptyList(), mockPlayer)
+    @Test
+    fun `HoleCards should work with empty list initialization`() {
+        val holeCards = HoleCards(emptyList(), mockPlayer)
 
-    assertThat(holeCards.cards).isEmpty()
-  }
+        assertThat(holeCards.cards).isEmpty()
+    }
 
-  @Test
-  fun `HoleCards should implement Iterable interface correctly`() {
-    val cards = listOf(
-      Card(Suit.DIAMONDS, Rank.FIVE),
-      Card(Suit.HEARTS, Rank.ACE)
-    )
+    @Test
+    fun `HoleCards should implement Iterable interface correctly`() {
+        val cards = listOf(
+            Card(Suit.DIAMONDS, Rank.FIVE),
+            Card(Suit.HEARTS, Rank.ACE)
+        )
 
-    val holeCards = HoleCards(cards, mockPlayer)
-    val iteratedCards = holeCards.toList()
+        val holeCards = HoleCards(cards, mockPlayer)
+        val iteratedCards = holeCards.toList()
 
-    assertThat(iteratedCards).containsExactlyElementsOf(cards)
-  }
+        assertThat(iteratedCards).containsExactlyElementsOf(cards)
+    }
 
 }

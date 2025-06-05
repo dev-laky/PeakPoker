@@ -6,16 +6,16 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class DbCommandTest : AnnotationSpec() {
-  @Test
-  fun `test db command`() {
-    // given
-    val command = DbCommand()
+    @Test
+    fun `test db command`() {
+        // given
+        val command = DbCommand()
 
-    // when
-    val result = command.test()
+        // when
+        val result = command.test()
 
-    // then
-    assertThat(command.commandName).isEqualTo("db")
-    assertThat(result.statusCode).isEqualTo(0)
-  }
+        // then
+        assertThat(command.commandName).isEqualTo("db")
+        assertThat(result.statusCode).isEqualTo(0)
+    }
 }
