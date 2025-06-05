@@ -6,11 +6,11 @@ import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 class PokerRound(
-    private val players: List<PokerPlayer>,
-    private val smallBlindAmount: Int,
-    private val bigBlindAmount: Int,
-    private val smallBlindIndex: Int,
-    private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
+  private val players: List<PokerPlayer>,
+  private val smallBlindAmount: Int,
+  private val bigBlindAmount: Int,
+  private val smallBlindIndex: Int,
+  private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
 ) : Round {
 
   private val deck: Deck = Deck()

@@ -4,10 +4,10 @@ import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 
 class PokerGame(
-    private val smallBlindAmount: Int,
-    private val bigBlindAmount: Int,
-    val players: List<PokerPlayer> = listOf(),
-    override val id: GameId = GameId.generate(),
+  private val smallBlindAmount: Int,
+  private val bigBlindAmount: Int,
+  val players: List<PokerPlayer> = listOf(),
+  override val id: GameId = GameId.generate(),
 ) : Game {
 
   // Variable to track the index of the small blind player within players
