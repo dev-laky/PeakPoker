@@ -7,7 +7,6 @@ import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
-import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
