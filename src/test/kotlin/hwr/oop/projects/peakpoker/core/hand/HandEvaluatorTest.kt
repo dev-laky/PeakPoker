@@ -22,34 +22,18 @@ import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import hwr.oop.projects.peakpoker.core.game.GameActionable
-import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import org.assertj.core.api.Assertions.assertThat
 
 class HandEvaluatorTest : AnnotationSpec() {
-  private val mockPlayer = object : Player {
-    override val name: String = "dummy"
-    override fun isFolded() = false
-    override fun isAllIn() = false
-    override fun hasChecked() = false
-    override fun chips() = 0
-    override fun hand() = HoleCards(emptyList(), this)
-    override fun bet() = 0
-    override fun resetRoundState() {}
-    override fun resetBet() {}
-    override fun assignHand(cards: HoleCards) {}
-    override fun setBetAmount(chips: Int) {}
-    override fun check() {}
-    override fun fold() {}
-    override fun allIn() {}
-  }
+  private val testPlayer = PokerPlayer("TestPlayer")
 
   private val mockRound = object : GameActionable {
-    override fun raiseBetTo(player: Player, chips: Int) {}
-    override fun call(player: Player) {}
-    override fun check(player: Player) {}
-    override fun fold(player: Player) {}
-    override fun allIn(player: Player) {}
+    override fun raiseBetTo(player: PokerPlayer, chips: Int) {}
+    override fun call(player: PokerPlayer) {}
+    override fun check(player: PokerPlayer) {}
+    override fun fold(player: PokerPlayer) {}
+    override fun allIn(player: PokerPlayer) {}
   }
 
   //SECTION: HandEvaluator.determineHighestHand
@@ -62,7 +46,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       listOf(
         Card(HEARTS, ACE),
         Card(SPADES, KING)
-      ), mockPlayer
+      ), testPlayer
     )
 
     val community = CommunityCards(
@@ -77,7 +61,7 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     val winner =
       HandEvaluator.determineHighestHand(listOf(holeCards), community)
-    assertThat(winner.player).isEqualTo(mockPlayer)
+    assertThat(winner.player).isEqualTo(testPlayer)
   }
 
   /**
@@ -129,7 +113,7 @@ class HandEvaluatorTest : AnnotationSpec() {
     val straightPlayer = PokerPlayer("Straight")
     val pairPlayer = PokerPlayer("Pair")
 
-    // Player can make straight (3-7)
+    // PokerPlayer can make straight (3-7)
     val holeStraight = HoleCards(
       listOf(
         Card(HEARTS, THREE),
@@ -138,7 +122,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       straightPlayer
     )
 
-    // Player has a pair
+    // PokerPlayer has a pair
     val holePair = HoleCards(
       listOf(
         Card(DIAMONDS, ACE),

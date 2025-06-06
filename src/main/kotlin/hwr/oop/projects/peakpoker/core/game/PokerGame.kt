@@ -3,13 +3,13 @@ package hwr.oop.projects.peakpoker.core.game
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 
 class PokerGame(
   private val smallBlindAmount: Int,
   private val bigBlindAmount: Int,
-  val players: List<Player> = listOf(),
+  val players: List<PokerPlayer> = listOf(),
   val id: GameId = GameId.generate(),
 ) : GameActionable {
 
@@ -64,11 +64,11 @@ class PokerGame(
   }
 
   // Game-level functions and delegation to Round
-  override fun raiseBetTo(player: Player, chips: Int) =
+  override fun raiseBetTo(player: PokerPlayer, chips: Int) =
     round.raiseBetTo(player, chips)
 
-  override fun call(player: Player) = round.call(player)
-  override fun check(player: Player) = round.check(player)
-  override fun fold(player: Player) = round.fold(player)
-  override fun allIn(player: Player) = round.allIn(player)
+  override fun call(player: PokerPlayer) = round.call(player)
+  override fun check(player: PokerPlayer) = round.check(player)
+  override fun fold(player: PokerPlayer) = round.fold(player)
+  override fun allIn(player: PokerPlayer) = round.allIn(player)
 }
