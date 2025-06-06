@@ -1,11 +1,11 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.player.Player
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 interface GameActionable {
-  fun raiseBetTo(player: Player, chips: Int)
-  fun call(player: Player)
-  fun check(player: Player)
-  fun fold(player: Player)
-  fun allIn(player: Player)
+  fun raiseBetTo(player: PokerPlayer, chips: Int)
+  fun call(player: PokerPlayer)
+  fun check(player: PokerPlayer)
+  fun fold(player: PokerPlayer)
+  fun allIn(player: PokerPlayer)
 }

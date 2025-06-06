@@ -4,31 +4,16 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HoleCardsTest : AnnotationSpec() {
 
-  private val mockPlayer = object : Player {
-    override val name: String = "TestPlayer"
-    override fun isFolded(): Boolean = false
-    override fun isAllIn(): Boolean = false
-    override fun hasChecked(): Boolean = false
-    override fun chips(): Int = 0
-    override fun hand(): HoleCards = HoleCards(emptyList(), this)
-    override fun bet(): Int = 0
-    override fun resetRoundState() {}
-    override fun resetBet() {}
-    override fun assignHand(cards: HoleCards) {}
-    override fun setBetAmount(chips: Int) {}
-    override fun check() {}
-    override fun fold() {}
-    override fun allIn() {}
-  }
+  private val testPlayer = PokerPlayer("TestPlayer")
 
   @Test
   fun `HoleCards should contain exactly two cards`() {
@@ -37,7 +22,7 @@ class HoleCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.ACE)
     )
 
-    val holeCards = HoleCards(cards, mockPlayer)
+    val holeCards = HoleCards(cards, testPlayer)
 
     assertThat(holeCards.cards).hasSize(2)
   }
@@ -48,7 +33,7 @@ class HoleCardsTest : AnnotationSpec() {
       Card(Suit.DIAMONDS, Rank.FIVE)
     )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
+    assertThatThrownBy { HoleCards(cards, testPlayer) }
       .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly two cards")
   }
@@ -61,7 +46,7 @@ class HoleCardsTest : AnnotationSpec() {
       Card(Suit.SPADES, Rank.KING)
     )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
+    assertThatThrownBy { HoleCards(cards, testPlayer) }
       .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly two cards")
   }
@@ -72,7 +57,7 @@ class HoleCardsTest : AnnotationSpec() {
     val card2 = Card(Suit.HEARTS, Rank.ACE)
 
     val inputCards = listOf(card1, card2)
-    val holeCards = HoleCards(inputCards, mockPlayer)
+    val holeCards = HoleCards(inputCards, testPlayer)
 
     assertThat(holeCards.cards).containsExactly(card1, card2)
   }
@@ -85,14 +70,14 @@ class HoleCardsTest : AnnotationSpec() {
       duplicateCard
     )
 
-    assertThatThrownBy { HoleCards(cards, mockPlayer) }
+    assertThatThrownBy { HoleCards(cards, testPlayer) }
       .isExactlyInstanceOf(DuplicateCardException::class.java)
       .hasMessageContaining("duplicates")
   }
 
   @Test
   fun `HoleCards should work with empty list initialization`() {
-    val holeCards = HoleCards(emptyList(), mockPlayer)
+    val holeCards = HoleCards(emptyList(), testPlayer)
 
     assertThat(holeCards.cards).isEmpty()
   }
@@ -104,7 +89,7 @@ class HoleCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.ACE)
     )
 
-    val holeCards = HoleCards(cards, mockPlayer)
+    val holeCards = HoleCards(cards, testPlayer)
     val iteratedCards = holeCards.toList()
 
     assertThat(iteratedCards).containsExactlyElementsOf(cards)
