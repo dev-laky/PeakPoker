@@ -25,7 +25,7 @@ class HandEvaluator {
         var bestPlayerHand = holeCardsList.first()
         var bestHand = getBestCombo(bestPlayerHand, community)
 
-        for (player in holeCardsList.drop(1)) {
+        holeCardsList.drop(1).forEach { player ->
             val currentHand = getBestCombo(player, community)
             if (currentHand.compareTo(bestHand) > 0) {
                 bestHand = currentHand
