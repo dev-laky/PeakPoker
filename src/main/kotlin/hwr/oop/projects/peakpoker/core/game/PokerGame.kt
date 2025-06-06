@@ -1,26 +1,40 @@
 package hwr.oop.projects.peakpoker.core.game
 
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
+import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
+import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 
 class PokerGame(
   private val smallBlindAmount: Int,
   private val bigBlindAmount: Int,
-  val players: List<PokerPlayer> = listOf(),
-  override val id: GameId = GameId.generate(),
-) : Game {
+  val players: List<Player> = listOf(),
+  val id: GameId = GameId.generate(),
+) : GameActionable {
 
   // Variable to track the index of the small blind player within players
   private var smallBlindIndex: Int = 0
 
-  private lateinit var round: PokerRound
+  private lateinit var round: GameActionable
 
   init {
-    require(smallBlindAmount > 0) { "Small blind amount must be positive" }
-    require(bigBlindAmount > 0) { "Big blind amount must be positive" }
-    require(bigBlindAmount == smallBlindAmount * 2) { "Big blind amount must be exactly double the small blind amount" }
-    require(players.size >= 2) { "Minimum number of players is 2" }
-    require(players.distinctBy { it.name }.size == players.size) { "All players must be unique" }
+    if (smallBlindAmount <= 0) {
+      throw InvalidBlindConfigurationException("Small blind amount must be positive")
+    }
+    if (bigBlindAmount <= 0) {
+      throw InvalidBlindConfigurationException("Big blind amount must be positive")
+    }
+    if (bigBlindAmount != smallBlindAmount * 2) {
+      throw InvalidBlindConfigurationException("Big blind amount must be exactly double the small blind amount")
+    }
+    if (players.size < 2) {
+      throw MinimumPlayersException("Minimum number of players is 2")
+    }
+    if (players.distinctBy { it.name }.size != players.size) {
+      throw DuplicatePlayerException("All players must be unique")
+    }
 
     // Initialize the first round
     newRound()
@@ -28,7 +42,7 @@ class PokerGame(
 
   private fun checkForGameEnd(): Boolean {
     // Check if only one player has chips left
-    val activePlayers = players.filter { it.getChips() > 0 }
+    val activePlayers = players.filter { it.chips() > 0 }
     return activePlayers.size == 1
   }
 
@@ -51,11 +65,11 @@ class PokerGame(
   }
 
   // Game-level functions and delegation to Round
-  fun raiseBetTo(player: PokerPlayer, chips: Int) =
+  override fun raiseBetTo(player: Player, chips: Int) =
     round.raiseBetTo(player, chips)
 
-  fun call(player: PokerPlayer) = round.call(player)
-  fun check(player: PokerPlayer) = round.check(player)
-  fun fold(player: PokerPlayer) = round.fold(player)
-  fun allIn(player: PokerPlayer) = round.allIn(player)
+  override fun call(player: Player) = round.call(player)
+  override fun check(player: Player) = round.check(player)
+  override fun fold(player: Player) = round.fold(player)
+  override fun allIn(player: Player) = round.allIn(player)
 }

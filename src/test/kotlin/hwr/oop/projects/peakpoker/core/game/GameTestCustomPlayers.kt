@@ -1,151 +1,110 @@
 package hwr.oop.projects.peakpoker.core.game
 
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import io.kotest.assertions.throwables.shouldThrow
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
+import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class GameTestCustomPlayers : AnnotationSpec() {
-  /*@Test
-  fun `check if player validity function returns correct boolean`() {
-    // given
-    val testGame = PokerGame(
-      10, 20,
-      listOf(PokerPlayer("Hans"), PokerPlayer("Peter"))
-    )
-    val duplicatePlayer = PokerPlayer("Hans")
-
-    // when/then
-    assertThat(testGame.checkPlayerValidity(duplicatePlayer)).isFalse()
-  }*/
-
   @Test
   fun `check if duplicate exception works`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         10, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Hans"))
       )
     }
+      .isExactlyInstanceOf(DuplicatePlayerException::class.java)
+      .hasMessageContaining("All players must be unique")
   }
 
   @Test
   fun `negative small blind amount throws exceptions`() {
-    // negative small blind
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         -10, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
   fun `negative big blind amount throws exceptions`() {
     // negative big blind
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         10, -20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `zero small blind amount throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         0, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
   fun `zero big blind amount throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         10, 0,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `big blind smaller than small blind throws exception`() {
-    shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         30, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be exactly double")
   }
 
   @Test
   fun `big blind amount must be positive`() {
-    val exception = shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         10, 0,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-
-    assertThat(exception.message).isEqualTo("Big blind amount must be positive")
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be positive")
   }
 
   @Test
   fun `big blind amount must be greater than or equal to small blind amount`() {
-    val exception = shouldThrow<IllegalArgumentException> {
+    assertThatThrownBy {
       PokerGame(
         20, 10,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-
-    assertThat(exception.message).isEqualTo("Big blind amount must be exactly double the small blind amount")
+      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .hasMessageContaining("Big blind amount must be exactly double")
   }
-
-  /*@Test
-  fun `makeTurn skips all-in players with multiple players`() {
-    val player1 = PokerPlayer("Hans")
-    val player2 = PokerPlayer("Peter")
-    val player3 = PokerPlayer("Max")
-    val player4 = PokerPlayer("Anna")
-    val testGame =
-      PokerGame(
-        10, 20,
-        listOf(player1, player2, player3, player4)
-      )
-
-    testGame.allIn(player3)
-    testGame.allIn(player4)
-
-    testGame.call(player1)
-    testGame.call(player2)
-
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-  }
-
-  @Test
-  fun `makeTurn skips folded players with multiple players`() {
-    val player1 = PokerPlayer("Hans")
-    val player2 = PokerPlayer("Peter")
-    val player3 = PokerPlayer("Max")
-    val player4 = PokerPlayer("Anna")
-    val testGame =
-      PokerGame(
-        10, 20,
-        listOf(player1, player2, player3, player4)
-      )
-
-    testGame.fold(player3)
-    testGame.fold(player4)
-
-    testGame.call(player1)
-    testGame.check(player2)
-
-    assertThat(testGame.getCurrentPlayer()).isEqualTo(player1)
-  }*/
 
   @Test
   fun `getId returns correct game identifier`() {
@@ -157,5 +116,29 @@ class GameTestCustomPlayers : AnnotationSpec() {
     )
 
     assertThat(testGame.id).isEqualTo(testGameId)
+  }
+
+  @Test
+  fun `game creation with empty player list throws exception`() {
+    assertThatThrownBy {
+      PokerGame(
+        10, 20,
+        emptyList()
+      )
+    }
+      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .hasMessageContaining("Minimum number of players is 2")
+  }
+
+  @Test
+  fun `game creation with one player list throws exception`() {
+    assertThatThrownBy {
+      PokerGame(
+        10, 20,
+        listOf(PokerPlayer("Hans"))
+      )
+    }
+      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .hasMessageContaining("Minimum number of players is 2")
   }
 }

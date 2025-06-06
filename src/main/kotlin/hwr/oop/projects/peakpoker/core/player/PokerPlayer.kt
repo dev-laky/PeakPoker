@@ -1,6 +1,9 @@
 package hwr.oop.projects.peakpoker.core.player
 
 import hwr.oop.projects.peakpoker.core.card.HoleCards
+import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 
 class PokerPlayer(
   override val name: String,
@@ -8,63 +11,77 @@ class PokerPlayer(
 ) : Player {
 
   init {
-    require(chips >= 0) { "Chips amount must be non-negative" }
-    require(name.isNotBlank()) { "PokerPlayer name cannot be blank" }
+    if (chips < 0) {
+      throw InsufficientChipsException("Chips amount must be non-negative")
+    }
+    if (name.isBlank()) {
+      throw InvalidPlayerStateException("PokerPlayer name cannot be blank")
+    }
   }
 
-  var isFolded: Boolean = false
-    private set
-  var isAllIn: Boolean = false
-    private set
-  var hasChecked: Boolean = false
-    private set
+  private var isFolded: Boolean = false
+  private var isAllIn: Boolean = false
+  private var hasChecked: Boolean = false
 
   private var hand: HoleCards = HoleCards(emptyList(), this)
   private var bet: Int = 0
 
-  fun resetRoundState() {
+  override fun chips(): Int {
+    return chips
+  }
+
+  override fun hand(): HoleCards {
+    return hand
+  }
+
+  override fun bet(): Int {
+    return bet
+  }
+
+  override fun isFolded(): Boolean {
+    return isFolded
+  }
+
+  override fun isAllIn(): Boolean {
+    return isAllIn
+  }
+
+  override fun hasChecked(): Boolean {
+    return hasChecked
+  }
+
+  override fun resetRoundState() {
     isFolded = false
     isAllIn = false
   }
 
-  fun getBet(): Int {
-    return bet
-  }
-
-  fun resetBet() {
+  override fun resetBet() {
     bet = 0
     hasChecked = false
   }
 
-  fun getChips(): Int {
-    return chips
-  }
-
-  fun getHand(): HoleCards {
-    return hand
-  }
-
-  fun assignHand(cards: HoleCards) {
-    require(cards.cards.size == 2) { "A player must have exactly 2 hole cards" }
+  override fun assignHand(cards: HoleCards) {
     hand = cards
   }
 
-  fun setBetAmount(chips: Int) {
-    require(chips > 0) { "Chips amount must be greater than zero" }
+  override fun setBetAmount(chips: Int) {
+    if (chips <= 0) {
+      throw InvalidBetAmountException("Chips amount must be greater than zero")
+    }
 
     this.chips -= chips - bet
     bet = chips
   }
 
-  fun check() {
+  override fun check() {
     hasChecked = true
   }
 
-  fun fold() {
+  override fun fold() {
     isFolded = true
   }
 
-  fun allIn() {
+  override fun allIn() {
     setBetAmount(this.chips + this.bet)
     isAllIn = true
   }

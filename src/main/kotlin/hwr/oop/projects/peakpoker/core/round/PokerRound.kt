@@ -3,23 +3,21 @@ package hwr.oop.projects.peakpoker.core.round
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.deck.Deck
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
-import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
-import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.game.GameActionable
+import hwr.oop.projects.peakpoker.core.player.Player
 
 class PokerRound(
-  private val players: List<PokerPlayer>,
+  private val players: List<Player>,
   private val smallBlindAmount: Int,
   private val bigBlindAmount: Int,
   private val smallBlindIndex: Int,
   private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
-) : Round {
+) : GameActionable {
 
   private val deck: Deck = Deck()
   private val communityCards: CommunityCards =
@@ -32,22 +30,6 @@ class PokerRound(
   private var currentPlayerIndex: Int = smallBlindIndex
 
   init {
-    if (smallBlindAmount <= 0) {
-      throw InvalidBlindConfigurationException("Small blind amount must be positive")
-    }
-    if (bigBlindAmount <= 0) {
-      throw InvalidBlindConfigurationException("Big blind amount must be positive")
-    }
-    if (bigBlindAmount != smallBlindAmount * 2) {
-      throw InvalidBlindConfigurationException("Big blind amount must be exactly double the small blind amount")
-    }
-    if (players.size < 2) {
-      throw MinimumPlayersException("Minimum number of players is 2")
-    }
-    if (players.distinctBy { it.name }.size != players.size) {
-      throw DuplicatePlayerException("All players must be unique")
-    }
-
     // Set the blinds for the players at the table
     setBlinds()
 
@@ -67,17 +49,17 @@ class PokerRound(
 
   private fun checkForNextGamePhase(): Boolean {
     // Check if all players have folded or gone all-in
-    if (players.all { it.isFolded || it.isAllIn }) return true
+    if (players.all { it.isFolded() || it.isAllIn() }) return true
 
     // Check if all players have called the highest bet
     val highestBet = getHighestBet()
 
     // Check if all players checked or gone all-in or folded
     if (highestBet == 0) {
-      return players.all { it.hasChecked }
+      return players.all { it.hasChecked() }
     }
 
-    return players.all { it.getBet() == highestBet }
+    return players.all { it.bet() == highestBet }
   }
 
   private fun initNextGamePhase() {
@@ -100,7 +82,7 @@ class PokerRound(
     communityCards.dealCommunityCards(roundPhase, deck)
 
     // Check if all players have folded or gone all-in
-    if (players.all { it.isFolded || it.isAllIn }) {
+    if (players.all { it.isFolded() || it.isAllIn() }) {
       initNextGamePhase()
       return
     }
@@ -120,7 +102,7 @@ class PokerRound(
     val nextPlayer = getNextPlayer()
 
     // Skip any folded / all-in players
-    if (nextPlayer.isFolded || nextPlayer.isAllIn) {
+    if (nextPlayer.isFolded() || nextPlayer.isAllIn()) {
       currentPlayerIndex = (players.indexOf(nextPlayer))
       makeTurn()
       return
@@ -136,14 +118,14 @@ class PokerRound(
   }
 
   private fun getHighestBet(): Int {
-    return players.maxOf { it.getBet() }
+    return players.maxOf { it.bet() }
   }
 
-  private fun getCurrentPlayer(): PokerPlayer {
+  private fun getCurrentPlayer(): Player {
     return players[currentPlayerIndex]
   }
 
-  private fun getNextPlayer(): PokerPlayer {
+  private fun getNextPlayer(): Player {
     return players[(currentPlayerIndex + 1) % players.size]
   }
 
@@ -160,57 +142,51 @@ class PokerRound(
   }
 
   private fun requireLargerThanHighestBet(highestBet: Int, chips: Int) {
-    if (highestBet >= chips) throw IllegalStateException("Bet must be higher than the current highest bet")
+    if (highestBet >= chips) throw InvalidBetAmountException("Bet must be higher than the current highest bet")
   }
 
   private fun requirePositiveChips(chips: Int) {
-    if (chips < 0) throw IllegalArgumentException("Bet amount must be positive")
+    if (chips < 0) throw InvalidBetAmountException("Bet amount must be positive")
   }
 
-  private fun requirePlayerTurn(
-    currentPlayer: PokerPlayer,
-    player: PokerPlayer,
-  ) {
-    if (currentPlayer != player) throw IllegalStateException("It's not your turn to bet")
+  private fun requirePlayerTurn(currentPlayer: Player, player: Player) {
+    if (currentPlayer != player) throw InvalidPlayerStateException("It's not your turn to bet")
   }
 
-  private fun requirePlayerNotFolded(player: PokerPlayer) {
-    if (player.isFolded) throw IllegalStateException("Cannot raise bet after folding")
+  private fun requirePlayerNotFolded(player: Player) {
+    if (player.isFolded()) throw InvalidPlayerStateException("Cannot raise bet after folding")
   }
 
-  private fun requirePlayerNotAllIn(player: PokerPlayer) {
-    if (player.isAllIn) throw IllegalStateException("Cannot raise bet after going all-in")
+  private fun requirePlayerNotAllIn(player: Player) {
+    if (player.isAllIn()) throw InvalidPlayerStateException("Cannot raise bet after going all-in")
   }
 
-  private fun requireSufficientChipsToRaise(player: PokerPlayer, chips: Int) {
-    if ((chips - player.getBet()) > player.getChips()) throw IllegalStateException(
+  private fun requireSufficientChipsToRaise(player: Player, chips: Int) {
+    if ((chips - player.bet()) > player.chips()) throw InsufficientChipsException(
       "Not enough chips to raise bet"
     )
   }
 
-  private fun requireNotAtHighestBet(player: PokerPlayer, highestBet: Int) {
-    if (player.getBet() == highestBet) throw IllegalStateException("You are already at the highest bet")
+  private fun requireNotAtHighestBet(player: Player, highestBet: Int) {
+    if (player.bet() == highestBet) throw InvalidCallException("You are already at the highest bet")
   }
 
-  private fun requirePlayerNotFoldedForCall(player: PokerPlayer) {
-    if (player.isFolded) throw IllegalStateException("You can not call after having folded")
+  private fun requirePlayerNotFoldedForCall(player: Player) {
+    if (player.isFolded()) throw InvalidPlayerStateException("You can not call after having folded")
   }
 
-  private fun requirePlayerNotAllInForCall(player: PokerPlayer) {
-    if (player.isAllIn) throw IllegalStateException("You can not call after having gone all-in")
+  private fun requirePlayerNotAllInForCall(player: Player) {
+    if (player.isAllIn()) throw InvalidPlayerStateException("You can not call after having gone all-in")
   }
 
-  private fun requireSufficientChipsToCall(
-    player: PokerPlayer,
-    highestBet: Int,
-  ) {
-    if (player.getChips() < (highestBet - player.getBet())) throw IllegalStateException(
+  private fun requireSufficientChipsToCall(player: Player, highestBet: Int) {
+    if (player.chips() < (highestBet - player.bet())) throw InsufficientChipsException(
       "You do not have enough chips to call."
     )
   }
 
-  private fun requirePlayerAtHighestBet(player: PokerPlayer) {
-    if (player.getBet() != getHighestBet()) throw IllegalStateException("You can not check if you are not at the highest bet")
+  private fun requirePlayerAtHighestBet(player: Player) {
+    if (player.bet() != getHighestBet()) throw InvalidCheckException("You can not check if you are not at the highest bet")
   }
 
   /**
@@ -227,7 +203,7 @@ class PokerRound(
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InsufficientChipsException If the player does not have enough chips
    */
-  override fun raiseBetTo(player: PokerPlayer, chips: Int) {
+  override fun raiseBetTo(player: Player, chips: Int) {
     val currentPlayer = getCurrentPlayer()
     val highestBet = getHighestBet()
 
@@ -237,8 +213,8 @@ class PokerRound(
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
     requireSufficientChipsToRaise(player, chips)
-    
-    pot += (chips - player.getBet())
+
+    pot += (chips - player.bet())
     player.setBetAmount(chips)
     makeTurn()
   }
@@ -252,7 +228,7 @@ class PokerRound(
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InsufficientChipsException If the player does not have enough chips
    */
-  override fun call(player: PokerPlayer) {
+  override fun call(player: Player) {
     val currentPlayer = getCurrentPlayer()
     val highestBet = getHighestBet()
 
@@ -262,7 +238,7 @@ class PokerRound(
     requirePlayerNotAllInForCall(player)
     requireSufficientChipsToCall(player, highestBet)
 
-    pot += (highestBet - player.getBet())
+    pot += (highestBet - player.bet())
     player.setBetAmount(highestBet)
     makeTurn()
   }
@@ -275,7 +251,7 @@ class PokerRound(
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InvalidCheckException If the player is not at the highest bet
    */
-  override fun check(player: PokerPlayer) {
+  override fun check(player: Player) {
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
@@ -294,7 +270,7 @@ class PokerRound(
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    */
-  override fun fold(player: PokerPlayer) {
+  override fun fold(player: Player) {
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
@@ -312,14 +288,14 @@ class PokerRound(
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    */
-  override fun allIn(player: PokerPlayer) {
+  override fun allIn(player: Player) {
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
 
-    pot += player.getChips()
+    pot += player.chips()
     player.allIn()
     makeTurn()
   }

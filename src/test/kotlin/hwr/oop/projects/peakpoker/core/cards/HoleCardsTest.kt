@@ -15,6 +15,19 @@ class HoleCardsTest : AnnotationSpec() {
 
   private val mockPlayer = object : Player {
     override val name: String = "TestPlayer"
+    override fun isFolded(): Boolean = false
+    override fun isAllIn(): Boolean = false
+    override fun hasChecked(): Boolean = false
+    override fun chips(): Int = 0
+    override fun hand(): HoleCards = HoleCards(emptyList(), this)
+    override fun bet(): Int = 0
+    override fun resetRoundState() {}
+    override fun resetBet() {}
+    override fun assignHand(cards: HoleCards) {}
+    override fun setBetAmount(chips: Int) {}
+    override fun check() {}
+    override fun fold() {}
+    override fun allIn() {}
   }
 
   @Test

@@ -1,20 +1,26 @@
 package hwr.oop.projects.peakpoker.core.card
 
 import hwr.oop.projects.peakpoker.core.deck.Deck
-import hwr.oop.projects.peakpoker.core.round.Round
+import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
+import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
+import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.round.RoundPhase
 
 class CommunityCards(
   cards: List<Card>,
-  val round: Round, // TODO: Evaluate if round is needed here (see at dealCommunityCards)
+  val round: GameActionable, // TODO: Evaluate if round is needed here (see at dealCommunityCards)
 ) : Iterable<Card> by cards {
 
   var cards = cards
     private set
 
   init {
-    require(cards.isEmpty() || cards.size == 5) { "Community cards must be empty or contain exactly five cards." }
-    require(cards.distinct().size == cards.size) { "Community cards must not contain duplicates." }
+    if (cards.isNotEmpty() && cards.size != 5) {
+      throw InvalidCardConfigurationException("Community cards must be empty or contain exactly five cards.")
+    }
+    if (cards.distinct().size != cards.size) {
+      throw DuplicateCardException("Community cards must not contain duplicates.")
+    }
   }
 
   fun dealCommunityCards(roundPhase: RoundPhase, deck: Deck) {

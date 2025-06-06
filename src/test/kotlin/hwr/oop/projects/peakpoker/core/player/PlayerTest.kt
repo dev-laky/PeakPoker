@@ -23,21 +23,21 @@ class PlayerTest : AnnotationSpec() {
   fun `player bet can be raised`() {
     val player = PokerPlayer("Hans")
     player.setBetAmount(10)
-    assertThat(player.getBet()).isEqualTo(10)
+    assertThat(player.bet()).isEqualTo(10)
   }
 
   @Test
   fun `player initializes with isFolded and isAllIn as false`() {
     val player = PokerPlayer("Hans")
-    assertThat(player.isFolded).isFalse()
-    assertThat(player.isAllIn).isFalse()
+    assertThat(player.isFolded()).isFalse()
+    assertThat(player.isAllIn()).isFalse()
   }
 
   @Test
   fun `getChips returns correct initial chip count`() {
     val initialChips = 500
     val player = PokerPlayer("Hans", initialChips)
-    assertThat(player.getChips()).isEqualTo(initialChips)
+    assertThat(player.chips()).isEqualTo(initialChips)
   }
 
   @Test
@@ -54,7 +54,7 @@ class PlayerTest : AnnotationSpec() {
 
     player.assignHand(holeCards)
 
-    assertThat(player.getHand()).isEqualTo(holeCards)
+    assertThat(player.hand()).isEqualTo(holeCards)
   }
 
   @Test
@@ -65,8 +65,8 @@ class PlayerTest : AnnotationSpec() {
 
     player.setBetAmount(betAmount)
 
-    assertThat(player.getChips()).isEqualTo(initialChips - betAmount)
-    assertThat(player.getBet()).isEqualTo(betAmount)
+    assertThat(player.chips()).isEqualTo(initialChips - betAmount)
+    assertThat(player.bet()).isEqualTo(betAmount)
   }
 
   @Test
@@ -77,8 +77,8 @@ class PlayerTest : AnnotationSpec() {
     player.setBetAmount(100)
     player.setBetAmount(150)
 
-    assertThat(player.getBet()).isEqualTo(150)
-    assertThat(player.getChips()).isEqualTo(initialChips - 150)
+    assertThat(player.bet()).isEqualTo(150)
+    assertThat(player.chips()).isEqualTo(initialChips - 150)
   }
 
   @Test
@@ -89,8 +89,8 @@ class PlayerTest : AnnotationSpec() {
       .isExactlyInstanceOf(InvalidBetAmountException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(player.getBet()).isEqualTo(0)
-    assertThat(player.getChips()).isEqualTo(500)
+    assertThat(player.bet()).isEqualTo(0)
+    assertThat(player.chips()).isEqualTo(500)
   }
 
   @Test
@@ -101,8 +101,8 @@ class PlayerTest : AnnotationSpec() {
       .isExactlyInstanceOf(InvalidBetAmountException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
-    assertThat(player.getBet()).isEqualTo(0)
-    assertThat(player.getChips()).isEqualTo(500)
+    assertThat(player.bet()).isEqualTo(0)
+    assertThat(player.chips()).isEqualTo(500)
   }
 
   @Test
@@ -117,14 +117,14 @@ class PlayerTest : AnnotationSpec() {
   @Test
   fun `player creation with zero chips is valid`() {
     val player = PokerPlayer("ZeroChipsPlayer", 0)
-    assertThat(player.getChips()).isEqualTo(0)
+    assertThat(player.chips()).isEqualTo(0)
   }
 
   @Test
   fun `player creation with positive chips is valid`() {
     val chips = 150
     val player = PokerPlayer("TestPlayer", chips)
-    assertThat(player.getChips()).isEqualTo(chips)
+    assertThat(player.chips()).isEqualTo(chips)
   }
 
   @Test

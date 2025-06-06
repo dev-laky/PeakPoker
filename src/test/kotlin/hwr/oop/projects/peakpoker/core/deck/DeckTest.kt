@@ -15,14 +15,14 @@ class DeckTest : AnnotationSpec() {
       while (true) {
         allCards.addAll(deck.draw())
       }
-    } catch (e: IllegalStateException) {
+    } catch (e: InsufficientCardsException) {
       // Expected when deck is empty
     }
     return allCards
   }
 
   @Test
-  fun `deck is initialized with 52 cards`() {
+  fun `deck should be initialized with 52 cards`() {
     // given
     val deck = Deck()
 
@@ -34,7 +34,7 @@ class DeckTest : AnnotationSpec() {
   }
 
   @Test
-  fun `draw returns different cards each time`() {
+  fun `draw should return different cards each time`() {
     // given
     val deck = Deck()
 
@@ -47,7 +47,7 @@ class DeckTest : AnnotationSpec() {
   }
 
   @Test
-  fun `draw removes a card from the deck`() {
+  fun `draw should remove a card from the deck`() {
     // given
     val deck = Deck()
 
@@ -61,7 +61,20 @@ class DeckTest : AnnotationSpec() {
   }
 
   @Test
-  fun `draw multiple cards from the deck`() {
+  fun `draw should return the requested number of cards`() {
+    // given
+    val deck = Deck()
+    val drawAmount = 5
+
+    // when
+    val drawnCards = deck.draw(drawAmount)
+
+    // then
+    assertThat(drawnCards).hasSize(drawAmount)
+  }
+
+  @Test
+  fun `draw should remove the drawn cards from the deck`() {
     // given
     val deck = Deck()
     val drawAmount = 5
@@ -71,35 +84,48 @@ class DeckTest : AnnotationSpec() {
     val remainingCards = drawAllCards(deck)
 
     // then
-    assertThat(drawnCards.size)
-      .isEqualTo(drawAmount)
-      .describedAs("Should draw exactly the requested number of cards")
+    assertThat(remainingCards).hasSize(52 - drawAmount)
 
-    assertThat(remainingCards.size)
-      .isEqualTo(52 - drawAmount)
-      .describedAs("Deck should have 52 - drawAmount cards remaining")
-
-    // Verify none of the drawn cards remain in the deck
     drawnCards.forEach { card ->
-      assertThat(remainingCards)
-        .doesNotContain(card)
-        .describedAs("Drawn card should not remain in the deck")
+      assertThat(remainingCards).doesNotContain(card)
     }
-
-    // Verify all drawn cards are unique
-    assertThat(drawnCards.size)
-      .isEqualTo(drawnCards.distinct().size)
-      .describedAs("All drawn cards should be unique")
   }
 
   @Test
-  fun `draw throws exception when no cards left`() {
+  fun `draw should return unique cards`() {
     // given
     val deck = Deck()
-    repeat(52) { deck.draw() } // draw all cards
+    val drawAmount = 10
+
+    // when
+    val drawnCards = deck.draw(drawAmount)
+
+    // then
+    assertThat(drawnCards).hasSize(drawnCards.distinct().size)
+  }
+
+  @Test
+  fun `draw should throw InsufficientCardsException when no cards left`() {
+    // given
+    val deck = Deck()
+    drawAllCards(deck) // draw all cards
 
     // when and then
     assertThatThrownBy { deck.draw() }
       .isExactlyInstanceOf(InsufficientCardsException::class.java)
+      .hasMessageContaining("Not enough cards left in the deck")
+  }
+
+  @Test
+  fun `draw should throw InsufficientCardsException when requesting more cards than available`() {
+    // given
+    val deck = Deck()
+    val remainingCards = 5
+    deck.draw(52 - remainingCards) // Draw most cards, leaving only a few
+
+    // when and then
+    assertThatThrownBy { deck.draw(remainingCards + 1) }
+      .isExactlyInstanceOf(InsufficientCardsException::class.java)
+      .hasMessageContaining("Not enough cards left in the deck")
   }
 }

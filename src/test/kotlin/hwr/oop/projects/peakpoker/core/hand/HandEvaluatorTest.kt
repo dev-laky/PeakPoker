@@ -21,25 +21,35 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
-import hwr.oop.projects.peakpoker.core.game.Game
-import hwr.oop.projects.peakpoker.core.game.GameId
+import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.Player
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.round.Round
 import org.assertj.core.api.Assertions.assertThat
 
 class HandEvaluatorTest : AnnotationSpec() {
   private val mockPlayer = object : Player {
     override val name: String = "dummy"
-    val id: String = "dummyId"
+    override fun isFolded() = false
+    override fun isAllIn() = false
+    override fun hasChecked() = false
+    override fun chips() = 0
+    override fun hand() = HoleCards(emptyList(), this)
+    override fun bet() = 0
+    override fun resetRoundState() {}
+    override fun resetBet() {}
+    override fun assignHand(cards: HoleCards) {}
+    override fun setBetAmount(chips: Int) {}
+    override fun check() {}
+    override fun fold() {}
+    override fun allIn() {}
   }
 
-  private val mockRound = object : Round {
-    override fun raiseBetTo(player: PokerPlayer, chips: Int) {}
-    override fun call(player: PokerPlayer) {}
-    override fun check(player: PokerPlayer) {}
-    override fun fold(player: PokerPlayer) {}
-    override fun allIn(player: PokerPlayer) {}
+  private val mockRound = object : GameActionable {
+    override fun raiseBetTo(player: Player, chips: Int) {}
+    override fun call(player: Player) {}
+    override fun check(player: Player) {}
+    override fun fold(player: Player) {}
+    override fun allIn(player: Player) {}
   }
 
   //SECTION: HandEvaluator.determineHighestHand
@@ -75,16 +85,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `higher pair wins between two players`() {
-    val player1 = object : Player {
-      override val name = "Alice"
-      val id = "1"
-    }
-    val player2 = object : Player {
-      override val name = "Bob"
-      val id = "2"
-    }
+    val player1 = PokerPlayer("Alice")
+    val player2 = PokerPlayer("Bob")
 
-    // Alice has pair of Aces
+    // Alice has a pair of Aces
     val hole1 = HoleCards(
       listOf(
         Card(HEARTS, ACE),
@@ -93,7 +97,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       player1
     )
 
-    // Bob has pair of Kings
+    // Bob has a pair of Kings
     val hole2 = HoleCards(
       listOf(
         Card(DIAMONDS, KING),
@@ -118,18 +122,12 @@ class HandEvaluatorTest : AnnotationSpec() {
   }
 
   /**
-   * Confirms that a straight hand beats a pair hand.
+   * Confirms that a straight hand beats a pair of hand.
    */
   @Test
   fun `straight beats pair`() {
-    val straightPlayer = object : Player {
-      override val name = "Straight"
-      val id = "1"
-    }
-    val pairPlayer = object : Player {
-      override val name = "Pair"
-      val id = "2"
-    }
+    val straightPlayer = PokerPlayer("Straight")
+    val pairPlayer = PokerPlayer("Pair")
 
     // Player can make straight (3-7)
     val holeStraight = HoleCards(
@@ -140,7 +138,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       straightPlayer
     )
 
-    // Player has pair
+    // Player has a pair
     val holePair = HoleCards(
       listOf(
         Card(DIAMONDS, ACE),
@@ -170,16 +168,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `tie returns first player with best hand`() {
-    val player1 = object : Player {
-      override val name = "First"
-      val id = "1"
-    }
-    val player2 = object : Player {
-      override val name = "Second"
-      val id = "2"
-    }
+    val player1 = PokerPlayer("First")
+    val player2 = PokerPlayer("Second")
 
-    // Both have same hand (Ace-high)
+    // Both have the same hand (Ace-high)
     val hole1 = HoleCards(
       listOf(
         Card(HEARTS, ACE),
@@ -217,14 +209,8 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `flush beats straight`() {
-    val flushPlayer = object : Player {
-      override val name = "Flush"
-      val id = "1"
-    }
-    val straightPlayer = object : Player {
-      override val name = "Straight"
-      val id = "2"
-    }
+    val flushPlayer = PokerPlayer("Flush")
+    val straightPlayer = PokerPlayer("Straight")
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
@@ -265,14 +251,8 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `royal flush beats straight flush`() {
-    val royalPlayer = object : Player {
-      override val name = "Royal"
-      val id = "1"
-    }
-    val straightFlushPlayer = object : Player {
-      override val name = "StraightFlush"
-      val id = "2"
-    }
+    val royalPlayer = PokerPlayer("Royal")
+    val straightFlushPlayer = PokerPlayer("StraightFlush")
 
     // Royal flush player
     val holeRoyal = HoleCards(
@@ -331,22 +311,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `Gives the correct winner out of 4 players`() {
-    val flushPlayer = object : Player {
-      override val name = "Flush"
-      val id = "1"
-    }
-    val straightPlayer = object : Player {
-      override val name = "Straight"
-      val id = "2"
-    }
-    val pairPlayer = object : Player {
-      override val name = "Pair"
-      val id = "3"
-    }
-    val highCardPlayer = object : Player {
-      override val name = "HighCard"
-      val id = "4"
-    }
+    val flushPlayer = PokerPlayer("Flush")
+    val straightPlayer = PokerPlayer("Straight")
+    val pairPlayer = PokerPlayer("Pair")
+    val highCardPlayer = PokerPlayer("HighCard")
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
@@ -374,7 +342,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       pairPlayer
     )
 
-    // High card player
+    // High-card player
     val holeHighCard = HoleCards(
       listOf(
         Card(SPADES, THREE),
