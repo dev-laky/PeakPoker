@@ -106,7 +106,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   }
 
   /**
-   * Confirms that a straight hand beats a pair of hand.
+   * Confirms that a straight hand beats a pair of hands.
    */
   @Test
   fun `straight beats pair`() {

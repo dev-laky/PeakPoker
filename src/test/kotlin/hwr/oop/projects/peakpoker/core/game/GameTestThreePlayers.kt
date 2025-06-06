@@ -4,11 +4,12 @@ import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
+
 class GameTestThreePlayers : AnnotationSpec() {
   private lateinit var player1: PokerPlayer
   private lateinit var player2: PokerPlayer
   private lateinit var player3: PokerPlayer
-  private lateinit var testGame: GameActionable
+  private lateinit var testGame: PokerGame
 
   @BeforeEach
   fun setup() {
@@ -36,5 +37,14 @@ class GameTestThreePlayers : AnnotationSpec() {
       player1.hand().cards + player2.hand().cards + player3.hand().cards
     assertThat(allCards).hasSize(6) // 3 players * 2 cards
     assertThat(allCards.distinct()).hasSize(6) // All cards should be unique
+  }
+
+  @Test
+  fun `test if GameId value returns correct value`() {
+    // when
+    val gameId = testGame.id.value
+
+    // then
+    assertThat(gameId).isEqualTo("testGame100")
   }
 }
