@@ -5,11 +5,12 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
-import hwr.oop.projects.peakpoker.core.game.PokerGame
-import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.exceptions.GameException
+import hwr.oop.projects.peakpoker.core.game.Game
+import hwr.oop.projects.peakpoker.core.player.Player
 
 class GameNew : CliktCommand(name = "new") {
-  override fun help(context: Context) = "Create a new PokerGame."
+  override fun help(context: Context) = "Create a new Game."
 
   val players: List<String>? by option("--players")
     .convert { input -> input.split(":").map { it.trim() } }
@@ -21,14 +22,18 @@ class GameNew : CliktCommand(name = "new") {
       return
     }
 
-    val game = PokerGame(
-      smallBlindAmount = 10,
-      bigBlindAmount = 20,
-      players = players!!.map { PokerPlayer(name = it, chips = 100) })
+    try {
+      val game = Game(
+        smallBlindAmount = 10,
+        bigBlindAmount = 20,
+        playersOnTable = players!!.map { Player(name = it, chips = 100) })
 
-    // TODO: Save game to file
+      // TODO: Save game to file
 
-    echo("PokerGame ID: ${game.id}")
-    echo("New game created with players: ${game.players.joinToString(", ") { it.name }}")
+      echo("Game ID: ${game.id}")
+      echo("New game created with players: ${game.playersOnTable.joinToString(", ") { it.name }}")
+    } catch (e: GameException) {
+      echo("Error creating game: ${e.message}")
+    }
   }
 }

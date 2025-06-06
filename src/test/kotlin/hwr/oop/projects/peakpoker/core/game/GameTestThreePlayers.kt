@@ -2,12 +2,13 @@ package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
+import org.assertj.core.api.Assertions.assertThat
 
 class GameTestThreePlayers : AnnotationSpec() {
-  lateinit var player1: PokerPlayer
-  lateinit var player2: PokerPlayer
-  lateinit var player3: PokerPlayer
-  lateinit var testGame: PokerGame
+  private lateinit var player1: PokerPlayer
+  private lateinit var player2: PokerPlayer
+  private lateinit var player3: PokerPlayer
+  private lateinit var testGame: Game
 
   @BeforeEach
   fun setup() {

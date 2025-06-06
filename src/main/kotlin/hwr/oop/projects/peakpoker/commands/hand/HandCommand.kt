@@ -46,7 +46,7 @@ class HandCommand : CliktCommand(name = "hand") {
     // TODO: We may want to remove the game from HoleCards in order to avoid any redundancy
     val hand = player.getHand()
 
-    val cardDisplay = hand.cards.joinToString(" <-> ") { card ->
+    val cardDisplay = hand.getCards().joinToString(" <-> ") { card ->
       "${card.suit}, ${card.rank}"
     }
 
