@@ -21,19 +21,27 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
-import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.round.PokerRound
 import org.assertj.core.api.Assertions.assertThat
 
 class HandEvaluatorTest : AnnotationSpec() {
-  private val testPlayer = PokerPlayer("TestPlayer")
+  private lateinit var player1: PokerPlayer
+  private lateinit var player2: PokerPlayer
+  private lateinit var player3: PokerPlayer
+  private lateinit var testRound: PokerRound
 
-  private val mockRound = object : GameActionable {
-    override fun raiseBetTo(player: PokerPlayer, chips: Int) {}
-    override fun call(player: PokerPlayer) {}
-    override fun check(player: PokerPlayer) {}
-    override fun fold(player: PokerPlayer) {}
-    override fun allIn(player: PokerPlayer) {}
+  @BeforeEach
+  fun setup() {
+    player1 = PokerPlayer("Hans")
+    player2 = PokerPlayer("Peter")
+    player3 = PokerPlayer("Max")
+    testRound = PokerRound(
+      smallBlindAmount = 10, bigBlindAmount = 20,
+      players = listOf(player1, player2, player3),
+      smallBlindIndex = 0,
+      onRoundComplete = {}
+    )
   }
 
   //SECTION: HandEvaluator.determineHighestHand
@@ -46,7 +54,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       listOf(
         Card(HEARTS, ACE),
         Card(SPADES, KING)
-      ), testPlayer
+      ), player1
     )
 
     val community = CommunityCards(
@@ -56,12 +64,12 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, FOUR),
         Card(SPADES, FIVE),
         Card(CLUBS, SIX)
-      ), mockRound
+      ), testRound
     )
 
     val winner =
       HandEvaluator.determineHighestHand(listOf(holeCards), community)
-    assertThat(winner.player).isEqualTo(testPlayer)
+    assertThat(winner.player).isEqualTo(player1)
   }
 
   /**
@@ -97,7 +105,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, FOUR),
         Card(SPADES, FIVE),
         Card(CLUBS, SIX)
-      ), mockRound
+      ), testRound
     )
 
     val winner =
@@ -138,7 +146,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SIX),
         Card(SPADES, TEN),
         Card(CLUBS, JACK)
-      ), mockRound
+      ), testRound
     )
 
     val winner = HandEvaluator.determineHighestHand(
@@ -179,7 +187,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SIX),
         Card(SPADES, SEVEN),
         Card(CLUBS, EIGHT)
-      ), mockRound
+      ), testRound
     )
 
     val winner = HandEvaluator.determineHighestHand(
@@ -221,7 +229,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, SEVEN),  // Straight uses these
         Card(CLUBS, SIX)
-      ), mockRound
+      ), testRound
     )
 
     val winner = HandEvaluator.determineHighestHand(
@@ -263,7 +271,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(SPADES, TEN),
         Card(HEARTS, FIVE),   // Straight flush
         Card(HEARTS, FOUR)
-      ), mockRound
+      ), testRound
     )
 
     val winner = HandEvaluator.determineHighestHand(
@@ -284,7 +292,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, JACK),
         Card(CLUBS, TEN)
-      ), mockRound
+      ), testRound
     )
 
     HandEvaluator.determineHighestHand(emptyList(), community)
@@ -342,7 +350,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, SEVEN),  // Straight uses these
         Card(CLUBS, SIX)
-      ), mockRound
+      ), testRound
     )
 
     val winner = HandEvaluator.determineHighestHand(

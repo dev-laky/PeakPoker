@@ -6,20 +6,29 @@ import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
-import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.round.PokerRound
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class CommunityCardsTest : AnnotationSpec() {
+  private lateinit var player1: PokerPlayer
+  private lateinit var player2: PokerPlayer
+  private lateinit var player3: PokerPlayer
+  private lateinit var testRound: PokerRound
 
-  private val mockRound = object : GameActionable {
-    override fun raiseBetTo(player: PokerPlayer, chips: Int) {}
-    override fun call(player: PokerPlayer) {}
-    override fun check(player: PokerPlayer) {}
-    override fun fold(player: PokerPlayer) {}
-    override fun allIn(player: PokerPlayer) {}
+  @BeforeEach
+  fun setup() {
+    player1 = PokerPlayer("Hans")
+    player2 = PokerPlayer("Peter")
+    player3 = PokerPlayer("Max")
+    testRound = PokerRound(
+      smallBlindAmount = 10, bigBlindAmount = 20,
+      players = listOf(player1, player2, player3),
+      smallBlindIndex = 0,
+      onRoundComplete = {}
+    )
   }
 
   @Test
@@ -32,7 +41,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.QUEEN)
     )
 
-    val communityCards = CommunityCards(cards, mockRound)
+    val communityCards = CommunityCards(cards, testRound)
 
     assertThat(communityCards.cards).hasSize(5)
   }
@@ -46,7 +55,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.CLUBS, Rank.KING)
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockRound) }
+    assertThatThrownBy { CommunityCards(cards, testRound) }
       .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly five cards")
   }
@@ -62,7 +71,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.JACK)
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockRound) }
+    assertThatThrownBy { CommunityCards(cards, testRound) }
       .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly five cards")
   }
@@ -78,14 +87,14 @@ class CommunityCardsTest : AnnotationSpec() {
       duplicateCard
     )
 
-    assertThatThrownBy { CommunityCards(cards, mockRound) }
+    assertThatThrownBy { CommunityCards(cards, testRound) }
       .isExactlyInstanceOf(DuplicateCardException::class.java)
       .hasMessageContaining("duplicates")
   }
 
   @Test
   fun `CommunityCards should work with empty list initialization`() {
-    val communityCards = CommunityCards(emptyList(), mockRound)
+    val communityCards = CommunityCards(emptyList(), testRound)
 
     assertThat(communityCards.cards).isEmpty()
   }
@@ -100,7 +109,7 @@ class CommunityCardsTest : AnnotationSpec() {
       Card(Suit.HEARTS, Rank.QUEEN)
     )
 
-    val communityCards = CommunityCards(cards, mockRound)
+    val communityCards = CommunityCards(cards, testRound)
     val iteratedCards = communityCards.toList()
 
     assertThat(iteratedCards).containsExactlyElementsOf(cards)
