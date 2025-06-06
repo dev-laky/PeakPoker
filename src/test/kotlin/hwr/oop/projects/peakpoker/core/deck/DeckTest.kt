@@ -15,7 +15,7 @@ class DeckTest : AnnotationSpec() {
       while (true) {
         allCards.addAll(deck.draw())
       }
-    } catch (e: InsufficientCardsException) {
+    } catch (_: InsufficientCardsException) {
       // Expected when deck is empty
     }
     return allCards

@@ -4,7 +4,6 @@ import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.Player
-import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 
 class PokerGame(
