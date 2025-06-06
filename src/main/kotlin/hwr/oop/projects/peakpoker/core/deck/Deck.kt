@@ -6,7 +6,7 @@ import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.exceptions.InsufficientCardsException
 
 class Deck() {
-  // Create list of all possible cards and shuffle it right away
+  // Create a list of all possible cards and shuffle it right away
   private val cards: MutableList<Card> = Suit.entries.flatMap { suit ->
     Rank.entries.map { rank ->
       Card(suit, rank)
@@ -14,15 +14,6 @@ class Deck() {
   }.toMutableList().apply { shuffle() }
 
   private val dealtCards: MutableList<Card> = mutableListOf()
-
-  /**
-   * Returns the current cards in the deck without modifying the deck.
-   *
-   * @return A list of cards currently in the deck
-   */
-  fun show(): List<Card> {
-    return cards.toList()
-  }
 
   /**
    * Draws a specified number of cards from the deck.
