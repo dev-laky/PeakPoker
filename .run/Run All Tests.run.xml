@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run All Tests" type="ioKotest" factoryName="Kotest" defaultName="singleModule">
-    <module name="project" />
+    <module name="peakpoker"/>
     <option name="jrePath" value="graalvm-ce-21" />
     <option name="jrePathEnabled" value="true" />
     <option name="passParentEnvs" value="true" />
