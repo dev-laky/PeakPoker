@@ -4,8 +4,6 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 
-
-
 /**
  * Evaluates poker hands and determines winning players.
  * Replaces the singleton implementation with a class-based approach.
@@ -45,7 +43,7 @@ class HandEvaluator {
      * @throws IllegalStateException If no valid hand could be found
      */
     private fun getBestCombo(hole: HoleCards, community: CommunityCards): PokerHand {
-        val allCards = hole.cards + community.cards
+        val allCards = hole.getCards() + community.cards
 
         require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 

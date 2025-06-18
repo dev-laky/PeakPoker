@@ -20,6 +20,7 @@ import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class PokerHandTest : AnnotationSpec() {
 
@@ -38,43 +39,49 @@ class PokerHandTest : AnnotationSpec() {
         assertThat(hand).isNotNull
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `throws exception for less than 5 cards`() {
-        PokerHand(
-            listOf(
-                Card(HEARTS, ACE),
-                Card(SPADES, KING),
-                Card(DIAMONDS, QUEEN),
-                Card(CLUBS, JACK)
+        assertThatThrownBy {
+            PokerHand(
+                listOf(
+                    Card(HEARTS, ACE),
+                    Card(SPADES, KING),
+                    Card(DIAMONDS, QUEEN),
+                    Card(CLUBS, JACK)
+                )
             )
-        )
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `throws exception for more than 5 cards`() {
-        PokerHand(
-            listOf(
-                Card(HEARTS, ACE),
-                Card(SPADES, KING),
-                Card(DIAMONDS, QUEEN),
-                Card(CLUBS, JACK),
-                Card(HEARTS, TEN),
-                Card(SPADES, NINE)
+        assertThatThrownBy {
+            PokerHand(
+                listOf(
+                    Card(HEARTS, ACE),
+                    Card(SPADES, KING),
+                    Card(DIAMONDS, QUEEN),
+                    Card(CLUBS, JACK),
+                    Card(HEARTS, TEN),
+                    Card(SPADES, NINE)
+                )
             )
-        )
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `throws exception for duplicate cards`() {
-        PokerHand(
-            listOf(
-                Card(HEARTS, ACE),
-                Card(HEARTS, ACE), // Duplicate card
-                Card(DIAMONDS, QUEEN),
-                Card(CLUBS, JACK),
-                Card(HEARTS, TEN)
+        assertThatThrownBy {
+            PokerHand(
+                listOf(
+                    Card(HEARTS, ACE),
+                    Card(HEARTS, ACE), // Duplicate card
+                    Card(DIAMONDS, QUEEN),
+                    Card(CLUBS, JACK),
+                    Card(HEARTS, TEN)
+                )
             )
-        )
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     // Hand rank tests

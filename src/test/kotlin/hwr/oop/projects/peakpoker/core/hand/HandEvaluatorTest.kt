@@ -25,13 +25,13 @@ import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.GameInterface
 import hwr.oop.projects.peakpoker.core.player.PlayerInterface
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HandEvaluatorTest : AnnotationSpec() {
   private val evaluator = HandEvaluator()
 
   private val mockPlayer = object : PlayerInterface {
     override val name: String = "dummy"
-    @Suppress("unused")
     val id: String = "dummyId"
   }
 
@@ -77,7 +77,6 @@ class HandEvaluatorTest : AnnotationSpec() {
     }
     val player2 = object : PlayerInterface {
       override val name = "Bob"
-      @Suppress("unused")
       val id = "2"
     }
 
@@ -116,12 +115,10 @@ class HandEvaluatorTest : AnnotationSpec() {
   fun `straight beats pair`() {
     val straightPlayer = object : PlayerInterface {
       override val name = "Straight"
-      @Suppress("unused")
       val id = "1"
     }
     val pairPlayer = object : PlayerInterface {
       override val name = "Pair"
-      @Suppress("unused")
       val id = "2"
     }
 
@@ -289,7 +286,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   /**
    * Verifies that an exception is thrown when the player list is empty.
    */
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun `empty player list throws exception`() {
     val community = CommunityCards(
       listOf(
@@ -301,7 +298,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), mockGame
     )
 
-    evaluator.determineHighestHand(emptyList<HoleCards>(), community)
+    assertThatThrownBy {
+      evaluator.determineHighestHand(emptyList<HoleCards>(), community)
+    }.isInstanceOf(IllegalArgumentException::class.java)
   }
 
   /**
@@ -368,10 +367,11 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
     assertThat(winner.player.name).isEqualTo("Flush")
   }
+
   /**
    * Tests that an exception is thrown when the total number of cards isn't 7.
    */
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun `throws exception when total cards is not 7`() {
     // Use valid CommunityCards but with duplicate cards in HoleCards to create an invalid combination
     val duplicateCard = Card(CLUBS, ACE)
@@ -393,8 +393,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), mockPlayer
     )
 
-    // This should throw an IllegalArgumentException in getBestCombo when it checks the combined card count
-    evaluator.determineHighestHand(listOf(holeCards), community)
+    assertThatThrownBy {
+      evaluator.determineHighestHand(listOf(holeCards), community)
+    }.isInstanceOf(IllegalArgumentException::class.java)
   }
 
   /**
