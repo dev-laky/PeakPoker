@@ -1,6 +1,5 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
@@ -23,7 +22,6 @@ class Game(
   // Variable to track the index of the small blind player within PlayersOnTable
   private var smallBlindIndex: Int = 0
   private val deck: Deck = Deck()
-
 
   // Will be = 2 after "blind" init
   var currentPlayerIndex: Int = 0

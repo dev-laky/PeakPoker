@@ -82,15 +82,19 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Alice has pair of Aces
     val hole1 = HoleCards(
-      listOf(Card(HEARTS, ACE),
-        Card(SPADES, ACE)),
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, ACE)
+      ),
       player1
     )
 
     // Bob has pair of Kings
     val hole2 = HoleCards(
-      listOf(Card(DIAMONDS, KING),
-        Card(CLUBS, KING)),
+      listOf(
+        Card(DIAMONDS, KING),
+        Card(CLUBS, KING)
+      ),
       player2
     )
 
@@ -124,15 +128,19 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Player can make straight (3-7)
     val holeStraight = HoleCards(
-      listOf(Card(HEARTS, THREE),
-        Card(SPADES, SEVEN)),
+      listOf(
+        Card(HEARTS, THREE),
+        Card(SPADES, SEVEN)
+      ),
       straightPlayer
     )
 
     // Player has pair
     val holePair = HoleCards(
-      listOf(Card(DIAMONDS, ACE),
-        Card(CLUBS, ACE)),
+      listOf(
+        Card(DIAMONDS, ACE),
+        Card(CLUBS, ACE)
+      ),
       pairPlayer
     )
 
@@ -168,14 +176,18 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Both have same hand (Ace-high)
     val hole1 = HoleCards(
-      listOf(Card(HEARTS, ACE),
-        Card(SPADES, TWO)),
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, TWO)
+      ),
       player1
     )
 
     val hole2 = HoleCards(
-      listOf(Card(DIAMONDS, ACE),
-        Card(CLUBS, THREE)),
+      listOf(
+        Card(DIAMONDS, ACE),
+        Card(CLUBS, THREE)
+      ),
       player2
     )
 
@@ -211,15 +223,19 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
-      listOf(Card(HEARTS, TEN),
-        Card(HEARTS, JACK)),
+      listOf(
+        Card(HEARTS, TEN),
+        Card(HEARTS, JACK)
+      ),
       flushPlayer
     )
 
     // Straight player
     val holeStraight = HoleCards(
-      listOf(Card(CLUBS, NINE),
-        Card(DIAMONDS, EIGHT)),
+      listOf(
+        Card(CLUBS, NINE),
+        Card(DIAMONDS, EIGHT)
+      ),
       straightPlayer
     )
 
@@ -255,15 +271,19 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Royal flush player
     val holeRoyal = HoleCards(
-      listOf(Card(SPADES, ACE),
-        Card(SPADES, KING)),
+      listOf(
+        Card(SPADES, ACE),
+        Card(SPADES, KING)
+      ),
       royalPlayer
     )
 
     // Straight flush player (7-high)
     val holeStraightFlush = HoleCards(
-      listOf(Card(HEARTS, SIX),
-        Card(HEARTS, SEVEN)),
+      listOf(
+        Card(HEARTS, SIX),
+        Card(HEARTS, SEVEN)
+      ),
       straightFlushPlayer
     )
 
@@ -327,28 +347,36 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
-      listOf(Card(HEARTS, TEN),
-        Card(HEARTS, JACK)),
+      listOf(
+        Card(HEARTS, TEN),
+        Card(HEARTS, JACK)
+      ),
       flushPlayer
     )
 
     // Straight player
     val holeStraight = HoleCards(
-      listOf(Card(CLUBS, NINE),
-        Card(DIAMONDS, EIGHT)),
+      listOf(
+        Card(CLUBS, NINE),
+        Card(DIAMONDS, EIGHT)
+      ),
       straightPlayer
     )
     // Pair player
     val holePair = HoleCards(
-      listOf(Card(CLUBS, TWO),
-        Card(DIAMONDS, TWO)),
+      listOf(
+        Card(CLUBS, TWO),
+        Card(DIAMONDS, TWO)
+      ),
       pairPlayer
     )
 
     // High card player
     val holeHighCard = HoleCards(
-      listOf(Card(SPADES, THREE),
-        Card(CLUBS, FOUR)),
+      listOf(
+        Card(SPADES, THREE),
+        Card(CLUBS, FOUR)
+      ),
       highCardPlayer
     )
 
@@ -604,7 +632,10 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), mockGame
     )
 
-    val winner = evaluator.determineHighestHand(listOf(holePlayer1, holePlayer2), community)
+    val winner = evaluator.determineHighestHand(
+      listOf(holePlayer1, holePlayer2),
+      community
+    )
     assertThat(winner.player.name).isEqualTo("SecondButBetter")
   }
 

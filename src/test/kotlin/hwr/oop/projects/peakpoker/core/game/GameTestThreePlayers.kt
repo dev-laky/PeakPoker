@@ -139,7 +139,8 @@ class GameTestThreePlayers : AnnotationSpec() {
   @Test
   fun `dealHoleCards assigns unique cards to each player`() {
     // then - collect all cards from players' hands and check for uniqueness
-    val allCards = player1.getHand().getCards() + player2.getHand().getCards() + player3.getHand().getCards()
+    val allCards = player1.getHand().getCards() + player2.getHand()
+      .getCards() + player3.getHand().getCards()
     assertThat(allCards).hasSize(6) // 3 players * 2 cards
     assertThat(allCards.distinct()).hasSize(6) // All cards should be unique
   }

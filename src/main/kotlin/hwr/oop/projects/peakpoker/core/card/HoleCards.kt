@@ -17,7 +17,7 @@ class HoleCards(
     }
   }
 
-    fun getCards(): List<Card> {
-        return cards
-    }
+  fun getCards(): List<Card> {
+    return cards
+  }
 }
