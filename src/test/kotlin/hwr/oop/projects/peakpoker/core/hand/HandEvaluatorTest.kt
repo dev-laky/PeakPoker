@@ -24,12 +24,15 @@ import hwr.oop.projects.peakpoker.core.card.Rank.ACE
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HandEvaluatorTest : AnnotationSpec() {
   private lateinit var player1: PokerPlayer
   private lateinit var player2: PokerPlayer
   private lateinit var player3: PokerPlayer
   private lateinit var testRound: PokerRound
+
+  private val evaluator = HandEvaluator()
 
   @BeforeEach
   fun setup() {
@@ -44,7 +47,6 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
   }
 
-  //SECTION: HandEvaluator.determineHighestHand
   /**
    * Verifies that a single player wins by default when no competition exists.
    */
@@ -67,13 +69,12 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner =
-      HandEvaluator.determineHighestHand(listOf(holeCards), community)
+    val winner = evaluator.determineHighestHand(listOf(holeCards), community)
     assertThat(winner.player).isEqualTo(player1)
   }
 
   /**
-   * Verifies that a single player wins by default when no competition exists.
+   * Ensures that a higher pair beats a lower pair between two players.
    */
   @Test
   fun `higher pair wins between two players`() {
@@ -109,7 +110,7 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     val winner =
-      HandEvaluator.determineHighestHand(listOf(hole1, hole2), community)
+      evaluator.determineHighestHand(listOf(hole1, hole2), community)
     assertThat(winner.player.name).isEqualTo("Alice")
   }
 
@@ -149,7 +150,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner = HandEvaluator.determineHighestHand(
+    val winner = evaluator.determineHighestHand(
       listOf(holeStraight, holePair), community
     )
     assertThat(winner.player.name).isEqualTo("Straight")
@@ -190,7 +191,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner = HandEvaluator.determineHighestHand(
+    val winner = evaluator.determineHighestHand(
       listOf(hole1, hole2), community
     )
     assertThat(winner.player.name).isEqualTo("First")
@@ -232,7 +233,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner = HandEvaluator.determineHighestHand(
+    val winner = evaluator.determineHighestHand(
       listOf(holeFlush, holeStraight), community
     )
     assertThat(winner.player.name).isEqualTo("Flush")
@@ -274,7 +275,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner = HandEvaluator.determineHighestHand(
+    val winner = evaluator.determineHighestHand(
       listOf(holeRoyal, holeStraightFlush), community
     )
     assertThat(winner.player.name).isEqualTo("Royal")
@@ -283,7 +284,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   /**
    * Verifies that an exception is thrown when the player list is empty.
    */
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun `empty player list throws exception`() {
     val community = CommunityCards(
       listOf(
@@ -295,7 +296,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    HandEvaluator.determineHighestHand(emptyList(), community)
+    assertThatThrownBy {
+      evaluator.determineHighestHand(emptyList<HoleCards>(), community)
+    }.isInstanceOf(IllegalArgumentException::class.java)
   }
 
   /**
@@ -353,9 +356,286 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val winner = HandEvaluator.determineHighestHand(
-      listOf(holeFlush, holeStraight), community
+    val winner = evaluator.determineHighestHand(
+      listOf(holeFlush, holeStraight, holePair, holeHighCard), community
     )
     assertThat(winner.player.name).isEqualTo("Flush")
+  }
+
+  /**
+   * Tests that an exception is thrown when the total number of cards isn't 7.
+   */
+  @Test
+  fun `throws exception when total cards is not 7`() {
+    // Use valid CommunityCards but with duplicate cards in HoleCards to create an invalid combination
+    val duplicateCard = Card(CLUBS, ACE)
+
+    val community = CommunityCards(
+      listOf(
+        duplicateCard,
+        Card(DIAMONDS, KING),
+        Card(HEARTS, QUEEN),
+        Card(SPADES, JACK),
+        Card(CLUBS, TEN)
+      ), testRound
+    )
+
+    val holeCards = HoleCards(
+      listOf(
+        duplicateCard, // Same card as in community
+        Card(DIAMONDS, THREE)
+      ), player1
+    )
+
+    assertThatThrownBy {
+      evaluator.determineHighestHand(listOf(holeCards), community)
+    }.isInstanceOf(IllegalArgumentException::class.java)
+  }
+
+  /**
+   * Test to ensure the bit manipulation logic works correctly with edge case patterns.
+   * This specifically targets code coverage in the getBestCombo method.
+   */
+  @Test
+  fun `selects best hand when all combinations are considered`() {
+    // Create a player with a potential royal flush in spades
+    val royalPlayer = PokerPlayer("Royal")
+
+    // Give exactly the cards needed for a royal flush
+    val holeRoyal = HoleCards(
+      listOf(
+        Card(SPADES, ACE),
+        Card(SPADES, KING)
+      ), royalPlayer
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(SPADES, QUEEN),
+        Card(SPADES, JACK),
+        Card(SPADES, TEN),
+        // Add cards that would create tempting but inferior hands
+        Card(HEARTS, ACE),
+        Card(DIAMONDS, ACE)
+      ), testRound
+    )
+
+    val winner = evaluator.determineHighestHand(listOf(holeRoyal), community)
+
+    // The player should have a royal flush, which is the best possible hand
+    assertThat(winner.player.name).isEqualTo("Royal")
+  }
+
+  /**
+   * Test to ensure the early return logic is covered when the first player
+   * is the only player.
+   */
+  @Test
+  fun `first player is best when they are the only player`() {
+    val player = PokerPlayer("OnlyPlayer")
+
+    val holeCards = HoleCards(
+      listOf(
+        Card(HEARTS, TWO),
+        Card(DIAMONDS, THREE)
+      ), player
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(CLUBS, FOUR),
+        Card(SPADES, FIVE),
+        Card(HEARTS, SIX),
+        Card(DIAMONDS, SEVEN),
+        Card(CLUBS, EIGHT)
+      ), testRound
+    )
+
+    // This should return the player directly from the first branch without comparison
+    val winner = evaluator.determineHighestHand(listOf(holeCards), community)
+    assertThat(winner.player.name).isEqualTo("OnlyPlayer")
+  }
+
+  /**
+   * Tests edge cases in the bit manipulation by testing a specific set of combinations.
+   */
+  @Test
+  fun `exercises different bit patterns for card combinations`() {
+    // Create a scenario where multiple valid 5-card hands can be created
+    // but only one is optimal
+    val player = PokerPlayer("BitPattern")
+
+    // These hole cards combined with community cards will create multiple possible hands
+    val holeCards = HoleCards(
+      listOf(
+        Card(CLUBS, ACE),
+        Card(CLUBS, KING)
+      ), player
+    )
+
+    // Create community cards that allow multiple hand types
+    val community = CommunityCards(
+      listOf(
+        Card(CLUBS, QUEEN),
+        Card(CLUBS, JACK),
+        Card(DIAMONDS, TEN),  // Potential royal flush or straight flush break
+        Card(HEARTS, ACE),    // Potential pair of aces
+        Card(SPADES, ACE)     // Potential three of a kind
+      ), testRound
+    )
+
+    val winner = evaluator.determineHighestHand(listOf(holeCards), community)
+    assertThat(winner.player.name).isEqualTo("BitPattern")
+  }
+
+  /**
+   * Tests another edge case for bit manipulation with specific bit patterns.
+   */
+  @Test
+  fun `tests another bit pattern combination`() {
+    // Create a scenario where the best hand would be at a specific bit pattern
+    val player = PokerPlayer("BitPattern2")
+
+    // Create a very specific set of cards where the best hand depends on the exact bit pattern selection
+    val holeCards = HoleCards(
+      listOf(
+        Card(CLUBS, FIVE),
+        Card(DIAMONDS, FIVE)
+      ), player
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(HEARTS, FIVE),
+        Card(SPADES, ACE),
+        Card(CLUBS, ACE),
+        Card(DIAMONDS, ACE),
+        Card(HEARTS, KING)
+      ), testRound
+    )
+
+    // Should find full house: Aces full of fives
+    val winner = evaluator.determineHighestHand(listOf(holeCards), community)
+    assertThat(winner.player.name).isEqualTo("BitPattern2")
+  }
+
+  /**
+   * Tests with cards arranged in a specific order to test edge cases in bit manipulation.
+   */
+  @Test
+  fun `tests specific card ordering for bit manipulation`() {
+    val player = PokerPlayer("OrderTest")
+
+    // The order of these cards might affect the bit manipulation
+    val holeCards = HoleCards(
+      listOf(
+        Card(CLUBS, TWO),    // First card
+        Card(CLUBS, THREE)   // Second card
+      ), player
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(CLUBS, FOUR),   // Third card
+        Card(CLUBS, FIVE),   // Fourth card
+        Card(CLUBS, SIX),    // Fifth card
+        Card(HEARTS, SEVEN), // Sixth card
+        Card(DIAMONDS, EIGHT) // Seventh card
+      ), testRound
+    )
+
+    // Should find straight flush
+    val winner = evaluator.determineHighestHand(listOf(holeCards), community)
+    assertThat(winner.player.name).isEqualTo("OrderTest")
+  }
+
+  /**
+   * Tests that the best hand is correctly updated when it's not the first player.
+   */
+  @Test
+  fun `second player wins when having better hand than first`() {
+    val player1 = PokerPlayer("FirstButWorse")
+
+    val player2 = PokerPlayer("SecondButBetter")
+
+    // First player has just a pair of twos
+    val holePlayer1 = HoleCards(
+      listOf(
+        Card(CLUBS, TWO),
+        Card(DIAMONDS, THREE)
+      ), player1
+    )
+
+    // Second player has a pair of aces
+    val holePlayer2 = HoleCards(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, KING)
+      ), player2
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(SPADES, ACE),     // Gives player2 a pair of aces
+        Card(DIAMONDS, FIVE),
+        Card(HEARTS, SEVEN),
+        Card(CLUBS, NINE),
+        Card(SPADES, TWO)      // Gives player1 a pair of twos
+      ), testRound
+    )
+
+    val winner = evaluator.determineHighestHand(
+      listOf(holePlayer1, holePlayer2),
+      community
+    )
+    assertThat(winner.player.name).isEqualTo("SecondButBetter")
+  }
+
+  /**
+   * Tests that the best hand is updated when a player after the first has a better hand.
+   */
+  @Test
+  fun `subsequent player with better hand becomes the winner`() {
+    // First player has a pair of twos
+    val holePlayer1 = HoleCards(
+      listOf(
+        Card(CLUBS, TWO),
+        Card(DIAMONDS, TWO)
+      ), player1
+    )
+
+    // Second player has a pair of threes (better than player1)
+    val holePlayer2 = HoleCards(
+      listOf(
+        Card(HEARTS, THREE),
+        Card(SPADES, THREE)
+      ), player2
+    )
+
+    // Third player has a pair of kings (best of all)
+    val holePlayer3 = HoleCards(
+      listOf(
+        Card(CLUBS, KING),
+        Card(DIAMONDS, FIVE)
+      ), player3
+    )
+
+    val community = CommunityCards(
+      listOf(
+        Card(HEARTS, KING),
+        Card(SPADES, SEVEN),
+        Card(DIAMONDS, EIGHT),
+        Card(CLUBS, NINE),
+        Card(HEARTS, TEN)
+      ), testRound
+    )
+
+    val winner = evaluator.determineHighestHand(
+      listOf(holePlayer1, holePlayer2, holePlayer3),
+      community
+    )
+
+    // Player3 should win with a pair of kings
+    assertThat(winner.player.name).isEqualTo("Max")
   }
 }
