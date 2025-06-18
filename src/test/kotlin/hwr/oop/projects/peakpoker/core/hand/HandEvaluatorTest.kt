@@ -21,35 +21,40 @@ import hwr.oop.projects.peakpoker.core.card.Rank.JACK
 import hwr.oop.projects.peakpoker.core.card.Rank.QUEEN
 import hwr.oop.projects.peakpoker.core.card.Rank.KING
 import hwr.oop.projects.peakpoker.core.card.Rank.ACE
-import hwr.oop.projects.peakpoker.core.game.GameId
-import hwr.oop.projects.peakpoker.core.game.GameInterface
-import hwr.oop.projects.peakpoker.core.player.PlayerInterface
+import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.round.PokerRound
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class HandEvaluatorTest : AnnotationSpec() {
-  private val evaluator = HandEvaluator()
+  private lateinit var player1: PokerPlayer
+  private lateinit var player2: PokerPlayer
+  private lateinit var player3: PokerPlayer
+  private lateinit var testRound: PokerRound
 
-  private val mockPlayer = object : PlayerInterface {
-    override val name: String = "dummy"
-    val id: String = "dummyId"
-  }
-
-  private val mockGame = object : GameInterface {
-    override val id: GameId = GameId("dummyGameId")
+  @BeforeEach
+  fun setup() {
+    player1 = PokerPlayer("Hans")
+    player2 = PokerPlayer("Peter")
+    player3 = PokerPlayer("Max")
+    testRound = PokerRound(
+      smallBlindAmount = 10, bigBlindAmount = 20,
+      players = listOf(player1, player2, player3),
+      smallBlindIndex = 0,
+      onRoundComplete = {}
+    )
   }
 
   /**
    * Verifies that a single player wins by default when no competition exists.
    */
   @Test
-
   fun `single player wins by default`() {
     val holeCards = HoleCards(
       listOf(
         Card(HEARTS, ACE),
         Card(SPADES, KING)
-      ), mockPlayer
+      ), player1
     )
 
     val community = CommunityCards(
@@ -59,11 +64,11 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, FOUR),
         Card(SPADES, FIVE),
         Card(CLUBS, SIX)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(listOf(holeCards), community)
-    assertThat(winner.player).isEqualTo(mockPlayer)
+    assertThat(winner.player).isEqualTo(player1)
   }
 
   /**
@@ -71,16 +76,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `higher pair wins between two players`() {
-    val player1 = object : PlayerInterface {
-      override val name = "Alice"
-      val id = "1"
-    }
-    val player2 = object : PlayerInterface {
-      override val name = "Bob"
-      val id = "2"
-    }
+    val player1 = PokerPlayer("Alice")
+    val player2 = PokerPlayer("Bob")
 
-    // Alice has pair of Aces
+    // Alice has a pair of Aces
     val hole1 = HoleCards(
       listOf(
         Card(HEARTS, ACE),
@@ -89,7 +88,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       player1
     )
 
-    // Bob has pair of Kings
+    // Bob has a pair of Kings
     val hole2 = HoleCards(
       listOf(
         Card(DIAMONDS, KING),
@@ -105,10 +104,11 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, FOUR),
         Card(SPADES, FIVE),
         Card(CLUBS, SIX)
-      ), mockGame
+      ), testRound
     )
 
-    val winner = evaluator.determineHighestHand(listOf(hole1, hole2), community)
+    val winner =
+      evaluator.determineHighestHand(listOf(hole1, hole2), community)
     assertThat(winner.player.name).isEqualTo("Alice")
   }
 
@@ -117,16 +117,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `straight beats pair`() {
-    val straightPlayer = object : PlayerInterface {
-      override val name = "Straight"
-      val id = "1"
-    }
-    val pairPlayer = object : PlayerInterface {
-      override val name = "Pair"
-      val id = "2"
-    }
+    val straightPlayer = PokerPlayer("Straight")
+    val pairPlayer = PokerPlayer("Pair")
 
-    // Player can make straight (3-7)
+    // PokerPlayer can make straight (3-7)
     val holeStraight = HoleCards(
       listOf(
         Card(HEARTS, THREE),
@@ -135,7 +129,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       straightPlayer
     )
 
-    // Player has pair
+    // PokerPlayer has a pair
     val holePair = HoleCards(
       listOf(
         Card(DIAMONDS, ACE),
@@ -151,7 +145,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SIX),
         Card(SPADES, TEN),
         Card(CLUBS, JACK)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -165,16 +159,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `tie returns first player with best hand`() {
-    val player1 = object : PlayerInterface {
-      override val name = "First"
-      val id = "1"
-    }
-    val player2 = object : PlayerInterface {
-      override val name = "Second"
-      val id = "2"
-    }
+    val player1 = PokerPlayer("First")
+    val player2 = PokerPlayer("Second")
 
-    // Both have same hand (Ace-high)
+    // Both have the same hand (Ace-high)
     val hole1 = HoleCards(
       listOf(
         Card(HEARTS, ACE),
@@ -198,7 +186,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SIX),
         Card(SPADES, SEVEN),
         Card(CLUBS, EIGHT)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -212,14 +200,8 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `flush beats straight`() {
-    val flushPlayer = object : PlayerInterface {
-      override val name = "Flush"
-      val id = "1"
-    }
-    val straightPlayer = object : PlayerInterface {
-      override val name = "Straight"
-      val id = "2"
-    }
+    val flushPlayer = PokerPlayer("Flush")
+    val straightPlayer = PokerPlayer("Straight")
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
@@ -246,7 +228,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, SEVEN),  // Straight uses these
         Card(CLUBS, SIX)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -260,14 +242,8 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `royal flush beats straight flush`() {
-    val royalPlayer = object : PlayerInterface {
-      override val name = "Royal"
-      val id = "1"
-    }
-    val straightFlushPlayer = object : PlayerInterface {
-      override val name = "StraightFlush"
-      val id = "2"
-    }
+    val royalPlayer = PokerPlayer("Royal")
+    val straightFlushPlayer = PokerPlayer("StraightFlush")
 
     // Royal flush player
     val holeRoyal = HoleCards(
@@ -294,7 +270,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(SPADES, TEN),
         Card(HEARTS, FIVE),   // Straight flush
         Card(HEARTS, FOUR)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -315,7 +291,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, JACK),
         Card(CLUBS, TEN)
-      ), mockGame
+      ), testRound
     )
 
     assertThatThrownBy {
@@ -328,22 +304,10 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `Gives the correct winner out of 4 players`() {
-    val flushPlayer = object : PlayerInterface {
-      override val name = "Flush"
-      val id = "1"
-    }
-    val straightPlayer = object : PlayerInterface {
-      override val name = "Straight"
-      val id = "2"
-    }
-    val pairPlayer = object : PlayerInterface {
-      override val name = "Pair"
-      val id = "3"
-    }
-    val highCardPlayer = object : PlayerInterface {
-      override val name = "HighCard"
-      val id = "4"
-    }
+    val flushPlayer = PokerPlayer("Flush")
+    val straightPlayer = PokerPlayer("Straight")
+    val pairPlayer = PokerPlayer("Pair")
+    val highCardPlayer = PokerPlayer("HighCard")
 
     // Flush player has two hearts
     val holeFlush = HoleCards(
@@ -371,7 +335,7 @@ class HandEvaluatorTest : AnnotationSpec() {
       pairPlayer
     )
 
-    // High card player
+    // High-card player
     val holeHighCard = HoleCards(
       listOf(
         Card(SPADES, THREE),
@@ -387,7 +351,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, SEVEN),  // Straight uses these
         Card(CLUBS, SIX)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
