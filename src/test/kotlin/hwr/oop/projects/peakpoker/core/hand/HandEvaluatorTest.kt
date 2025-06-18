@@ -32,6 +32,8 @@ class HandEvaluatorTest : AnnotationSpec() {
   private lateinit var player3: PokerPlayer
   private lateinit var testRound: PokerRound
 
+  private val evaluator = HandEvaluator()
+
   @BeforeEach
   fun setup() {
     player1 = PokerPlayer("Hans")
@@ -375,14 +377,14 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, QUEEN),
         Card(SPADES, JACK),
         Card(CLUBS, TEN)
-      ), mockGame
+      ), testRound
     )
 
     val holeCards = HoleCards(
       listOf(
         duplicateCard, // Same card as in community
         Card(DIAMONDS, THREE)
-      ), mockPlayer
+      ), player1
     )
 
     assertThatThrownBy {
@@ -397,9 +399,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   @Test
   fun `selects best hand when all combinations are considered`() {
     // Create a player with a potential royal flush in spades
-    val royalPlayer = object : PlayerInterface {
-      override val name = "Royal"
-    }
+    val royalPlayer = PokerPlayer("Royal")
 
     // Give exactly the cards needed for a royal flush
     val holeRoyal = HoleCards(
@@ -417,7 +417,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         // Add cards that would create tempting but inferior hands
         Card(HEARTS, ACE),
         Card(DIAMONDS, ACE)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(listOf(holeRoyal), community)
@@ -432,9 +432,7 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `first player is best when they are the only player`() {
-    val player = object : PlayerInterface {
-      override val name = "OnlyPlayer"
-    }
+    val player = PokerPlayer("OnlyPlayer")
 
     val holeCards = HoleCards(
       listOf(
@@ -450,7 +448,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SIX),
         Card(DIAMONDS, SEVEN),
         Card(CLUBS, EIGHT)
-      ), mockGame
+      ), testRound
     )
 
     // This should return the player directly from the first branch without comparison
@@ -465,9 +463,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   fun `exercises different bit patterns for card combinations`() {
     // Create a scenario where multiple valid 5-card hands can be created
     // but only one is optimal
-    val player = object : PlayerInterface {
-      override val name = "BitPattern"
-    }
+    val player = PokerPlayer("BitPattern")
 
     // These hole cards combined with community cards will create multiple possible hands
     val holeCards = HoleCards(
@@ -485,7 +481,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(DIAMONDS, TEN),  // Potential royal flush or straight flush break
         Card(HEARTS, ACE),    // Potential pair of aces
         Card(SPADES, ACE)     // Potential three of a kind
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(listOf(holeCards), community)
@@ -498,9 +494,7 @@ class HandEvaluatorTest : AnnotationSpec() {
   @Test
   fun `tests another bit pattern combination`() {
     // Create a scenario where the best hand would be at a specific bit pattern
-    val player = object : PlayerInterface {
-      override val name = "BitPattern2"
-    }
+    val player = PokerPlayer("BitPattern2")
 
     // Create a very specific set of cards where the best hand depends on the exact bit pattern selection
     val holeCards = HoleCards(
@@ -517,7 +511,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(CLUBS, ACE),
         Card(DIAMONDS, ACE),
         Card(HEARTS, KING)
-      ), mockGame
+      ), testRound
     )
 
     // Should find full house: Aces full of fives
@@ -530,9 +524,7 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `tests specific card ordering for bit manipulation`() {
-    val player = object : PlayerInterface {
-      override val name = "OrderTest"
-    }
+    val player = PokerPlayer("OrderTest")
 
     // The order of these cards might affect the bit manipulation
     val holeCards = HoleCards(
@@ -549,7 +541,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(CLUBS, SIX),    // Fifth card
         Card(HEARTS, SEVEN), // Sixth card
         Card(DIAMONDS, EIGHT) // Seventh card
-      ), mockGame
+      ), testRound
     )
 
     // Should find straight flush
@@ -562,13 +554,9 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `second player wins when having better hand than first`() {
-    val player1 = object : PlayerInterface {
-      override val name = "FirstButWorse"
-    }
+    val player1 = PokerPlayer("FirstButWorse")
 
-    val player2 = object : PlayerInterface {
-      override val name = "SecondButBetter"
-    }
+    val player2 = PokerPlayer("SecondButBetter")
 
     // First player has just a pair of twos
     val holePlayer1 = HoleCards(
@@ -593,7 +581,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(HEARTS, SEVEN),
         Card(CLUBS, NINE),
         Card(SPADES, TWO)      // Gives player1 a pair of twos
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -608,19 +596,6 @@ class HandEvaluatorTest : AnnotationSpec() {
    */
   @Test
   fun `subsequent player with better hand becomes the winner`() {
-    // Create three players to ensure we're testing the full loop logic
-    val player1 = object : PlayerInterface {
-      override val name = "Player1"
-    }
-
-    val player2 = object : PlayerInterface {
-      override val name = "Player2"
-    }
-
-    val player3 = object : PlayerInterface {
-      override val name = "Player3"
-    }
-
     // First player has a pair of twos
     val holePlayer1 = HoleCards(
       listOf(
@@ -652,7 +627,7 @@ class HandEvaluatorTest : AnnotationSpec() {
         Card(DIAMONDS, EIGHT),
         Card(CLUBS, NINE),
         Card(HEARTS, TEN)
-      ), mockGame
+      ), testRound
     )
 
     val winner = evaluator.determineHighestHand(
@@ -661,6 +636,6 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // Player3 should win with a pair of kings
-    assertThat(winner.player.name).isEqualTo("Player3")
+    assertThat(winner.player.name).isEqualTo("Max")
   }
 }

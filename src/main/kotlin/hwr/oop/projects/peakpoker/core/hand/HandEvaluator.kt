@@ -49,7 +49,7 @@ class HandEvaluator {
       hole: HoleCards,
       community: CommunityCards,
   ): PokerHand {
-    val allCards = hole.getCards() + community.cards
+    val allCards = hole.cards + community.cards
 
     require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 
