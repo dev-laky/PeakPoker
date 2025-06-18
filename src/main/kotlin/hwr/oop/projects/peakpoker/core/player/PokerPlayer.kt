@@ -5,53 +5,76 @@ import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 
-class Player(
-  override val name: String,
+class PokerPlayer(
+  val name: String,
   private var chips: Int = 100,
-) : PlayerInterface {
+) {
+
   init {
     if (chips < 0) {
       throw InsufficientChipsException("Chips amount must be non-negative")
     }
     if (name.isBlank()) {
-      throw InvalidPlayerStateException("Player name cannot be blank")
+      throw InvalidPlayerStateException("PokerPlayer name cannot be blank")
     }
   }
 
-  var isFolded: Boolean = false
-  var isAllIn: Boolean = false
+  private var isFolded: Boolean = false
+  private var isAllIn: Boolean = false
+  private var hasChecked: Boolean = false
 
   private var hand: HoleCards = HoleCards(emptyList(), this)
   private var bet: Int = 0
 
-  fun getBet(): Int {
-    return bet
-  }
-
-  fun getChips(): Int {
+  fun chips(): Int {
     return chips
   }
 
-  fun getHand(): HoleCards {
+  fun hand(): HoleCards {
     return hand
+  }
+
+  fun bet(): Int {
+    return bet
+  }
+
+  fun isFolded(): Boolean {
+    return isFolded
+  }
+
+  fun isAllIn(): Boolean {
+    return isAllIn
+  }
+
+  fun hasChecked(): Boolean {
+    return hasChecked
+  }
+
+  fun resetRoundState() {
+    isFolded = false
+    isAllIn = false
+  }
+
+  fun resetBet() {
+    bet = 0
+    hasChecked = false
   }
 
   fun assignHand(cards: HoleCards) {
     hand = cards
   }
 
-  /**
-   * Sets the bet amount for the player.
-   *
-   * @param chips The amount of chips to bet
-   * @throws InvalidBetAmountException If the chips amount is not greater than zero
-   */
   fun setBetAmount(chips: Int) {
     if (chips <= 0) {
       throw InvalidBetAmountException("Chips amount must be greater than zero")
     }
+
     this.chips -= chips - bet
     bet = chips
+  }
+
+  fun check() {
+    hasChecked = true
   }
 
   fun fold() {
@@ -59,9 +82,7 @@ class Player(
   }
 
   fun allIn() {
-    val totalBet = chips + bet
-    chips = 0
-    setBetAmount(totalBet)
+    setBetAmount(this.chips + this.bet)
     isAllIn = true
   }
 }
