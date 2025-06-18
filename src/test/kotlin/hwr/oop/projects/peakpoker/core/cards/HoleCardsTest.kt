@@ -25,7 +25,7 @@ class HoleCardsTest : AnnotationSpec() {
 
     val holeCards = HoleCards(cards, mockPlayer)
 
-    assertThat(holeCards.cards).hasSize(2)
+    assertThat(holeCards.getCards()).hasSize(2)
   }
 
   @Test
@@ -59,7 +59,7 @@ class HoleCardsTest : AnnotationSpec() {
     val inputCards = listOf(card1, card2)
     val holeCards = HoleCards(inputCards, mockPlayer)
 
-    assertThat(holeCards.cards).containsExactly(card1, card2)
+    assertThat(holeCards.getCards()).containsExactly(card1, card2)
   }
 
   @Test
@@ -78,7 +78,7 @@ class HoleCardsTest : AnnotationSpec() {
   fun `HoleCards should work with empty list initialization`() {
     val holeCards = HoleCards(emptyList(), mockPlayer)
 
-    assertThat(holeCards.cards).isEmpty()
+    assertThat(holeCards.getCards()).isEmpty()
   }
 
   @Test

@@ -46,6 +46,7 @@ class HandEvaluator {
      */
     private fun getBestCombo(hole: HoleCards, community: CommunityCards): PokerHand {
         val allCards = hole.cards + community.cards
+
         require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 
         var bestCombo: PokerHand? = null

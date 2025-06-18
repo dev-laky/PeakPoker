@@ -222,7 +222,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
     customGame.allIn(smallStackPlayer)
 
-    assertThat(customGame.pot).isEqualTo(70) // 10 + 20 + 40
+    assertThat(customGame.calculatePot()).isEqualTo(70) // 10 + 20 + 40
     assertThat(smallStackPlayer.isAllIn).isTrue()
   }
 
@@ -240,7 +240,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
     customGame.allIn(poorPlayer) // All-in with 50
 
     // then
-    assertThat(customGame.pot).isEqualTo(110) // 40 + 50 + 20
-    assertThat(customGame.pot).isEqualTo(richPlayer.getBet() + poorPlayer.getBet() + mediumPlayer.getBet())
+    assertThat(customGame.calculatePot()).isEqualTo(110) // 40 + 50 + 20
+    assertThat(customGame.calculatePot()).isEqualTo(richPlayer.getBet() + poorPlayer.getBet() + mediumPlayer.getBet())
   }
 }

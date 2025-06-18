@@ -5,10 +5,10 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 class GameTestThreePlayers : AnnotationSpec() {
-  lateinit var player1: Player
-  lateinit var player2: Player
-  lateinit var player3: Player
-  lateinit var testGame: Game
+  private lateinit var player1: Player
+  private lateinit var player2: Player
+  private lateinit var player3: Player
+  private lateinit var testGame: Game
 
   @BeforeEach
   fun setup() {
@@ -94,7 +94,7 @@ class GameTestThreePlayers : AnnotationSpec() {
 
   @Test
   fun `big blind amount must be twice the smallBlind amount`() {
-    assertThat(testGame.bigBlindAmount).isEqualTo(testGame.smallBlindAmount * 2)
+    assertThat(testGame.getBigBlind()).isEqualTo(testGame.getSmallBlind() * 2)
   }
 
   @Test
@@ -124,22 +124,22 @@ class GameTestThreePlayers : AnnotationSpec() {
 
   @Test
   fun `dealHoleCards correctly assigns 2 cards to each player during initialization`() {
-    assertThat(player1.getHand().cards).hasSize(2)
-    assertThat(player2.getHand().cards).hasSize(2)
-    assertThat(player3.getHand().cards).hasSize(2)
+    assertThat(player1.getHand().getCards()).hasSize(2)
+    assertThat(player2.getHand().getCards()).hasSize(2)
+    assertThat(player3.getHand().getCards()).hasSize(2)
   }
 
   @Test
   fun `dealHoleCards removes correct number of cards from the deck`() {
     val playerCount = testGame.playersOnTable.size
 
-    assertThat(testGame.deck.show()).hasSize(52 - (2 * playerCount))
+    assertThat(testGame.getDeck().show()).hasSize(52 - (2 * playerCount))
   }
 
   @Test
   fun `dealHoleCards assigns unique cards to each player`() {
     // then - collect all cards from players' hands and check for uniqueness
-    val allCards = player1.getHand().cards + player2.getHand().cards + player3.getHand().cards
+    val allCards = player1.getHand().getCards() + player2.getHand().getCards() + player3.getHand().getCards()
     assertThat(allCards).hasSize(6) // 3 players * 2 cards
     assertThat(allCards.distinct()).hasSize(6) // All cards should be unique
   }
@@ -148,8 +148,8 @@ class GameTestThreePlayers : AnnotationSpec() {
   @Test
   fun `initial pot equals sum of blinds`() {
     // then
-    assertThat(testGame.pot).isEqualTo(30) // Small blind(10) + Big blind(20)
-    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testGame.calculatePot()).isEqualTo(30) // Small blind(10) + Big blind(20)
+    assertThat(testGame.calculatePot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
   }
 
   @Test
@@ -159,7 +159,7 @@ class GameTestThreePlayers : AnnotationSpec() {
     testGame.raiseBetTo(player1, 50) // Player1 raises to 50
 
     // then
-    assertThat(testGame.pot).isEqualTo(90) // 20 + 20 + 50
+    assertThat(testGame.calculatePot()).isEqualTo(90) // 20 + 20 + 50
   }
 
   @Test
@@ -170,8 +170,8 @@ class GameTestThreePlayers : AnnotationSpec() {
     testGame.fold(player2) // Player2 folds (still has 20 in pot)
 
     // then
-    assertThat(testGame.pot).isEqualTo(90) // 50 + 20 + 20
+    assertThat(testGame.calculatePot()).isEqualTo(90) // 50 + 20 + 20
     assertThat(player2.isFolded).isTrue()
-    assertThat(testGame.pot).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
+    assertThat(testGame.calculatePot()).isEqualTo(player1.getBet() + player2.getBet() + player3.getBet())
   }
 }
