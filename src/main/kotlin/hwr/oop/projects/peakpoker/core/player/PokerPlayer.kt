@@ -64,6 +64,13 @@ class PokerPlayer(
     hand = cards
   }
 
+  fun assignPot(chips: Int) {
+    if (chips < 0) {
+      throw InsufficientChipsException("Chips amount must be non-negative")
+    }
+    this.chips += chips
+  }
+
   fun setBetAmount(chips: Int) {
     if (chips <= 0) {
       throw InvalidBetAmountException("Chips amount must be greater than zero")
