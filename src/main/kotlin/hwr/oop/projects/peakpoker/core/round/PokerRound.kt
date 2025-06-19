@@ -129,16 +129,23 @@ class PokerRound(
     return players[(currentPlayerIndex + 1) % players.size]
   }
 
+  private fun getPlayerByName(name: String): PokerPlayer {
+    players.forEach { player ->
+      if (player.name == name) return player
+    }
+    throw IllegalStateException("Player with name $name not found")
+  }
+
   private fun setBlinds() {
-    raiseBetTo(getCurrentPlayer(), smallBlindAmount)
+    raiseBetTo(getCurrentPlayer().name, smallBlindAmount)
 
     // Check for the same blind amounts --> call
     if (bigBlindAmount == smallBlindAmount) {
-      call(getCurrentPlayer())
+      call(getCurrentPlayer().name)
       return
     }
 
-    raiseBetTo(getCurrentPlayer(), bigBlindAmount)
+    raiseBetTo(getCurrentPlayer().name, bigBlindAmount)
   }
 
   private fun requireLargerThanHighestBet(highestBet: Int, chips: Int) {
@@ -201,7 +208,7 @@ class PokerRound(
    * This method validates that the bet is higher than the current highest bet
    * and that it's the player's turn before raising their bet.
    *
-   * @param player The player who is raising their bet
+   * @param playerName The player who is raising their bet
    * @param chips The total amount to bet (not the additional amount)
    * @throws InvalidBetAmountException If the bet amount is negative
    * @throws InvalidBetAmountException If the bet is not higher than the current highest bet
@@ -209,7 +216,8 @@ class PokerRound(
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InsufficientChipsException If the player does not have enough chips
    */
-  override fun raiseBetTo(player: PokerPlayer, chips: Int) {
+  override fun raiseBetTo(playerName: String, chips: Int) {
+    val player = getPlayerByName(playerName)
     val currentPlayer = getCurrentPlayer()
     val highestBet = getHighestBet()
 
@@ -228,13 +236,14 @@ class PokerRound(
   /**
    * Allows a player to match the current highest bet.
    *
-   * @param player The player who is calling
+   * @param playerName The player who is calling
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidCallException If the player is already at the highest bet
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InsufficientChipsException If the player does not have enough chips
    */
-  override fun call(player: PokerPlayer) {
+  override fun call(playerName: String) {
+    val player = getPlayerByName(playerName)
     val currentPlayer = getCurrentPlayer()
     val highestBet = getHighestBet()
 
@@ -252,12 +261,13 @@ class PokerRound(
   /**
    * Allows a player to check (pass the action to the next player without betting).
    *
-   * @param player The player who is checking
+   * @param playerName The player who is checking
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    * @throws InvalidCheckException If the player is not at the highest bet
    */
-  override fun check(player: PokerPlayer) {
+  override fun check(playerName: String) {
+    val player = getPlayerByName(playerName)
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
@@ -272,11 +282,12 @@ class PokerRound(
   /**
    * Allows a player to fold (give up their hand and sit out the current round).
    *
-   * @param player The player who is folding
+   * @param playerName The player who is folding
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    */
-  override fun fold(player: PokerPlayer) {
+  override fun fold(playerName: String) {
+    val player = getPlayerByName(playerName)
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
@@ -290,11 +301,12 @@ class PokerRound(
   /**
    * Allows a player to bet all their remaining chips.
    *
-   * @param player The player who is going all-in
+   * @param playerName The player who is going all-in
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
    */
-  override fun allIn(player: PokerPlayer) {
+  override fun allIn(playerName: String) {
+    val player = getPlayerByName(playerName)
     val currentPlayer = getCurrentPlayer()
 
     requirePlayerTurn(currentPlayer, player)
