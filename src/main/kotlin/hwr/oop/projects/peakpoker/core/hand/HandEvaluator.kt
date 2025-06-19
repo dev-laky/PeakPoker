@@ -18,8 +18,8 @@ class HandEvaluator {
    * @throws IllegalArgumentException If the list of players is empty
    */
   fun determineHighestHand(
-      holeCardsList: List<HoleCards>,
-      community: CommunityCards,
+    holeCardsList: List<HoleCards>,
+    community: CommunityCards,
   ): HoleCards {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
@@ -46,8 +46,8 @@ class HandEvaluator {
    * @throws IllegalStateException If no valid hand could be found
    */
   private fun getBestCombo(
-      hole: HoleCards,
-      community: CommunityCards,
+    hole: HoleCards,
+    community: CommunityCards,
   ): PokerHand {
     val allCards = hole.cards + community.cards
 
@@ -72,6 +72,17 @@ class HandEvaluator {
     }
 
     return bestCombo ?: throw IllegalStateException("No valid hand found")
+  }
+
+  /**
+   * Compares two poker hands to determine if they are tied.
+   *
+   * @param hand1 The first [PokerHand] to compare
+   * @param hand2 The second [PokerHand] to compare
+   * @return `true` if the hands are tied, `false` otherwise
+   */
+  fun areHandsTied(hand1: PokerHand, hand2: PokerHand): Boolean {
+    return hand1.compareTo(hand2) == 0
   }
 }
 
