@@ -3,7 +3,6 @@ package hwr.oop.projects.peakpoker.core.card
 import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
-import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.round.PokerRound
 import hwr.oop.projects.peakpoker.core.round.RoundPhase
 
@@ -22,6 +21,10 @@ class CommunityCards(
     if (cards.distinct().size != cards.size) {
       throw DuplicateCardException("Community cards must not contain duplicates.")
     }
+  }
+
+  fun reset() {
+    cards = emptyList()
   }
 
   fun dealCommunityCards(roundPhase: RoundPhase, deck: Deck) {

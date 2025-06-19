@@ -85,4 +85,15 @@ class PokerPlayer(
     setBetAmount(this.chips + this.bet)
     isAllIn = true
   }
+
+  /**
+   * Adds the specified amount of chips to the player's stack.
+   *
+   * @param amount The amount of chips to add
+   * @throws InvalidBetAmountException If the amount is negative
+   */
+  fun addChips(amount: Int) {
+    if (amount < 0) throw InvalidBetAmountException("Cannot add negative amount of chips")
+    chips += amount
+  }
 }
