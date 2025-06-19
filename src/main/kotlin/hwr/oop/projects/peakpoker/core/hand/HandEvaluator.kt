@@ -18,8 +18,8 @@ class HandEvaluator {
    * @throws IllegalArgumentException If the list of players is empty
    */
   fun determineHighestHand(
-      holeCardsList: List<HoleCards>,
-      community: CommunityCards,
+    holeCardsList: List<HoleCards>,
+    community: CommunityCards,
   ): HoleCards {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
@@ -46,8 +46,8 @@ class HandEvaluator {
    * @throws IllegalStateException If no valid hand could be found
    */
   private fun getBestCombo(
-      hole: HoleCards,
-      community: CommunityCards,
+    hole: HoleCards,
+    community: CommunityCards,
   ): PokerHand {
     val allCards = hole.cards + community.cards
 
