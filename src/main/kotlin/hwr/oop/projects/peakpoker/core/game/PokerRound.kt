@@ -30,7 +30,7 @@ class PokerRound(
 
   private val pots: MutableList<Pot> = mutableListOf(Pot(0, players.toSet()))
   private val mainPot: Pot get() = pots.first()
-  val totalPotAmount: Int get() = pots.sumOf { it.amount }
+//  val totalPotAmount: Int get() = pots.sumOf { it.amount } // We might need this later
 
   // Will be = 2 after "blind" init
   private var currentPlayerIndex: Int = smallBlindIndex
@@ -46,30 +46,34 @@ class PokerRound(
     }
   }
 
+  /**
+   * Handles the showdown phase when players reveal their cards to determine the winner.
+   *
+   * This method executes the following steps in sequence:
+   * 1. Distributes winnings from all pots to winning players
+   * 2. Resets player round states (bets and statuses)
+   * 3. Clears community cards and pots
+   * 4. Notifies the game about round completion via callback
+   *
+   * This is the final phase of a poker round, after which a new round can begin.
+   */
   private fun showdown() {
-//    // 1. Ensure all community cards are dealt
-//    // In case we reached showdown without all cards being revealed (e.g., all players but one folded)
-//    while (communityCards.cards.size < 5) {
-//      communityCards.dealCommunityCards(roundPhase, deck)
-//    }
-
-    // 2. Distribute winnings across all pots
+    // 1. Distribute winnings across all pots
     distributeWinnings()
 
-    // 3. Reset player round states
+    // 2. Reset player round states
     players.forEach { player ->
       player.resetBet()
       player.resetRoundState()
     }
 
-    // 4. Clear community cards and pots
+    // 3. Clear community cards and pots
     communityCards.reset()
     pots.clear()
     pots.add(Pot(0, players.toSet()))
 
-    // 5. Notify the game about the round completion
+    // 4. Notify the game about the round completion
     onRoundComplete()
-    TODO("Implement showdown logic to determine the winner based on the players' hands and community cards")
   }
 
   private fun checkForNextGamePhase(): Boolean {
@@ -245,7 +249,7 @@ class PokerRound(
     requirePlayerNotAllIn(player)
     requireSufficientChipsToRaise(player, chips)
 
-    addToCurrentPot(player, chips - player.bet())
+    addToCurrentPot(chips - player.bet())
     player.setBetAmount(chips)
     makeTurn()
   }
@@ -269,7 +273,7 @@ class PokerRound(
     requirePlayerNotAllInForCall(player)
     requireSufficientChipsToCall(player, highestBet)
 
-    addToCurrentPot(player, highestBet - player.bet())
+    addToCurrentPot(highestBet - player.bet())
     player.setBetAmount(highestBet)
     makeTurn()
   }
@@ -326,20 +330,37 @@ class PokerRound(
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
 
-    addToCurrentPot(player, player.chips())
+    addToCurrentPot( player.chips())
     createSidePot(player)
     player.allIn()
     makeTurn()
   }
 
-  // New changes: Side-pots
-  // Seems to work just fine, but needs more testing
-  private fun addToCurrentPot(player: PokerPlayer, amount: Int) {
+  /**
+   * Adds the specified amount of chips to the main pot.
+   *
+   * This method updates the main pot by creating a new copy with the increased
+   * amount, since the Pot class is immutable.
+   *
+   * @param amount The number of chips to add to the pot
+   */
+  private fun addToCurrentPot(amount: Int) {
     // Add to main pot by creating an updated version (as Pot is immutable)
     val updatedMainPot = mainPot.copy(amount = mainPot.amount + amount)
     pots[0] = updatedMainPot
   }
 
+  /**
+   * Creates a side pot when a player goes all-in.
+   *
+   * This method:
+   * 1. Calculates excess chips from other players (amounts above what the all-in player could match)
+   * 2. Reduces those players' bets to match the all-in amount
+   * 3. Moves excess chips from the main pot to a new side pot
+   * 4. Makes the all-in player ineligible for the side pot
+   *
+   * @param allInPlayer The player who has gone all-in
+   */
   private fun createSidePot(allInPlayer: PokerPlayer) {
     // Get all-in amount (player's bet + remaining chips)
     val allInTotal = allInPlayer.bet() + allInPlayer.chips()
@@ -347,7 +368,6 @@ class PokerRound(
     // Calculate excess chips from other players
     var excessAmount = 0
     for (player in players) {
-      // Find all players who are not folded && not the all-in player && and who have bet more than the all-in total
       if (!player.isFolded() && player != allInPlayer && player.bet() > allInTotal) {
         val excess = player.bet() - allInTotal
         excessAmount += excess
@@ -369,6 +389,19 @@ class PokerRound(
     }
   }
 
+  /**
+   * Distributes the winnings from all pots to the appropriate players at the end of a hand.
+   *
+   * This method processes each pot in reverse order (side pots first, then main pot).
+   * For each pot, it determines the eligible players (those who haven't folded), evaluates
+   * their hands, and distributes the pot amount among the winners:
+   *
+   * - If there is a single winner, they receive the entire pot amount
+   * - If there are multiple winners with equivalent hands, the pot is split evenly
+   * - If the pot cannot be split evenly, the remainder is given to the first winner
+   *
+   * The method relies on the [HandEvaluator] to determine the highest hand(s) among the eligible players.
+   */
   private fun distributeWinnings() {
     // Process each pot (starting from side pots, then main pot)
     for (pot in pots.reversed()) {
@@ -377,15 +410,23 @@ class PokerRound(
       // Skip if no eligible players (edge case)
       if (eligibleActivePlayers.isEmpty()) continue
 
-      // Determine winners for this pot
-      val winners = determineWinners(eligibleActivePlayers)
+      // Get hole cards for each eligible player
+      val holeCardsList = eligibleActivePlayers.map { it.hand() }
+
+      // Skip if no valid hands (another edge case)
+      if (holeCardsList.isEmpty()) continue
+
+      // Use HandEvaluator to determine winners
+      val winningHoleCards =
+        handEvaluator.determineHighestHand(holeCardsList, communityCards)
+      val winningPlayers = winningHoleCards.map { it.player }
 
       // Split the pot among winners
-      if (winners.isNotEmpty()) {
-        val winAmount = pot.amount / winners.size
-        val remainder = pot.amount % winners.size
+      if (winningPlayers.isNotEmpty()) {
+        val winAmount = pot.amount / winningPlayers.size
+        val remainder = pot.amount % winningPlayers.size
 
-        winners.forEachIndexed { index, player ->
+        winningPlayers.forEachIndexed { index: Int, player: PokerPlayer ->
           player.addChips(winAmount)
 
           // Give the remainder to the first winner (convention in poker)
@@ -395,94 +436,5 @@ class PokerRound(
         }
       }
     }
-  }
-
-  private fun determineWinners2(eligiblePlayers: Collection<PokerPlayer>): List<PokerPlayer> {
-    if (eligiblePlayers.isEmpty()) return emptyList()
-
-    // Get hole cards for each eligible player
-    val holeCardsList = eligiblePlayers.map { it.hand() }
-
-    // If only one player remains, they win by default
-    if (holeCardsList.size == 1) return listOf(holeCardsList.first().player)
-
-    // Since getBestCombo is private, we'll use determineHighestHand to find the best hand type
-    // But then we'll loop through all players to find ties
-    val bestPlayerHand =
-      handEvaluator.determineHighestHand(holeCardsList, communityCards)
-
-    val winners = mutableListOf<PokerPlayer>()
-
-    // Compare each player's hand with others
-    for (holeCards in holeCardsList) {
-      // Skip already processed hands
-      if (winners.contains(holeCards.player)) continue
-
-      val playerToCompare = holeCards.player
-      val otherPlayers = holeCardsList.filter { it.player != playerToCompare }
-
-      // If this is the player with the best hand we found earlier, add them
-      if (holeCards.player == bestPlayerHand.player) {
-        winners.add(holeCards.player)
-
-        // Find all ties by comparing each remaining player with the best player
-        for (otherHoleCards in otherPlayers) {
-          val result = handEvaluator.determineHighestHand(
-            listOf(bestPlayerHand, otherHoleCards),
-            communityCards
-          )
-
-          // If comparing these two players doesn't yield a clear winner, they're tied
-          if (otherHoleCards.player == result.player) {
-            winners.add(otherHoleCards.player)
-          }
-        }
-
-        // Break after processing the best player
-        break
-      }
-    }
-
-    return winners
-  }
-
-  /**
-   * Determines the winners by comparing each player's hand directly against the best hand.
-   *
-   * @param eligiblePlayers A collection of eligible players
-   * @return A list of [PokerPlayer]s who are tied for the best hand
-   */
-  private fun determineWinners(eligiblePlayers: Collection<PokerPlayer>): List<PokerPlayer> {
-    if (eligiblePlayers.isEmpty()) return emptyList()
-
-    // Get hole cards for each eligible player
-    val holeCardsList = eligiblePlayers.map { it.hand() }
-
-    // If only one player remains, they win by default
-    if (holeCardsList.size == 1) return listOf(holeCardsList.first().player)
-
-    // Find the player with the best hand
-    val bestPlayerHand = handEvaluator.determineHighestHand(holeCardsList, communityCards)
-    val winners = mutableListOf(bestPlayerHand.player)
-
-    // Find all ties by comparing each remaining player with the best player
-    for (holeCards in holeCardsList) {
-      // Skip the best player we already added
-      if (holeCards.player == bestPlayerHand.player) continue
-
-      // Key insight: In a tie, determineHighestHand always returns the first player
-      // So if we reverse the order and the second player wins, they must be tied
-      val result = handEvaluator.determineHighestHand(
-        listOf(holeCards, bestPlayerHand),
-        communityCards
-      )
-
-      // If the current player wins when listed first, they must be tied with the best player
-      if (result.player == holeCards.player) {
-        winners.add(holeCards.player)
-      }
-    }
-
-    return winners
   }
 }
