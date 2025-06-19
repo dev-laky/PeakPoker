@@ -9,6 +9,7 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.game.GameActionable
+import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 class PokerRound(
@@ -23,6 +24,9 @@ class PokerRound(
   private val communityCards: CommunityCards =
     CommunityCards(mutableListOf(), this)
   private var roundPhase = RoundPhase.PRE_FLOP
+
+  private val handEvaluator =
+    HandEvaluator(players.map { it.hand() }, communityCards)
 
   private var pot = 0
 
@@ -41,7 +45,8 @@ class PokerRound(
   }
 
   private fun showdown() {
-    TODO("Implement showdown logic to determine the winner based on the players' hands and community cards")
+    val winningPlayer = handEvaluator.determineHighestHand().player
+    winningPlayer.assignPot(pot)
 
     // Notify the game about the round completion
     onRoundComplete()
