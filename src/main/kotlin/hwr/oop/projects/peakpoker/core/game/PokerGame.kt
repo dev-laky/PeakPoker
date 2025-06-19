@@ -64,11 +64,11 @@ class PokerGame(
   }
 
   // Game-level functions and delegation to Round
-  override fun raiseBetTo(player: PokerPlayer, chips: Int) =
-    round.raiseBetTo(player, chips)
+  override fun raiseBetTo(playerName: String, chips: Int) =
+    round.raiseBetTo(playerName, chips)
 
-  override fun call(player: PokerPlayer) = round.call(player)
-  override fun check(player: PokerPlayer) = round.check(player)
-  override fun fold(player: PokerPlayer) = round.fold(player)
-  override fun allIn(player: PokerPlayer) = round.allIn(player)
+  override fun call(playerName: String) = round.call(playerName)
+  override fun check(playerName: String) = round.check(playerName)
+  override fun fold(playerName: String) = round.fold(playerName)
+  override fun allIn(playerName: String) = round.allIn(playerName)
 }
