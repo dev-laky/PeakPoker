@@ -10,30 +10,42 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
  */
 class HandEvaluator {
   /**
-   * Determines the player with the highest hand among a list of players.
+   * Determines all players with the highest hand among a list of players.
+   * Returns all players who are tied for the best hand to properly support split pots.
    *
    * @param holeCardsList A list of [HoleCards] representing each player's cards
    * @param community The [CommunityCards] shared by all players
-   * @return The [HoleCards] of the player with the highest hand
+   * @return List of [HoleCards] of all players tied for the highest hand
    * @throws IllegalArgumentException If the list of players is empty
    */
   fun determineHighestHand(
     holeCardsList: List<HoleCards>,
     community: CommunityCards,
-  ): HoleCards {
+  ): List<HoleCards> {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
-    var bestPlayerHand = holeCardsList.first()
-    var bestHand = getBestCombo(bestPlayerHand, community)
+    // If only one player, they win by default
+    if (holeCardsList.size == 1) return listOf(holeCardsList.first())
 
-    holeCardsList.drop(1).forEach { player ->
-      val currentHand = getBestCombo(player, community)
-      if (currentHand.compareTo(bestHand) > 0) {
-        bestHand = currentHand
-        bestPlayerHand = player
+    // Find the best hand value among all players
+    var bestHandValue: PokerHand? = null
+    holeCardsList.forEach { holeCards ->
+      val currentHand = getBestCombo(holeCards, community)
+      if (bestHandValue == null || currentHand.compareTo(bestHandValue) > 0) {
+        bestHandValue = currentHand
       }
     }
-    return bestPlayerHand
+
+    // Collect all players whose hands match the best hand value (ties)
+    val tiedWinners = mutableListOf<HoleCards>()
+    holeCardsList.forEach { holeCards ->
+      val currentHand = getBestCombo(holeCards, community)
+      if (currentHand.compareTo(bestHandValue!!) == 0) {
+        tiedWinners.add(holeCards)
+      }
+    }
+
+    return tiedWinners
   }
 
   /**
@@ -72,17 +84,6 @@ class HandEvaluator {
     }
 
     return bestCombo ?: throw IllegalStateException("No valid hand found")
-  }
-
-  /**
-   * Compares two poker hands to determine if they are tied.
-   *
-   * @param hand1 The first [PokerHand] to compare
-   * @param hand2 The second [PokerHand] to compare
-   * @return `true` if the hands are tied, `false` otherwise
-   */
-  fun areHandsTied(hand1: PokerHand, hand2: PokerHand): Boolean {
-    return hand1.compareTo(hand2) == 0
   }
 }
 
