@@ -144,4 +144,36 @@ class PlayerTest : AnnotationSpec() {
       .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
       .hasMessageContaining("PokerPlayer name cannot be blank")
   }
+
+  @Test
+  fun `assignPot adds chips to player's stack`() {
+    val initialChips = 100
+    val player = PokerPlayer("Hans", initialChips)
+    val potAmount = 50
+
+    player.assignPot(potAmount)
+
+    assertThat(player.chips()).isEqualTo(initialChips + potAmount)
+  }
+
+  @Test
+  fun `assignPot with zero amount is valid`() {
+    val initialChips = 100
+    val player = PokerPlayer("Hans", initialChips)
+
+    player.assignPot(0)
+
+    assertThat(player.chips()).isEqualTo(initialChips)
+  }
+
+  @Test
+  fun `assignPot with negative amount throws exception`() {
+    val player = PokerPlayer("Hans", 100)
+
+    assertThatThrownBy { player.assignPot(-50) }
+      .isExactlyInstanceOf(InsufficientChipsException::class.java)
+      .hasMessageContaining("Chips amount must be non-negative")
+
+    assertThat(player.chips()).isEqualTo(100)
+  }
 }
