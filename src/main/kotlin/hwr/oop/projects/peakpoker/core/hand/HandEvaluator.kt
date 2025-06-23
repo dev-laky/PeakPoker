@@ -8,20 +8,18 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
  * Evaluates poker hands and determines winning players.
  * Replaces the singleton implementation with a class-based approach.
  */
-class HandEvaluator {
+class HandEvaluator(
+  private val holeCardsList: List<HoleCards>,
+  private val communityCards: CommunityCards,
+) {
   /**
    * Determines all players with the highest hand among a list of players.
    * Returns all players who are tied for the best hand to properly support split pots.
    *
-   * @param holeCardsList A list of [HoleCards] representing each player's cards
-   * @param community The [CommunityCards] shared by all players
    * @return List of [HoleCards] of all players tied for the highest hand
    * @throws IllegalArgumentException If the list of players is empty
    */
-  fun determineHighestHand(
-    holeCardsList: List<HoleCards>,
-    community: CommunityCards,
-  ): List<HoleCards> {
+  fun determineHighestHand(): List<HoleCards> {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
     // If only one player, they win by default
@@ -30,7 +28,7 @@ class HandEvaluator {
     // Find the best hand value among all players
     var bestHandValue: PokerHand? = null
     holeCardsList.forEach { holeCards ->
-      val currentHand = getBestCombo(holeCards, community)
+      val currentHand = getBestCombo(holeCards)
       if (bestHandValue == null || currentHand.compareTo(bestHandValue) > 0) {
         bestHandValue = currentHand
       }
@@ -39,7 +37,7 @@ class HandEvaluator {
     // Collect all players whose hands match the best hand value (ties)
     val tiedWinners = mutableListOf<HoleCards>()
     holeCardsList.forEach { holeCards ->
-      val currentHand = getBestCombo(holeCards, community)
+      val currentHand = getBestCombo(holeCards)
       if (currentHand.compareTo(bestHandValue!!) == 0) {
         tiedWinners.add(holeCards)
       }
@@ -52,16 +50,12 @@ class HandEvaluator {
    * Finds the best 5-card poker hand from a player's hole cards and the community cards.
    *
    * @param hole The [HoleCards] of the player
-   * @param community The [CommunityCards] shared by all players
    * @return The best [PokerHand] combination
    * @throws IllegalArgumentException If the total number of cards is not 7
    * @throws IllegalStateException If no valid hand could be found
    */
-  private fun getBestCombo(
-    hole: HoleCards,
-    community: CommunityCards,
-  ): PokerHand {
-    val allCards = hole.cards + community.cards
+  private fun getBestCombo(hole: HoleCards): PokerHand {
+    val allCards = hole.cards + communityCards.cards
 
     require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 

@@ -9,12 +9,16 @@ import hwr.oop.projects.peakpoker.core.card.Card
  * @property cards The list of cards that make up the hand
  */
 class PokerHand(private val cards: List<Card>) : Iterable<Card> by cards {
+
+  private val rank: HandRank
+
   init {
     require(cards.size == 5) { "Hand must contain exactly 5 cards" }
     require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
-  }
 
-  val rank: HandRank by lazy { evaluate() }
+    // Evaluate the rank of the hand upon initialization
+    rank = evaluate()
+  }
 
   /**
    * Evaluates the rank of this poker hand.
@@ -55,17 +59,17 @@ class PokerHand(private val cards: List<Card>) : Iterable<Card> by cards {
   /**
    * Compares this poker hand to another poker hand to determine which is stronger.
    *
-   * @param other The other poker hand to compare against
+   * @param otherHand The other poker hand to compare against
    * @return A positive integer if this hand is stronger, negative if the other hand is stronger,
    *         or zero if they are equal
    */
-  fun compareTo(other: PokerHand): Int {
-    if (rank != other.rank) {
-      return rank.rank.compareTo(other.rank.rank)
+  fun compareTo(otherHand: PokerHand): Int {
+    if (rank != otherHand.rank) {
+      return rank.rank.compareTo(otherHand.rank.rank)
     }
 
     val v1 = cards.map { it.rank.value }.sortedDescending()
-    val v2 = other.cards.map { it.rank.value }.sortedDescending()
+    val v2 = otherHand.cards.map { it.rank.value }.sortedDescending()
 
     for (i in v1.indices) {
       val cmp = v1[i].compareTo(v2[i])
