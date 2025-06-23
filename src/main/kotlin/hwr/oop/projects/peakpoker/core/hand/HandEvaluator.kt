@@ -9,7 +9,6 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
  * Replaces the singleton implementation with a class-based approach.
  */
 class HandEvaluator(
-  private val holeCardsList: List<HoleCards>,
   private val communityCards: CommunityCards,
 ) {
   /**
@@ -19,7 +18,7 @@ class HandEvaluator(
    * @return List of [HoleCards] of all players tied for the highest hand
    * @throws IllegalArgumentException If the list of players is empty
    */
-  fun determineHighestHand(): List<HoleCards> {
+  fun determineHighestHand(holeCardsList: List<HoleCards>): List<HoleCards> {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
     // If only one player, they win by default
