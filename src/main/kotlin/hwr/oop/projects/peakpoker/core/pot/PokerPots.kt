@@ -15,8 +15,9 @@ class PokerPots(
     ),
 ) : Iterable<Pot> by pots {
   private val mainPot: Pot get() = pots.first()
+  private val totalPotAmount: Int get() = pots.sumOf { it.amount() } // TODO: Do we need this?
 
-  fun addChipsToCurrentPot(chips: Int) {
+  fun addChipsToMainPot(chips: Int) {
     mainPot.addChips(chips)
   }
 
