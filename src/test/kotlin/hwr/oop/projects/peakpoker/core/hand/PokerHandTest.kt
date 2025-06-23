@@ -84,7 +84,8 @@ class PokerHandTest : AnnotationSpec() {
     }.isInstanceOf(IllegalArgumentException::class.java)
   }
 
-  // Hand rank tests
+  // Hand rank tests - Instead of checking the private rank property,
+  // we'll use comparison to verify the relative strength of hands
   @Test
   fun `correctly identifies royal flush`() {
     val royalFlush = PokerHand(
@@ -96,7 +97,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, TEN)
       )
     )
-    assertThat(royalFlush.rank).isEqualTo(HandRank.ROYAL_FLUSH)
+
+    val straightFlush = PokerHand(
+      listOf(
+        Card(CLUBS, NINE),
+        Card(CLUBS, EIGHT),
+        Card(CLUBS, SEVEN),
+        Card(CLUBS, SIX),
+        Card(CLUBS, FIVE)
+      )
+    )
+
+    // Royal flush is better than straight flush
+    assertThat(royalFlush.compareTo(straightFlush)).isGreaterThan(0)
   }
 
   @Test
@@ -110,7 +123,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(CLUBS, FIVE)
       )
     )
-    assertThat(straightFlush.rank).isEqualTo(HandRank.STRAIGHT_FLUSH)
+
+    val fourOfAKind = PokerHand(
+      listOf(
+        Card(HEARTS, JACK),
+        Card(DIAMONDS, JACK),
+        Card(CLUBS, JACK),
+        Card(SPADES, JACK),
+        Card(HEARTS, KING)
+      )
+    )
+
+    // Straight flush is better than four of a kind
+    assertThat(straightFlush.compareTo(fourOfAKind)).isGreaterThan(0)
   }
 
   @Test
@@ -124,7 +149,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, KING)
       )
     )
-    assertThat(fourOfAKind.rank).isEqualTo(HandRank.FOUR_OF_A_KIND)
+
+    val fullHouse = PokerHand(
+      listOf(
+        Card(HEARTS, QUEEN),
+        Card(DIAMONDS, QUEEN),
+        Card(CLUBS, QUEEN),
+        Card(SPADES, TWO),
+        Card(HEARTS, TWO)
+      )
+    )
+
+    // Four of a kind is better than full house
+    assertThat(fourOfAKind.compareTo(fullHouse)).isGreaterThan(0)
   }
 
   @Test
@@ -138,7 +175,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, TWO)
       )
     )
-    assertThat(fullHouse.rank).isEqualTo(HandRank.FULL_HOUSE)
+
+    val flush = PokerHand(
+      listOf(
+        Card(DIAMONDS, ACE),
+        Card(DIAMONDS, JACK),
+        Card(DIAMONDS, NINE),
+        Card(DIAMONDS, SEVEN),
+        Card(DIAMONDS, THREE)
+      )
+    )
+
+    // Full house is better than flush
+    assertThat(fullHouse.compareTo(flush)).isGreaterThan(0)
   }
 
   @Test
@@ -152,7 +201,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(DIAMONDS, THREE)
       )
     )
-    assertThat(flush.rank).isEqualTo(HandRank.FLUSH)
+
+    val straight = PokerHand(
+      listOf(
+        Card(HEARTS, EIGHT),
+        Card(DIAMONDS, SEVEN),
+        Card(CLUBS, SIX),
+        Card(SPADES, FIVE),
+        Card(HEARTS, FOUR)
+      )
+    )
+
+    // Flush is better than straight
+    assertThat(flush.compareTo(straight)).isGreaterThan(0)
   }
 
   @Test
@@ -166,7 +227,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, FOUR)
       )
     )
-    assertThat(straight.rank).isEqualTo(HandRank.STRAIGHT)
+
+    val threeOfAKind = PokerHand(
+      listOf(
+        Card(HEARTS, FOUR),
+        Card(DIAMONDS, FOUR),
+        Card(CLUBS, FOUR),
+        Card(SPADES, JACK),
+        Card(HEARTS, ACE)
+      )
+    )
+
+    // Straight is better than three of a kind
+    assertThat(straight.compareTo(threeOfAKind)).isGreaterThan(0)
   }
 
   @Test
@@ -180,7 +253,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, FIVE)
       )
     )
-    assertThat(wheelStraight.rank).isEqualTo(HandRank.STRAIGHT)
+
+    val threeOfAKind = PokerHand(
+      listOf(
+        Card(HEARTS, FOUR),
+        Card(DIAMONDS, FOUR),
+        Card(CLUBS, FOUR),
+        Card(SPADES, JACK),
+        Card(HEARTS, KING)
+      )
+    )
+
+    // Wheel straight is better than three of a kind
+    assertThat(wheelStraight.compareTo(threeOfAKind)).isGreaterThan(0)
   }
 
   @Test
@@ -194,7 +279,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, ACE)
       )
     )
-    assertThat(threeOfAKind.rank).isEqualTo(HandRank.THREE_OF_A_KIND)
+
+    val twoPair = PokerHand(
+      listOf(
+        Card(HEARTS, NINE),
+        Card(DIAMONDS, NINE),
+        Card(CLUBS, SEVEN),
+        Card(SPADES, SEVEN),
+        Card(HEARTS, ACE)
+      )
+    )
+
+    // Three of a kind is better than two pair
+    assertThat(threeOfAKind.compareTo(twoPair)).isGreaterThan(0)
   }
 
   @Test
@@ -208,7 +305,19 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, ACE)
       )
     )
-    assertThat(twoPair.rank).isEqualTo(HandRank.TWO_PAIR)
+
+    val onePair = PokerHand(
+      listOf(
+        Card(HEARTS, TEN),
+        Card(DIAMONDS, TEN),
+        Card(CLUBS, KING),
+        Card(SPADES, SEVEN),
+        Card(HEARTS, THREE)
+      )
+    )
+
+    // Two pair is better than one pair
+    assertThat(twoPair.compareTo(onePair)).isGreaterThan(0)
   }
 
   @Test
@@ -222,11 +331,7 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, THREE)
       )
     )
-    assertThat(onePair.rank).isEqualTo(HandRank.ONE_PAIR)
-  }
 
-  @Test
-  fun `correctly identifies high card`() {
     val highCard = PokerHand(
       listOf(
         Card(HEARTS, ACE),
@@ -236,7 +341,35 @@ class PokerHandTest : AnnotationSpec() {
         Card(HEARTS, THREE)
       )
     )
-    assertThat(highCard.rank).isEqualTo(HandRank.HIGH_CARD)
+
+    // One pair is better than high card
+    assertThat(onePair.compareTo(highCard)).isGreaterThan(0)
+  }
+
+  @Test
+  fun `correctly identifies high card`() {
+    val highCardAce = PokerHand(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(DIAMONDS, KING),
+        Card(CLUBS, JACK),
+        Card(SPADES, SEVEN),
+        Card(HEARTS, THREE)
+      )
+    )
+
+    val highCardKing = PokerHand(
+      listOf(
+        Card(HEARTS, KING),
+        Card(DIAMONDS, QUEEN),
+        Card(CLUBS, JACK),
+        Card(SPADES, SEVEN),
+        Card(HEARTS, THREE)
+      )
+    )
+
+    // Ace-high is better than king-high
+    assertThat(highCardAce.compareTo(highCardKing)).isGreaterThan(0)
   }
 
   // Comparison tests
