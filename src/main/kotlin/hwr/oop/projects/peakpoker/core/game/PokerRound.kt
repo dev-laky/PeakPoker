@@ -10,8 +10,7 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.pot.Pot
-import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
+import hwr.oop.projects.peakpoker.core.pot.PokerPots
 
 class PokerRound(
   private val players: List<PokerPlayer>,
@@ -19,21 +18,19 @@ class PokerRound(
   private val bigBlindAmount: Int,
   private val smallBlindIndex: Int,
   private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
-  // TODO: Do we need the HandEvaluator as a dependency here?
-  private val handEvaluator: HandEvaluator = HandEvaluator(),
 ) : GameActionable {
 
-  private val deck: Deck = Deck()
-  private val communityCards: CommunityCards =
-    CommunityCards(mutableListOf(), this)
   private var roundPhase = RoundPhase.PRE_FLOP
-
-  private val pots: MutableList<Pot> = mutableListOf(Pot(0, players.toSet()))
-  private val mainPot: Pot get() = pots.first()
-//  val totalPotAmount: Int get() = pots.sumOf { it.amount } // We might need this later
 
   // Will be = 2 after "blind" init
   private var currentPlayerIndex: Int = smallBlindIndex
+
+  private val deck: Deck = Deck()
+
+  private val communityCards: CommunityCards =
+    CommunityCards(mutableListOf(), this)
+
+  private val pots: PokerPots = PokerPots(players, communityCards)
 
   init {
     // Set the blinds for the players at the table
@@ -52,14 +49,15 @@ class PokerRound(
    * This method executes the following steps in sequence:
    * 1. Distributes winnings from all pots to winning players
    * 2. Resets player round states (bets and statuses)
-   * 3. Clears community cards and pots
-   * 4. Notifies the game about round completion via callback
+   * 3. Notifies the game about round completion via callback
    *
    * This is the final phase of a poker round, after which a new round can begin.
    */
   private fun showdown() {
     // 1. Distribute winnings across all pots
-    distributeWinnings()
+
+    // Process each pot (starting from side pots, then main pot)
+    pots.reversed().forEach { it.payoutWinnings() }
 
     // 2. Reset player round states
     players.forEach { player ->
@@ -67,12 +65,7 @@ class PokerRound(
       player.resetRoundState()
     }
 
-    // 3. Clear community cards and pots
-    communityCards.reset()
-    pots.clear()
-    pots.add(Pot(0, players.toSet()))
-
-    // 4. Notify the game about the round completion
+    // 3. Notify the game about the round completion
     onRoundComplete()
   }
 
@@ -100,13 +93,13 @@ class PokerRound(
       RoundPhase.SHOWDOWN -> throw IllegalStateException("PokerGame is already in the SHOWDOWN phase")
     }
 
-    resetBets()
-
     // Check for the Showdown phase
     if (roundPhase == RoundPhase.SHOWDOWN) {
       showdown()
       return
     }
+
+    resetBets()
 
     communityCards.dealCommunityCards(roundPhase, deck)
 
@@ -249,7 +242,7 @@ class PokerRound(
     requirePlayerNotAllIn(player)
     requireSufficientChipsToRaise(player, chips)
 
-    addToCurrentPot(chips - player.bet())
+    pots.addChipsToMainPot(chips - player.bet())
     player.setBetAmount(chips)
     makeTurn()
   }
@@ -273,7 +266,7 @@ class PokerRound(
     requirePlayerNotAllInForCall(player)
     requireSufficientChipsToCall(player, highestBet)
 
-    addToCurrentPot(highestBet - player.bet())
+    pots.addChipsToMainPot(highestBet - player.bet())
     player.setBetAmount(highestBet)
     makeTurn()
   }
@@ -330,111 +323,9 @@ class PokerRound(
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
 
-    addToCurrentPot( player.chips())
-    createSidePot(player)
+    pots.addChipsToMainPot(player.chips())
+    pots.createSidePotIfNeeded(player)
     player.allIn()
     makeTurn()
-  }
-
-  /**
-   * Adds the specified amount of chips to the main pot.
-   *
-   * This method updates the main pot by creating a new copy with the increased
-   * amount, since the Pot class is immutable.
-   *
-   * @param amount The number of chips to add to the pot
-   */
-  private fun addToCurrentPot(amount: Int) {
-    // Add to main pot by creating an updated version (as Pot is immutable)
-    val updatedMainPot = mainPot.copy(amount = mainPot.amount + amount)
-    pots[0] = updatedMainPot
-  }
-
-  /**
-   * Creates a side pot when a player goes all-in.
-   *
-   * This method:
-   * 1. Calculates excess chips from other players (amounts above what the all-in player could match)
-   * 2. Reduces those players' bets to match the all-in amount
-   * 3. Moves excess chips from the main pot to a new side pot
-   * 4. Makes the all-in player ineligible for the side pot
-   *
-   * @param allInPlayer The player who has gone all-in
-   */
-  private fun createSidePot(allInPlayer: PokerPlayer) {
-    // Get all-in amount (player's bet + remaining chips)
-    val allInTotal = allInPlayer.bet() + allInPlayer.chips()
-
-    // Calculate excess chips from other players
-    var excessAmount = 0
-    for (player in players) {
-      if (!player.isFolded() && player != allInPlayer && player.bet() > allInTotal) {
-        val excess = player.bet() - allInTotal
-        excessAmount += excess
-        // Adjust player's bet to match all-in
-        player.setBetAmount(allInTotal)
-      }
-    }
-
-    // If there are excess chips, move them to a side pot
-    if (excessAmount > 0) {
-      // Reduce main pot by the excess amount
-      val updatedMainPot = mainPot.copy(amount = mainPot.amount - excessAmount)
-      pots[0] = updatedMainPot
-
-      // Create side pot with eligible players (everyone but the all-in player)
-      val eligiblePlayers =
-        mainPot.eligiblePlayers.filter { it != allInPlayer }.toSet()
-      pots.add(Pot(excessAmount, eligiblePlayers))
-    }
-  }
-
-  /**
-   * Distributes the winnings from all pots to the appropriate players at the end of a hand.
-   *
-   * This method processes each pot in reverse order (side pots first, then main pot).
-   * For each pot, it determines the eligible players (those who haven't folded), evaluates
-   * their hands, and distributes the pot amount among the winners:
-   *
-   * - If there is a single winner, they receive the entire pot amount
-   * - If there are multiple winners with equivalent hands, the pot is split evenly
-   * - If the pot cannot be split evenly, the remainder is given to the first winner
-   *
-   * The method relies on the [HandEvaluator] to determine the highest hand(s) among the eligible players.
-   */
-  private fun distributeWinnings() {
-    // Process each pot (starting from side pots, then main pot)
-    for (pot in pots.reversed()) {
-      val eligibleActivePlayers = pot.eligiblePlayers.filter { !it.isFolded() }
-
-      // Skip if no eligible players (edge case)
-      if (eligibleActivePlayers.isEmpty()) continue
-
-      // Get hole cards for each eligible player
-      val holeCardsList = eligibleActivePlayers.map { it.hand() }
-
-      // Skip if no valid hands (another edge case)
-      if (holeCardsList.isEmpty()) continue
-
-      // Use HandEvaluator to determine winners
-      val winningHoleCards =
-        handEvaluator.determineHighestHand(holeCardsList, communityCards)
-      val winningPlayers = winningHoleCards.map { it.player }
-
-      // Split the pot among winners
-      if (winningPlayers.isNotEmpty()) {
-        val winAmount = pot.amount / winningPlayers.size
-        val remainder = pot.amount % winningPlayers.size
-
-        winningPlayers.forEachIndexed { index: Int, player: PokerPlayer ->
-          player.addChips(winAmount)
-
-          // Give the remainder to the first winner (convention in poker)
-          if (index == 0 && remainder > 0) {
-            player.addChips(remainder)
-          }
-        }
-      }
-    }
   }
 }
