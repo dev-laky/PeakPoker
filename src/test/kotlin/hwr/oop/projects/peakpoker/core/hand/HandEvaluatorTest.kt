@@ -67,8 +67,8 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(holeCards), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeCards))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player).isEqualTo(player1)
   }
@@ -109,8 +109,8 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(hole1, hole2), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole1, hole2))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Alice")
   }
@@ -151,8 +151,8 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(holeStraight, holePair), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeStraight, holePair))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Straight")
   }
@@ -192,8 +192,8 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(hole1, hole2), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole1, hole2))
     assertThat(winners).hasSize(2)
     assertThat(winners.map { it.player.name }).containsExactly(
       "First",
@@ -237,8 +237,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(holeFlush, holeStraight), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners =
+      evaluator.determineHighestHand(listOf(holeFlush, holeStraight))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Flush")
   }
@@ -280,8 +281,9 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     val evaluator =
-      HandEvaluator(listOf(holeRoyal, holeStraightFlush), community)
-    val winners = evaluator.determineHighestHand()
+      HandEvaluator(community)
+    val winners =
+      evaluator.determineHighestHand(listOf(holeRoyal, holeStraightFlush))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Royal")
   }
@@ -301,9 +303,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(emptyList(), community)
+    val evaluator = HandEvaluator(community)
     assertThatThrownBy {
-      evaluator.determineHighestHand()
+      evaluator.determineHighestHand(emptyList())
     }.isInstanceOf(IllegalArgumentException::class.java)
   }
 
@@ -363,9 +365,16 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     val evaluator = HandEvaluator(
-      listOf(holeFlush, holeStraight, holePair, holeHighCard), community
+      community
     )
-    val winners = evaluator.determineHighestHand()
+    val winners = evaluator.determineHighestHand(
+      listOf(
+        holeFlush,
+        holeStraight,
+        holePair,
+        holeHighCard
+      )
+    )
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Flush")
   }
@@ -399,8 +408,8 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // The player should have a royal flush, which is the best possible hand
-    val evaluator = HandEvaluator(listOf(holeRoyal), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeRoyal))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Royal")
   }
@@ -431,8 +440,8 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // This should return the player directly from the first branch without comparison
-    val evaluator = HandEvaluator(listOf(holeCards), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeCards))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("OnlyPlayer")
   }
@@ -465,8 +474,8 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(holeCards), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeCards))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("BitPattern")
   }
@@ -498,8 +507,8 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // Should find a full house: Aces full of fives
-    val evaluator = HandEvaluator(listOf(holeCards), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeCards))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("BitPattern2")
   }
@@ -530,8 +539,8 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // Should find straight flush
-    val evaluator = HandEvaluator(listOf(holeCards), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeCards))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("OrderTest")
   }
@@ -571,8 +580,9 @@ class HandEvaluatorTest : AnnotationSpec() {
       ), testRound
     )
 
-    val evaluator = HandEvaluator(listOf(holePlayer1, holePlayer2), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners =
+      evaluator.determineHighestHand(listOf(holePlayer1, holePlayer2))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("SecondButBetter")
   }
@@ -617,9 +627,15 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     val evaluator = HandEvaluator(
-      listOf(holePlayer1, holePlayer2, holePlayer3), community
+      community
     )
-    val winners = evaluator.determineHighestHand()
+    val winners = evaluator.determineHighestHand(
+      listOf(
+        holePlayer1,
+        holePlayer2,
+        holePlayer3
+      )
+    )
     // Player3 should win with a pair of kings
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("Max")
@@ -661,9 +677,9 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // Both players should be returned when hands are tied
-    val evaluator = HandEvaluator(listOf(hole1, hole2), community)
+    val evaluator = HandEvaluator(community)
     val winners =
-      evaluator.determineHighestHand()
+      evaluator.determineHighestHand(listOf(hole1, hole2))
     assertThat(winners).hasSize(2)
     assertThat(winners.map { it.player.name }).containsExactlyInAnyOrder(
       "First",
@@ -717,9 +733,9 @@ class HandEvaluatorTest : AnnotationSpec() {
 
     // All three players should be returned when hands are tied
     val evaluator = HandEvaluator(
-      listOf(hole1, hole2, hole3), community
+      community
     )
-    val winners = evaluator.determineHighestHand()
+    val winners = evaluator.determineHighestHand(listOf(hole1, hole2, hole3))
     assertThat(winners).hasSize(3)
     assertThat(winners.map { it.player.name })
       .containsExactlyInAnyOrder("First", "Second", "Third")
@@ -762,16 +778,17 @@ class HandEvaluatorTest : AnnotationSpec() {
     )
 
     // Only the player with the better kicker should win
-    val evaluator = HandEvaluator(listOf(holeBetter, holeWorse), community)
-    val winners = evaluator.determineHighestHand()
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(holeBetter, holeWorse))
     assertThat(winners).hasSize(1)
     assertThat(winners[0].player.name).isEqualTo("BetterKicker")
 
     // Order shouldn't matter in this case (not a tie)
     val evaluatorReversed = HandEvaluator(
-      listOf(holeWorse, holeBetter), community
+      community
     )
-    val reverseWinners = evaluatorReversed.determineHighestHand()
+    val reverseWinners =
+      evaluatorReversed.determineHighestHand(listOf(holeWorse, holeBetter))
     assertThat(reverseWinners).hasSize(1)
     assertThat(reverseWinners[0].player.name).isEqualTo("BetterKicker")
   }
