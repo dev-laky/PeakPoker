@@ -23,10 +23,6 @@ class CommunityCards(
     }
   }
 
-  fun reset() {
-    cards = emptyList()
-  }
-
   fun dealCommunityCards(roundPhase: RoundPhase, deck: Deck) {
     when (roundPhase) {
       RoundPhase.PRE_FLOP -> throw IllegalStateException("Cannot deal community cards before the flop")
