@@ -26,19 +26,15 @@ class HandEvaluator(
     if (holeCardsList.size == 1) return listOf(holeCardsList.first())
 
     // Find the best hand value among all players
-    var bestHandValue: PokerHand? = null
-    holeCardsList.forEach { holeCards ->
-      val currentHand = getBestCombo(holeCards)
-      if (bestHandValue == null || currentHand.compareTo(bestHandValue) > 0) {
-        bestHandValue = currentHand
-      }
-    }
+    val bestHandValue: PokerHand = holeCardsList
+      .map { getBestCombo(it) }
+      .reduce { bestHand, hand -> if (hand.compareTo(bestHand) > 0) hand else bestHand }
 
     // Collect all players whose hands match the best hand value (ties)
     val tiedWinners = mutableListOf<HoleCards>()
     holeCardsList.forEach { holeCards ->
       val currentHand = getBestCombo(holeCards)
-      if (currentHand.compareTo(bestHandValue!!) == 0) {
+      if (currentHand.compareTo(bestHandValue) == 0) {
         tiedWinners.add(holeCards)
       }
     }
