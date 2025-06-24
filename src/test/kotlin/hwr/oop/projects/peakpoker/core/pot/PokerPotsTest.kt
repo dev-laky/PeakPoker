@@ -98,7 +98,7 @@ class PokerPotsTest : AnnotationSpec() {
     val players = listOf(player1, player2, player3)
     val pokerPots = PokerPots(players, communityCards)
 
-    pokerPots.addChipsToCurrentPot(50)
+    pokerPots.addChipsToMainPot(50)
 
     assertThat(pokerPots.first().amount()).isEqualTo(50)
   }
@@ -108,8 +108,8 @@ class PokerPotsTest : AnnotationSpec() {
     val players = listOf(player1, player2, player3)
     val pokerPots = PokerPots(players, communityCards)
 
-    pokerPots.addChipsToCurrentPot(30)
-    pokerPots.addChipsToCurrentPot(20)
+    pokerPots.addChipsToMainPot(30)
+    pokerPots.addChipsToMainPot(20)
 
     assertThat(pokerPots.first().amount()).isEqualTo(50)
   }
@@ -119,7 +119,7 @@ class PokerPotsTest : AnnotationSpec() {
     val players = listOf(player1, player2, player3)
     val pokerPots = PokerPots(players, communityCards)
 
-    pokerPots.addChipsToCurrentPot(0)
+    pokerPots.addChipsToMainPot(0)
 
     assertThat(pokerPots.first().amount()).isEqualTo(0)
   }
@@ -134,7 +134,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(100)
     player3.setBetAmount(100)
 
-    pokerPots.addChipsToCurrentPot(300)
+    pokerPots.addChipsToMainPot(300)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Should still have only one pot
@@ -154,7 +154,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(100)
     player3.setBetAmount(100)
 
-    pokerPots.addChipsToCurrentPot(250)
+    pokerPots.addChipsToMainPot(250)
     pokerPots.createSidePotIfNeeded(player1)
 
     assertThat(pokerPots.count()).isEqualTo(1)
@@ -170,7 +170,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(100)
     player3.setBetAmount(100)
 
-    pokerPots.addChipsToCurrentPot(350)
+    pokerPots.addChipsToMainPot(350)
     pokerPots.createSidePotIfNeeded(player1)
 
     assertThat(pokerPots.count()).isEqualTo(1)
@@ -189,7 +189,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(600) // Excess 100 over player1's total 500
     player3.setBetAmount(700) // 200 excess over player1's total 500
 
-    pokerPots.addChipsToCurrentPot(1350)
+    pokerPots.addChipsToMainPot(1350)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Should have 2 pots now
@@ -225,7 +225,7 @@ class PokerPotsTest : AnnotationSpec() {
     // Player3 had bet before folding
     player3.setBetAmount(700)
 
-    pokerPots.addChipsToCurrentPot(1350)
+    pokerPots.addChipsToMainPot(1350)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Folded player should not affect excess calculation
@@ -247,7 +247,7 @@ class PokerPotsTest : AnnotationSpec() {
     // Player2 bets more
     player2.setBetAmount(600) // 100 excess
 
-    pokerPots.addChipsToCurrentPot(650)
+    pokerPots.addChipsToMainPot(650)
     pokerPots.createSidePotIfNeeded(player1)
 
     assertThat(pokerPots.count()).isEqualTo(2)
@@ -266,7 +266,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(600) // 100 excess
     player3.setBetAmount(600) // 100 excess
 
-    pokerPots.addChipsToCurrentPot(1250)
+    pokerPots.addChipsToMainPot(1250)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Second all-in: player2 now has a total = 500 + (500-100) = 900
@@ -331,7 +331,7 @@ class PokerPotsTest : AnnotationSpec() {
     // Player3 has a much higher total
     player3.setBetAmount(200) // total = 200 + 300 = 500, no excess
 
-    pokerPots.addChipsToCurrentPot(700)
+    pokerPots.addChipsToMainPot(700)
     pokerPots.createSidePotIfNeeded(player1)
 
     // No excess since all totals are equal
@@ -356,7 +356,7 @@ class PokerPotsTest : AnnotationSpec() {
     // Let's adjust: player3 bets 300, has 200 left, total = 500
     player3.setBetAmount(300)
 
-    pokerPots.addChipsToCurrentPot(1000)
+    pokerPots.addChipsToMainPot(1000)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Since all have the same total (500), no side pot should be created
@@ -376,7 +376,7 @@ class PokerPotsTest : AnnotationSpec() {
     player2.setBetAmount(600) // More than player1's total
     player3.setBetAmount(700) // Even more
 
-    pokerPots.addChipsToCurrentPot(1800)
+    pokerPots.addChipsToMainPot(1800)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Should create a side pot
@@ -401,7 +401,7 @@ class PokerPotsTest : AnnotationSpec() {
     // Player3 bets less than all-in total
     player3.setBetAmount(300)
 
-    pokerPots.addChipsToCurrentPot(900)
+    pokerPots.addChipsToMainPot(900)
     pokerPots.createSidePotIfNeeded(player1)
 
     // Should have only 1 pot since no player exceeded the all-in total
