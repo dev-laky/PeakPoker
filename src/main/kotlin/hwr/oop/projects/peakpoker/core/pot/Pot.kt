@@ -6,7 +6,7 @@ import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 
 class Pot(
   val eligiblePlayers: Set<PokerPlayer>,
-  private val communityCards: CommunityCards,
+  communityCards: CommunityCards,
   private var amount: Int = 0,
 ) {
   private val handEvaluator: HandEvaluator =
@@ -23,6 +23,9 @@ class Pot(
   }
 
   fun removeChips(chips: Int) {
+    if (chips > amount) {
+      throw IllegalArgumentException("Cannot remove more chips than are in the pot")
+    }
     amount -= chips
   }
 
