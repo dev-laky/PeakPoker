@@ -4,8 +4,9 @@ import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
 import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.round.PokerRound
+import kotlinx.serialization.Serializable
 
+@Serializable
 class PokerGame(
   private val smallBlindAmount: Int,
   private val bigBlindAmount: Int,
@@ -16,7 +17,12 @@ class PokerGame(
   // Variable to track the index of the small blind player within players
   private var smallBlindIndex: Int = 0
 
-  private lateinit var round: GameActionable
+  private var currentRound: PokerRound? = null
+
+  private val round: GameActionable
+    get() = currentRound ?: throw IllegalStateException("No active round")
+
+  private var hasEnded: Boolean = false
 
   init {
     if (smallBlindAmount <= 0) {
@@ -35,8 +41,21 @@ class PokerGame(
       throw DuplicatePlayerException("All players must be unique")
     }
 
-    // Initialize the first round
-    newRound()
+    // Initialize first round or restore callback for loaded round
+    if (currentRound == null) {
+      newRound()
+    } else {
+      // Restore callback after deserialization
+      currentRound?.restoreCallback { newRound() }
+    }
+  }
+
+  fun getGameInfo(): GameInfo {
+    return GameInfo(
+      gameId = id.value,
+      hasEnded = hasEnded,
+      roundInfo = currentRound?.getRoundInfo()
+    )
   }
 
   private fun checkForGameEnd(): Boolean {
@@ -45,27 +64,45 @@ class PokerGame(
     return activePlayers.size == 1
   }
 
-  fun newRound() {
-    // Evaluate ending of game
-    val hasGameEnded = checkForGameEnd()
-    if (hasGameEnded) return
+  private inline fun <T> withGameEndCheck(action: () -> T): T {
+    if (hasEnded) {
+      throw IllegalStateException("Game has ended - no more actions allowed")
+    }
+    return action()
+  }
 
-    round = PokerRound(
+  private fun newRound() {
+    val hasGameEnded = checkForGameEnd()
+    if (hasGameEnded) {
+      hasEnded = true; return
+    }
+
+    currentRound = PokerRound(
       players = players,
       smallBlindIndex = smallBlindIndex,
       smallBlindAmount = smallBlindAmount,
-      bigBlindAmount = bigBlindAmount,
-      onRoundComplete = { newRound() }
+      bigBlindAmount = bigBlindAmount
     )
+
+    // Set the callback after creation
+    currentRound?.restoreCallback { newRound() }
+
     smallBlindIndex = (smallBlindIndex + 1) % players.size
   }
 
   // Game-level functions and delegation to Round
   override fun raiseBetTo(playerName: String, chips: Int) =
-    round.raiseBetTo(playerName, chips)
+    withGameEndCheck { round.raiseBetTo(playerName, chips) }
 
-  override fun call(playerName: String) = round.call(playerName)
-  override fun check(playerName: String) = round.check(playerName)
-  override fun fold(playerName: String) = round.fold(playerName)
-  override fun allIn(playerName: String) = round.allIn(playerName)
+  override fun call(playerName: String) =
+    withGameEndCheck { round.call(playerName) }
+
+  override fun check(playerName: String) =
+    withGameEndCheck { round.check(playerName) }
+
+  override fun fold(playerName: String) =
+    withGameEndCheck { round.fold(playerName) }
+
+  override fun allIn(playerName: String) =
+    withGameEndCheck { round.allIn(playerName) }
 }
