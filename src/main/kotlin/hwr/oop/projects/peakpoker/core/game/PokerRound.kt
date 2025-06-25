@@ -1,4 +1,4 @@
-package hwr.oop.projects.peakpoker.core.round
+package hwr.oop.projects.peakpoker.core.game
 
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
@@ -8,17 +8,22 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
-import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.pot.PokerPots
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class PokerRound(
   private val players: List<PokerPlayer>,
   private val smallBlindAmount: Int,
   private val bigBlindAmount: Int,
   private val smallBlindIndex: Int,
-  private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
 ) : GameActionable {
+
+  @Transient
+  private var onRoundComplete: () -> Unit =
+    {} // Callback function to notify when the round is complete
 
   private var roundPhase = RoundPhase.PRE_FLOP
 
@@ -28,11 +33,27 @@ class PokerRound(
   private val deck: Deck = Deck()
 
   private val communityCards: CommunityCards =
-    CommunityCards(mutableListOf(), this)
+    CommunityCards(mutableListOf())
 
   private val pots: PokerPots = PokerPots(players, communityCards)
 
+  // Track if the round has been initialized (for deserialization)
+  private var isInitialized: Boolean = false
+
   init {
+    initializeRound()
+  }
+
+  /**
+   * Restores the callback function after deserialization
+   */
+  fun restoreCallback(callback: () -> Unit) {
+    this.onRoundComplete = callback
+  }
+
+  private fun initializeRound() {
+    if (isInitialized) return
+
     // Set the blinds for the players at the table
     setBlinds()
 
@@ -41,6 +62,8 @@ class PokerRound(
       val cards = deck.draw(2)
       player.assignHand(HoleCards(cards, player))
     }
+
+    isInitialized = true
   }
 
   /**
@@ -123,8 +146,8 @@ class PokerRound(
 
     val nextPlayer = getNextPlayer()
 
-    // Skip any folded / all-in players
-    if (nextPlayer.isFolded() || nextPlayer.isAllIn()) {
+    // Skip any folded / all-in players / eliminated players
+    if (nextPlayer.isFolded() || nextPlayer.isAllIn() || nextPlayer.chips() < 1) {
       currentPlayerIndex = (players.indexOf(nextPlayer))
       makeTurn()
       return
@@ -159,6 +182,12 @@ class PokerRound(
   }
 
   private fun setBlinds() {
+    // Skip setting blinds if they're already set
+    val currentBets = players.sumOf { it.bet() }
+    if (currentBets > 0) {
+      return
+    }
+
     raiseBetTo(getCurrentPlayer().name, smallBlindAmount)
 
     // Check for the same blind amounts --> call
