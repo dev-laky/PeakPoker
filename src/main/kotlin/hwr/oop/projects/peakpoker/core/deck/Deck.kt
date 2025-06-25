@@ -4,9 +4,13 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.exceptions.InsufficientCardsException
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class Deck() {
   // Create a list of all possible cards and shuffle it right away
+  @Transient
   private val cards: MutableList<Card> = Suit.entries.flatMap { suit ->
     Rank.entries.map { rank ->
       Card(suit, rank)
@@ -27,8 +31,9 @@ class Deck() {
     check(cards.size >= amount) { throw InsufficientCardsException("Not enough cards left in the deck") }
     val drawnCards = mutableListOf<Card>()
 
-    repeat(amount) {
+    while (drawnCards.size < amount) {
       val drawnCard = cards.removeAt(cards.size - 1)
+      if (dealtCards.contains(drawnCard)) continue
       dealtCards.add(drawnCard)
       drawnCards.add(drawnCard)
     }
