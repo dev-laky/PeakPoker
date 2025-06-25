@@ -1,5 +1,8 @@
 package hwr.oop.projects.peakpoker.core.card
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Rank(
   val value: Int,
 ) {
