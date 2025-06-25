@@ -3,7 +3,6 @@ package hwr.oop.projects.peakpoker
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.parse
 import com.github.ajalt.clikt.core.subcommands
-import hwr.oop.projects.peakpoker.commands.PokerCommand
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -12,7 +11,21 @@ fun main(args: Array<String>) {
       File("poker_data.json")
     )
 
-  val command = PokerCommand().subcommands()
+  val command = Poker().subcommands(
+    CreateNewGame(persistenceAdapter),
+    HandInfo(persistenceAdapter),
+    GameInfo(persistenceAdapter),
+    Raise(persistenceAdapter, persistenceAdapter),
+    Call(persistenceAdapter, persistenceAdapter),
+    Check(
+      persistenceAdapter,
+      persistenceAdapter
+    ),
+    GameCommand().subcommands(
+      GameNew()
+    ),
+    HandCommand()
+  )
 
   try {
     command.parse(args)
