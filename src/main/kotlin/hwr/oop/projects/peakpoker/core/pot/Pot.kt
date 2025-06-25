@@ -3,14 +3,17 @@ package hwr.oop.projects.peakpoker.core.pot
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.hand.HandEvaluator
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class Pot(
   val eligiblePlayers: Set<PokerPlayer>,
-  communityCards: CommunityCards,
+  @Transient val communityCards: CommunityCards = CommunityCards(),
   private var amount: Int = 0,
 ) {
-  private val handEvaluator: HandEvaluator =
-    HandEvaluator(communityCards)
+  @Transient
+  private val handEvaluator: HandEvaluator = HandEvaluator(communityCards)
 
   /**
    * Adds the specified amount of chips to the pot.
@@ -68,12 +71,12 @@ class Pot(
     val winAmount = amount / winningPlayers.size
     val remainder = amount % winningPlayers.size
 
-    winningPlayers.forEachIndexed { index: Int, player: PokerPlayer ->
-      player.addChips(winAmount)
+    winningPlayers.forEachIndexed { index: Int, player: PokerPlayer? ->
+      player?.addChips(winAmount)
 
       // Give the remainder to the first winner (convention in poker)
       if (index == 0 && remainder > 0) {
-        player.addChips(remainder)
+        player?.addChips(remainder)
       }
     }
   }
