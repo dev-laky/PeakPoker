@@ -144,4 +144,149 @@ class PlayerTest : AnnotationSpec() {
       .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
       .hasMessageContaining("PokerPlayer name cannot be blank")
   }
+
+  @Test
+  fun `check sets hasChecked to true`() {
+    val player = PokerPlayer("Hans")
+    assertThat(player.hasChecked()).isFalse()
+
+    player.check()
+    assertThat(player.hasChecked()).isTrue()
+  }
+
+  @Test
+  fun `fold sets isFolded to true`() {
+    val player = PokerPlayer("Hans")
+    assertThat(player.isFolded()).isFalse()
+
+    player.fold()
+    assertThat(player.isFolded()).isTrue()
+  }
+
+  @Test
+  fun `allIn sets isAllIn to true and bets all chips`() {
+    val player = PokerPlayer("Hans", 100)
+    assertThat(player.isAllIn()).isFalse()
+
+    player.allIn()
+
+    assertThat(player.isAllIn()).isTrue()
+    assertThat(player.bet()).isEqualTo(100)
+    assertThat(player.chips()).isEqualTo(0)
+  }
+
+  @Test
+  fun `allIn with existing bet adds remaining chips`() {
+    val player = PokerPlayer("Hans", 100)
+    player.setBetAmount(30)
+
+    player.allIn()
+
+    assertThat(player.isAllIn()).isTrue()
+    assertThat(player.bet()).isEqualTo(100)
+    assertThat(player.chips()).isEqualTo(0)
+  }
+
+  @Test
+  fun `resetRoundState resets isFolded and isAllIn to false`() {
+    val player = PokerPlayer("Hans")
+    player.fold()
+    player.allIn()
+
+    assertThat(player.isFolded()).isTrue()
+    assertThat(player.isAllIn()).isTrue()
+
+    player.resetRoundState()
+
+    assertThat(player.isFolded()).isFalse()
+    assertThat(player.isAllIn()).isFalse()
+  }
+
+  @Test
+  fun `resetBet resets bet to zero and hasChecked to false`() {
+    val player = PokerPlayer("Hans", 100)
+    player.setBetAmount(50)
+    player.check()
+
+    assertThat(player.bet()).isEqualTo(50)
+    assertThat(player.hasChecked()).isTrue()
+
+    player.resetBet()
+
+    assertThat(player.bet()).isEqualTo(0)
+    assertThat(player.hasChecked()).isFalse()
+  }
+
+  @Test
+  fun `addChips increases chip count`() {
+    val player = PokerPlayer("Hans", 100)
+
+    player.addChips(50)
+
+    assertThat(player.chips()).isEqualTo(150)
+  }
+
+  @Test
+  fun `addChips with zero amount does not change chips`() {
+    val player = PokerPlayer("Hans", 100)
+
+    player.addChips(0)
+
+    assertThat(player.chips()).isEqualTo(100)
+  }
+
+  @Test
+  fun `addChips with negative amount throws exception`() {
+    val player = PokerPlayer("Hans", 100)
+
+    assertThatThrownBy { player.addChips(-10) }
+      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .hasMessageContaining("Cannot add negative amount of chips")
+
+    assertThat(player.chips()).isEqualTo(100)
+  }
+
+  @Test
+  fun `default constructor initializes with 100 chips`() {
+    val player = PokerPlayer("Hans")
+    assertThat(player.chips()).isEqualTo(100)
+  }
+
+  @Test
+  fun `hand initializes with empty hole cards`() {
+    val player = PokerPlayer("Hans")
+    val hand = player.hand()
+
+    assertThat(hand.cards).isEmpty()
+    assertThat(hand.player).isEqualTo(player)
+  }
+
+  @Test
+  fun `bet initializes to zero`() {
+    val player = PokerPlayer("Hans")
+    assertThat(player.bet()).isEqualTo(0)
+  }
+
+  @Test
+  fun `setBetAmount with same amount as current bet does not change chips`() {
+    val player = PokerPlayer("Hans", 100)
+    player.setBetAmount(50)
+    val chipsAfterFirstBet = player.chips()
+
+    player.setBetAmount(50)
+
+    assertThat(player.chips()).isEqualTo(chipsAfterFirstBet)
+    assertThat(player.bet()).isEqualTo(50)
+  }
+
+  @Test
+  fun `setBetAmount with lower amount than current bet increases chips`() {
+    val player = PokerPlayer("Hans", 100)
+    player.setBetAmount(50)
+
+    player.setBetAmount(30)
+
+    assertThat(player.chips()).isEqualTo(70)
+    assertThat(player.bet()).isEqualTo(30)
+  }
 }

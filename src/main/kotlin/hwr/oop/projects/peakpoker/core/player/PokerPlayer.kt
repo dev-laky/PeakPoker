@@ -4,7 +4,9 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
+import kotlinx.serialization.Serializable
 
+@Serializable
 class PokerPlayer(
   val name: String,
   private var chips: Int = 100,
