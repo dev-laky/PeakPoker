@@ -55,135 +55,118 @@ Be aware that it might differ from the code style configured in your *Project*, 
 
 ## Abstract
 
-[TODO]: # (Write a short description of your project.)
-
-[TODO]: # (State most important features.)
-
 ### Project Description
 
 Have you ever wanted to reach the peak of poker?
 This project aims to create a poker game that allows players to experience the thrill of climbing to the top of the
 poker world - up to the poker everest!
-You can play virtual poker games via the *CLI* against other players or a computer opponent.
+You can play virtual poker games via the *CLI* against other players.
 Start with free 10$ and try to climb up the wealth ladder.
 
 ### Challenges
 
-[TODO]: # (State the most interesting problems you encountered during the project.)
-tbd
+### Challenges
+
+- **Managing Game State and Player Interaction**  
+  Synchronizing game state across multiple players and handling asynchronous CLI inputs smoothly.
+
+- **Team Coordination and Code Integration**  
+  Efficiently collaborating and maintaining consistent code quality.
 
 ### Features
 
-- Customize amount of computer players
-- Customize amount of human players
-- Customize difficulty of computer players
-- Customize starting money
-- Customize number of rounds
-- Customize amount of chips
+#### 🎮 Game Management
+
+- **Start a New Game**
+    - `poker new-game --players=<name1>:<name2>:<name3>:...`
+    - Starts a new poker game with the given list of players.
+    - Have multiple games running at the same time.
+
+#### 💰 Betting Commands
+
+- **Raise**
+    - `poker raise <amount> --game=<gameID> --player=<name>`
+    - Raises the current bet by the specified amount.
+
+- **Call**
+    - `poker call --game=<gameID> --player=<name>`
+    - Matches the current highest bet.
+
+- **Check**
+    - `poker check --game=<gameID> --player=<name>`
+    - Passes the turn without betting if no bet is active.
+
+- **Fold**
+    - `poker fold --game=<gameID> --player=<name>`
+    - Folds the player's hand, removing them from the current round.
+
+- **All-In**
+    - `poker all-in --game=<gameID> --player=<name>`
+    - Bets all of the player’s remaining chips.
+
+#### 📊 Info Commands
+
+- **Game Info**
+    - `poker game-info --game=<gameID>`
+    - Displays the current game state, including players, pot, and turn.
+
+- **Show Hand**
+    - `poker hand --game=<gameID> --player=<name>`
+    - Reveals the cards held by the specified player.
 
 ## Feature List
 
-[TODO]: # (For each feature implemented, add a row to the table!)
-
-| Number | Feature | Tests |
-|--------|---------|-------|
-| 1      | /       | /     |
+| Number | Feature                     | Tests                                    |
+|--------|-----------------------------|------------------------------------------|
+| 1      | Start new game              | CreateNewGameTest, GameTestCustomPlayers |
+| 2      | Raise                       | RaiseTest                                |
+| 3      | Call                        | CallTest                                 |
+| 4      | Check                       | CheckTest                                |
+| 5      | Fold                        | FoldTest                                 |
+| 6      | All-In                      | AllInTest                                |
+| 7      | Game Info                   | GameInfoTest                             |
+| 8      | Show Hand                   | HandInfoTest                             |
+| 9      | Deck Management             | DeckTest                                 |
+| 10     | Community Cards             | CommunityCardsTest                       |
+| 11     | Hole Cards                  | HoleCardsTest                            |
+| 12     | Hand Evaluation             | HandEvaluatorTest, PokerHandTest         |
+| 13     | Player Management           | PlayerTest                               |
+| 14     | Pot Management              | PotTest, PokerPotsTest                   |
+| 15     | Persistence Layer           | FileSystemPersistenceAdapterTest.kt      |
+| 16     | Command Parsing/Integration | PokerTest, MainTest                      |
 
 ## Additional Dependencies
 
-[TODO]: # (For each additional dependency your project requires- Add an additional row to the table!)
-
-| Number | Dependency Name | Dependency Description            | Why is it necessary?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-|--------|-----------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1      | clikt           | Command Line Interface for Kotlin | Clikt is necessary for this project because it provides a simple and intuitive way to create command-line interfaces in Kotlin. This is especially important for team collaboration as it ensures that all team members can easily understand and modify the command-line interface code. Additionally, Clikt helps in maintaining consistency and reducing boilerplate code, which improves the overall development efficiency and code quality. Lastly it provides command documentation by default. |
+| Number | Dependency Name          | Dependency Description            | Why is it necessary?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|--------|--------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1      | clikt                    | Command Line Interface for Kotlin | Clikt is necessary for this project because it provides a simple and intuitive way to create command-line interfaces in Kotlin. This is especially important for team collaboration as it ensures that all team members can easily understand and modify the command-line interface code. Additionally, Clikt helps in maintaining consistency and reducing boilerplate code, which improves the overall development efficiency and code quality. Lastly it provides command documentation by default. |
+| 2      | kotlinx.serialization    | Kotlin Serialization Library      | This library is used to serialize and deserialize game data such as player states, hands, and game progress. It helps in saving and loading game states efficiently, which is crucial for game persistence and debugging. Serialization also facilitates potential features like network communication or saving game logs.                                                                                                                                                                            |
+| 3      | mockito / mockito-kotlin | Mocking Framework for Kotlin/Java | Mockito and its Kotlin extensions are essential for writing unit tests by allowing mocking of classes and interfaces. This helps in isolating components during testing, ensuring the poker game logic behaves correctly under various scenarios without relying on actual implementations of dependencies. It improves test reliability and helps the team maintain high code quality.                                                                                                                |
 
 ## Game Commands
 
-#### Start a Game
+### Admin Commands
 
-| Command                    | Description                        |
-|:---------------------------|:-----------------------------------|
-| `$ poker play [ID]`        | Join existing game                 |
-| `$ poker init`             | Initialize new game                |
-| `$ poker join Alice, 1000` | Join new game as player with money |
-| `$ poker play start`       | Start initialized game             |
-| `$ poker ID`               | Get current game ID                |
+| Command                                                | Description                                  |
+|--------------------------------------------------------|----------------------------------------------|
+| `poker new-game --players=<name1>:<name2>:<name3>:...` | Starts a new game with the specified players |
 
-[NOTE]: # (`$ poker init` starts "joining phase" in the CLI that ends with `$ poker play start`)
+### Betting Commands
 
-#### Pre-Flop Phase
+| Command                                          | Description           |
+|--------------------------------------------------|-----------------------|
+| `poker raise 10 --game=<gameID> --player=<name>` | Raise the bet by 10   |
+| `poker call --game=<gameID> --player=<name>`     | Call the current bet  |
+| `poker check --game=<gameID> --player=<name>`    | Check (pass the turn) |
+| `poker fold --game=<gameID> --player=<name>`     | Fold the hand         |
+| `poker all-in --game=<gameID> --player=<name>`   | Go all-in             |
 
-| Command                     | Description                      |
-|:----------------------------|:---------------------------------|
-| `$ poker deal preflop`      | Deal cards to players            |
-| `$ poker post blinds`       | Post Small and Big Blinds        |
-| `$ poker bet Sblind 10`     | Set and bet the Small Blind      |
-| `$ poker bet Bblind 25`     | Set and bet the Big Blind        |
-| `$ poker bet Bob raise 100` | Bob raises to 100                |
-| `$ poker fold Charlie`      | Charlie folds                    |
-| `$ poker bet Alice all-in`  | Alice is all-in                  |
-| `$ poker hand Alice`        | Show Alice’s hand for 10 seconds | 
-| `$ poker pot`               | Show Pot                         |
-| `$ poker ID`                | Get current game ID              |
-| `$ poker stack Bob`         | Show Bob's current balance       |
+### Info Commands
 
-[NOTE]: # (only let players see their hand after all bets are placed)
-
-#### Flop Phase
-
-| Command                     | Description                      |
-|:----------------------------|:---------------------------------|
-| `$ poker deal flop`         | Reveal three community cards     |
-| `$ poker bet Alice check`   | Alice checks                     |
-| `$ poker bet Bob raise 150` | Bob raises with 150              |
-| `$ poker bet Alice call`    | Alice calls                      |
-| `$ poker bet Alice all-in`  | Alice is all-in                  |
-| `$ poker hand Bob`          | Show Bob’s hand (optional/debug) |
-| `$ poker pot`               | Show Pot                         |
-| `$ poker ID`                | Get current game ID              |
-| `$ poker board`             | Show community Cards             |
-| `$ poker stack Alice`       | Show Alice's current balance     |
-
-#### Turn Phase
-
-| Command                     | Description                        |
-|:----------------------------|:-----------------------------------|
-| `$ poker deal turn`         | Reveal fourth community card       |
-| `$ poker bet Alice check`   | Alice checks                       |
-| `$ poker bet Bob raise 200` | Bob bets 200                       |
-| `$ poker bet Alice call`    | Alice calls                        |
-| `$ poker bet Alice all-in`  | Alice is all-in                    |
-| `$ poker hand Alice`        | Show Alice’s hand (optional/debug) |
-| `$ poker pot`               | Show Pot                           |
-| `$ poker ID`                | Get current game ID                |
-| `$ poker board`             | Show community Cards               |
-| `$ poker stack Bob`         | Show Bob's current balance         |
-
-#### River Phase
-
-| Command                     | Description                        |
-|:----------------------------|:-----------------------------------|
-| `$ poker deal river`        | Reveal fifth community card        |
-| `$ poker bet Alice check`   | Alice checks                       |
-| `$ poker bet Bob raise 250` | Bob bets 250                       |
-| `$ poker bet Alice call`    | Alice calls                        |
-| `$ poker bet Bob all-in`    | Bob is all-in                      |
-| `$ poker hand Alice`        | Show Alice’s hand (optional/debug) |
-| `$ poker pot`               | Show Pot                           |
-| `$ poker ID`                | Get current game ID                |
-| `$ poker board`             | Show community Cards               |
-| `$ poker stack Bob`         | Show Bob's current balance         |
-
-#### Showdown
-
-| Command               | Description                      |
-|:----------------------|:---------------------------------|
-| `$ poker board`       | Show community Cards             |
-| `$ poker showdown`    | Compare cards and declare winner |
-| `$ poker score board` | Show current chip standings      |
-| `$ poker stack Bob`   | Show Bob's current balance       |
-| `$ poker next hand`   | Start a new hand                 |
-| `$ poker ID`          | Get current game ID              |
+| Command                                      | Description                   |
+|----------------------------------------------|-------------------------------|
+| `poker game-info --game=<gameID>`            | Show current game information |
+| `poker hand --game=<gameID> --player=<name>` | Show the hand of the player   |
 
 [maven]: https://maven.apache.org/
 
