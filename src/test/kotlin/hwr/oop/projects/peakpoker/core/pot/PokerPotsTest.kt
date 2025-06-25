@@ -6,7 +6,7 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.round.PokerRound
+import hwr.oop.projects.peakpoker.core.game.PokerRound
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
@@ -27,19 +27,17 @@ class PokerPotsTest : AnnotationSpec() {
       smallBlindAmount = 10,
       bigBlindAmount = 20,
       players = listOf(player1, player2, player3),
-      smallBlindIndex = 0,
-      onRoundComplete = {}
+      smallBlindIndex = 0
     )
 
     communityCards = CommunityCards(
-      listOf(
+      mutableListOf(
         Card(Suit.CLUBS, Rank.TWO),
         Card(Suit.DIAMONDS, Rank.THREE),
         Card(Suit.HEARTS, Rank.FOUR),
         Card(Suit.SPADES, Rank.FIVE),
         Card(Suit.CLUBS, Rank.SIX)
-      ),
-      testRound
+      )
     )
 
     // Assign hole cards to players
