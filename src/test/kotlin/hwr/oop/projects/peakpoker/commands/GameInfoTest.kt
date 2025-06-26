@@ -103,6 +103,47 @@ class GameInfoTest : AnnotationSpec() {
   }
 
   @Test
+  fun `test game-info command with empty community cards`() {
+    val player1Info =
+      PlayerInfo("Alice", 900, 100, isFolded = false, isAllIn = false)
+
+    val mainPot = PotInfo(150, listOf("Alice"))
+
+    val roundInfo = RoundInfo(
+      roundPhase = RoundPhase.PRE_FLOP, // Pre-flop usually has no community cards
+      smallBlindAmount = 10,
+      smallBlindPlayerName = "Alice",
+      bigBlindAmount = 20,
+      currentPlayerName = "Alice",
+      communityCards = emptyList(), // Empty list for this test
+      pots = listOf(mainPot),
+      players = listOf(player1Info)
+    )
+
+    val gameInfo = GameInfo(
+      gameId = testGameId,
+      hasEnded = false,
+      roundInfo = roundInfo
+    )
+
+    val mockGame: PokerGame = mock {
+      on { id } doReturn gameIdObject
+      on { getGameInfo() } doReturn gameInfo
+    }
+    whenever(mockLoadGamePort.loadGame(testGameId)).doReturn(mockGame)
+
+    val command = GameInfo(mockLoadGamePort)
+
+    val result = command.test(
+      "--gameID=$testGameId"
+    )
+
+    assertThat(result.output).contains("=== COMMUNITY CARDS ===")
+    assertThat(result.output).contains("No community cards dealt yet.")
+    assertThat(result.statusCode).isEqualTo(0)
+  }
+
+  @Test
   fun `test game-info command with ended game success`() {
     val gameInfo = GameInfo(
       gameId = testGameId,
