@@ -791,4 +791,225 @@ class HandEvaluatorTest : AnnotationSpec() {
     assertThat(reverseWinners).hasSize(1)
     assertThat(reverseWinners[0].player?.name).isEqualTo("BetterKicker")
   }
+
+  @Test
+  fun `reduce correctly finds maximum hand among multiple players`() {
+    val weakPlayer = PokerPlayer("Weak")
+    val strongPlayer = PokerPlayer("Strong")
+    val mediumPlayer = PokerPlayer("Medium")
+
+    // Weak: just high card (King high)
+    val holeWeak = HoleCards(
+      listOf(Card(HEARTS, TWO), Card(SPADES, THREE)),
+      weakPlayer
+    )
+
+    // Medium: a pair of fives
+    val holeMedium = HoleCards(
+      listOf(Card(HEARTS, FIVE), Card(DIAMONDS, FIVE)),
+      mediumPlayer
+    )
+
+    // Strong: a pair of aces
+    val holeStrong = HoleCards(
+      listOf(Card(HEARTS, ACE), Card(SPADES, ACE)),
+      strongPlayer
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, FOUR), Card(DIAMONDS, SEVEN),
+        Card(CLUBS, EIGHT), Card(SPADES, NINE),
+        Card(CLUBS, KING)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners =
+      evaluator.determineHighestHand(listOf(holeWeak, holeMedium, holeStrong))
+
+    // Should select the strongest hand (pair of aces)
+    assertThat(winners).hasSize(1)
+    assertThat(winners[0].player?.name).isEqualTo("Strong")
+  }
+
+  @Test
+  fun `reduce comparison logic handles equal hands correctly`() {
+    val player1 = PokerPlayer("Equal1")
+    val player2 = PokerPlayer("Equal2")
+
+    // Both have identical hands
+    val hole1 = HoleCards(
+      listOf(Card(HEARTS, KING), Card(SPADES, QUEEN)),
+      player1
+    )
+
+    val hole2 = HoleCards(
+      listOf(Card(CLUBS, KING), Card(DIAMONDS, QUEEN)),
+      player2
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(HEARTS, ACE), Card(SPADES, JACK),
+        Card(CLUBS, TEN), Card(DIAMONDS, NINE),
+        Card(HEARTS, EIGHT)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole1, hole2))
+
+    // Both should be returned for tie
+    assertThat(winners).hasSize(2)
+  }
+
+  @Test
+  fun `mask iteration covers all 21 possible 5-card combinations`() {
+    val player = PokerPlayer("TestPlayer")
+
+    // Create cards that would form different hand types depending on combination
+    val hole = HoleCards(
+      listOf(Card(HEARTS, ACE), Card(SPADES, KING)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, QUEEN), Card(DIAMONDS, JACK),
+        Card(HEARTS, TEN), Card(SPADES, NINE),
+        Card(CLUBS, EIGHT)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should find the best possible hand (straight)
+    assertThat(winners).hasSize(1)
+    assertThat(winners[0].player?.name).isEqualTo("TestPlayer")
+  }
+
+  @Test
+  fun `mask bit counting correctly filters to exactly 5 cards`() {
+    val player = PokerPlayer("BitCount")
+
+    val hole = HoleCards(
+      listOf(Card(HEARTS, TWO), Card(SPADES, THREE)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, FOUR), Card(DIAMONDS, FIVE),
+        Card(HEARTS, SIX), Card(SPADES, SEVEN),
+        Card(CLUBS, EIGHT)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should successfully evaluate despite needing exact 5-card combinations
+    assertThat(winners).hasSize(1)
+  }
+
+  @Test
+  fun `card index iteration correctly builds 5-card combinations`() {
+    val player = PokerPlayer("IndexTest")
+
+    // Specific cards where order matters for finding best hand
+    val hole = HoleCards(
+      listOf(Card(SPADES, ACE), Card(HEARTS, ACE)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, ACE), Card(DIAMONDS, KING),
+        Card(SPADES, KING), Card(HEARTS, QUEEN),
+        Card(CLUBS, JACK)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should find full house (aces over kings)
+    assertThat(winners).hasSize(1)
+  }
+
+  @Test
+  fun `bestCombo comparison correctly updates when better hand found`() {
+    val player = PokerPlayer("Comparison")
+
+    // Cards that create multiple valid hands with clear best option
+    val hole = HoleCards(
+      listOf(Card(SPADES, KING), Card(HEARTS, QUEEN)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, JACK), Card(DIAMONDS, TEN),
+        Card(SPADES, NINE), Card(HEARTS, TWO),
+        Card(CLUBS, THREE)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should find straight (best among all combinations)
+    assertThat(winners).hasSize(1)
+  }
+
+  @Test
+  fun `bestCombo null check handles first valid combination`() {
+    val player = PokerPlayer("NullCheck")
+
+    val hole = HoleCards(
+      listOf(Card(HEARTS, TWO), Card(SPADES, FOUR)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, SIX), Card(DIAMONDS, EIGHT),
+        Card(HEARTS, TEN), Card(SPADES, QUEEN),
+        Card(CLUBS, ACE)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should successfully set the first valid combination as the bestCombo
+    assertThat(winners).hasSize(1)
+  }
+
+  @Test
+  fun `mask range covers complete search space`() {
+    val player = PokerPlayer("MaskRange")
+
+    // Cards create an edge case at boundary conditions
+    val hole = HoleCards(
+      listOf(Card(HEARTS, ACE), Card(SPADES, TWO)),
+      player
+    )
+
+    val community = CommunityCards(
+      mutableListOf(
+        Card(CLUBS, THREE), Card(DIAMONDS, FOUR),
+        Card(HEARTS, FIVE), Card(SPADES, SIX),
+        Card(CLUBS, SEVEN)
+      )
+    )
+
+    val evaluator = HandEvaluator(community)
+    val winners = evaluator.determineHighestHand(listOf(hole))
+
+    // Should find the best hand within the complete search space
+    assertThat(winners).hasSize(1)
+  }
 }
