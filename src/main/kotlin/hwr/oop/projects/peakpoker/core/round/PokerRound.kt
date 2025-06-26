@@ -10,6 +10,7 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.game.GameActionable
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import hwr.oop.projects.peakpoker.core.pot.PokerPots
 
 class PokerRound(
   private val players: List<PokerPlayer>,
@@ -19,15 +20,17 @@ class PokerRound(
   private val onRoundComplete: () -> Unit,  // Callback function to notify when the round is complete
 ) : GameActionable {
 
-  private val deck: Deck = Deck()
-  private val communityCards: CommunityCards =
-    CommunityCards(mutableListOf(), this)
   private var roundPhase = RoundPhase.PRE_FLOP
-
-  private var pot = 0
 
   // Will be = 2 after "blind" init
   private var currentPlayerIndex: Int = smallBlindIndex
+
+  private val deck: Deck = Deck()
+
+  private val communityCards: CommunityCards =
+    CommunityCards(mutableListOf(), this)
+
+  private val pots: PokerPots = PokerPots(players, communityCards)
 
   init {
     // Set the blinds for the players at the table
@@ -40,10 +43,28 @@ class PokerRound(
     }
   }
 
+  /**
+   * Handles the showdown phase when players reveal their cards to determine the winner.
+   *
+   * This method executes the following steps in sequence:
+   * 1. Distributes winnings from all pots to winning players
+   * 2. Resets player round states (bets and statuses)
+   * 3. Notifies the game about round completion via callback
+   *
+   * This is the final phase of a poker round, after which a new round can begin.
+   */
   private fun showdown() {
-    TODO("Implement showdown logic to determine the winner based on the players' hands and community cards")
+    // 1. Distribute winnings across all pots
+    // Process each pot (starting from side pots, then main pot)
+    pots.reversed().forEach { it.payoutWinnings() }
 
-    // Notify the game about the round completion
+    // 2. Reset player round states
+    players.forEach { player ->
+      player.resetBet()
+      player.resetRoundState()
+    }
+
+    // 3. Notify the game about the round completion
     onRoundComplete()
   }
 
@@ -71,13 +92,13 @@ class PokerRound(
       RoundPhase.SHOWDOWN -> throw IllegalStateException("PokerGame is already in the SHOWDOWN phase")
     }
 
-    resetBets()
-
     // Check for the Showdown phase
     if (roundPhase == RoundPhase.SHOWDOWN) {
       showdown()
       return
     }
+
+    resetBets()
 
     communityCards.dealCommunityCards(roundPhase, deck)
 
@@ -228,7 +249,7 @@ class PokerRound(
     requirePlayerNotAllIn(player)
     requireSufficientChipsToRaise(player, chips)
 
-    pot += (chips - player.bet())
+    pots.addChipsToCurrentPot(chips - player.bet())
     player.setBetAmount(chips)
     makeTurn()
   }
@@ -253,7 +274,7 @@ class PokerRound(
     requirePlayerNotAllInForCall(player)
     requireSufficientChipsToCall(player, highestBet)
 
-    pot += (highestBet - player.bet())
+    pots.addChipsToCurrentPot(highestBet - player.bet())
     player.setBetAmount(highestBet)
     makeTurn()
   }
@@ -313,7 +334,8 @@ class PokerRound(
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
 
-    pot += player.chips()
+    pots.addChipsToCurrentPot(player.chips())
+    pots.createSidePotIfNeeded(player)
     player.allIn()
     makeTurn()
   }

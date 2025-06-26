@@ -6,41 +6,44 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 /**
  * Evaluates poker hands and determines winning players.
- * Replaces the singleton implementation with a class-based approach.
  */
 class HandEvaluator(
-  private val holeCardsList: List<HoleCards>,
   private val communityCards: CommunityCards,
 ) {
   /**
-   * Determines the player with the highest hand among a list of players.
+   * Determines all players with the highest hand among a list of players.
+   * Returns all players who are tied for the best hand to properly support split pots.
    *
-   * @param holeCardsList A list of [HoleCards] representing each player's cards
-   * @param communityCards The [CommunityCards] shared by all players
-   * @return The [HoleCards] of the player with the highest hand
+   * @return List of [HoleCards] of all players tied for the highest hand
    * @throws IllegalArgumentException If the list of players is empty
    */
-  fun determineHighestHand(): HoleCards {
+  fun determineHighestHand(holeCardsList: List<HoleCards>): List<HoleCards> {
     require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
 
-    var bestPlayerHand = holeCardsList.first()
-    var bestHand = getBestCombo(bestPlayerHand)
+    // If only one player, they win by default
+    if (holeCardsList.size == 1) return listOf(holeCardsList.first())
 
-    holeCardsList.drop(1).forEach { player ->
-      val currentHand = getBestCombo(player)
-      if (currentHand.compareTo(bestHand) > 0) {
-        bestHand = currentHand
-        bestPlayerHand = player
+    // Find the best hand value among all players
+    val bestHandValue: PokerHand = holeCardsList
+      .map { getBestCombo(it) }
+      .reduce { bestHand, hand -> if (hand.compareTo(bestHand) > 0) hand else bestHand }
+
+    // Collect all players whose hands match the best hand value (ties)
+    val tiedWinners = mutableListOf<HoleCards>()
+    holeCardsList.forEach { holeCards ->
+      val currentHand = getBestCombo(holeCards)
+      if (currentHand.compareTo(bestHandValue) == 0) {
+        tiedWinners.add(holeCards)
       }
     }
-    return bestPlayerHand
+
+    return tiedWinners
   }
 
   /**
    * Finds the best 5-card poker hand from a player's hole cards and the community cards.
    *
    * @param hole The [HoleCards] of the player
-   * @param communityCards The [CommunityCards] shared by all players
    * @return The best [PokerHand] combination
    * @throws IllegalArgumentException If the total number of cards is not 7
    * @throws IllegalStateException If no valid hand could be found

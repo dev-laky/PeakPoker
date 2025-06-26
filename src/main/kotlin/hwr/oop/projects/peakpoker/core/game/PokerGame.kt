@@ -46,9 +46,6 @@ class PokerGame(
   }
 
   fun newRound() {
-    // Reset player states (fold, allIn) for the new round
-    players.forEach { it.resetRoundState() }
-
     // Evaluate ending of game
     val hasGameEnded = checkForGameEnd()
     if (hasGameEnded) return
