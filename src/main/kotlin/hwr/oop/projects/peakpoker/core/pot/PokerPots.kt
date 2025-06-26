@@ -2,11 +2,13 @@ package hwr.oop.projects.peakpoker.core.pot
 
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
+import kotlinx.serialization.Serializable
 
+@Serializable
 class PokerPots(
   private val players: List<PokerPlayer>,
   private val communityCards: CommunityCards,
-  private val pots: MutableList<Pot> =
+  val pots: MutableList<Pot> =
     mutableListOf(
       Pot(
         eligiblePlayers = players.toSet(),

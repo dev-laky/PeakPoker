@@ -49,7 +49,7 @@ class HandEvaluator(
    * @throws IllegalStateException If no valid hand could be found
    */
   private fun getBestCombo(hole: HoleCards): PokerHand {
-    val allCards = hole.cards + communityCards.cards
+    val allCards = hole.cards + communityCards.cards()
 
     require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
 

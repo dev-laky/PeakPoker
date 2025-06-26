@@ -36,3 +36,6 @@ build/
 
 ### Sqlite ###
 *.db
+
+### Game Data ###
+poker_data.json
