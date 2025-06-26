@@ -4,6 +4,9 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
+import hwr.oop.projects.peakpoker.core.deck.Deck
+import hwr.oop.projects.peakpoker.core.game.RoundPhase
+
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -112,5 +115,35 @@ class CommunityCardsTest : AnnotationSpec() {
     val iteratedCards = communityCards.toList()
 
     assertThat(iteratedCards).containsExactlyElementsOf(cards)
+  }
+
+  @Test
+  fun `dealCommunityCards should throw exception when called with PRE_FLOP phase`() {
+    val communityCards = CommunityCards()
+    val deck = Deck()
+
+    assertThatThrownBy {
+      communityCards.dealCommunityCards(
+        RoundPhase.PRE_FLOP,
+        deck
+      )
+    }
+      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .hasMessageContaining("Cannot deal community cards before the flop")
+  }
+
+  @Test
+  fun `dealCommunityCards should throw exception when called with SHOWDOWN phase`() {
+    val communityCards = CommunityCards()
+    val deck = Deck()
+
+    assertThatThrownBy {
+      communityCards.dealCommunityCards(
+        RoundPhase.SHOWDOWN,
+        deck
+      )
+    }
+      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .hasMessageContaining("Cannot deal community cards after the showdown")
   }
 }

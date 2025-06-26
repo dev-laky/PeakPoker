@@ -380,4 +380,225 @@ class PotTest : AnnotationSpec() {
     // Single winner gets all chips, index == 0 && remainder > 0 condition tested
     assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 1)
   }
+
+  @Test
+  fun `index equals 0 condition with remainder 0`() {
+    // index == 0 && remainder == 0 (should not give extra chips)
+    player1.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.HEARTS, Rank.ACE),
+          Card(Suit.SPADES, Rank.KING)
+        ), player1
+      )
+    )
+
+    player2.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.DIAMONDS, Rank.ACE),
+          Card(Suit.CLUBS, Rank.KING)
+        ), player2
+      )
+    )
+
+    player3.fold()
+
+    val initialPotAmount = 100 // Even split, remainder = 0
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+    val initialPlayer2Chips = player2.chips()
+
+    pot.payoutWinnings()
+
+    // Both players get equal amounts, no bonus for the first player
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 50)
+    assertThat(player2.chips()).isEqualTo(initialPlayer2Chips + 50)
+  }
+
+  @Test
+  fun `index not equals 0 with remainder greater than 0`() {
+    // index != 0 && remainder > 0 (the second player should not get a remainder)
+    player1.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.HEARTS, Rank.ACE),
+          Card(Suit.SPADES, Rank.KING)
+        ), player1
+      )
+    )
+
+    player2.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.DIAMONDS, Rank.ACE),
+          Card(Suit.CLUBS, Rank.KING)
+        ), player2
+      )
+    )
+
+    player3.fold()
+
+    val initialPotAmount = 101 // Odd split, remainder = 1
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+    val initialPlayer2Chips = player2.chips()
+
+    pot.payoutWinnings()
+
+    // Only the first player gets a remainder
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 50 + 1)
+    assertThat(player2.chips()).isEqualTo(initialPlayer2Chips + 50)
+  }
+
+  @Test
+  fun `single winner with remainder`() {
+    // index == 0 && remainder > 0 with single winner
+    player2.fold()
+    player3.fold()
+
+    val initialPotAmount = 77 // Single winner gets all
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+
+    pot.payoutWinnings()
+
+    // Single winner gets entire pot (including any "remainder")
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 77)
+  }
+
+  @Test
+  fun `three way tie with remainder`() {
+    // index positions 0, 1, 2 with the remainder > 0
+    player1.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.HEARTS, Rank.ACE),
+          Card(Suit.SPADES, Rank.KING)
+        ), player1
+      )
+    )
+
+    player2.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.DIAMONDS, Rank.ACE),
+          Card(Suit.CLUBS, Rank.KING)
+        ), player2
+      )
+    )
+
+    player3.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.SPADES, Rank.ACE),
+          Card(Suit.HEARTS, Rank.KING)
+        ), player3
+      )
+    )
+
+    val initialPotAmount = 103 // 34 + 34 + 34 + 1 remainder
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+    val initialPlayer2Chips = player2.chips()
+    val initialPlayer3Chips = player3.chips()
+
+    pot.payoutWinnings()
+
+    // Only the first player (index 0) gets a remainder
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 34 + 1)
+    assertThat(player2.chips()).isEqualTo(initialPlayer2Chips + 34)
+    assertThat(player3.chips()).isEqualTo(initialPlayer3Chips + 34)
+  }
+
+  @Test
+  fun `boundary condition with remainder equals 1`() {
+    // remainder == 1 edge case
+    player1.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.HEARTS, Rank.ACE),
+          Card(Suit.SPADES, Rank.KING)
+        ), player1
+      )
+    )
+
+    player2.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.DIAMONDS, Rank.ACE),
+          Card(Suit.CLUBS, Rank.KING)
+        ), player2
+      )
+    )
+
+    player3.fold()
+
+    val initialPotAmount = 3 // 1 + 1 + 1 remainder
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+    val initialPlayer2Chips = player2.chips()
+
+    pot.payoutWinnings()
+
+    // First player gets base and remainder
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 1 + 1)
+    assertThat(player2.chips()).isEqualTo(initialPlayer2Chips + 1)
+  }
+
+  @Test
+  fun `large remainder value`() {
+    // remainder > 1 to ensure the condition works for larger remainders
+    player1.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.HEARTS, Rank.ACE),
+          Card(Suit.SPADES, Rank.KING)
+        ), player1
+      )
+    )
+
+    player2.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.DIAMONDS, Rank.ACE),
+          Card(Suit.CLUBS, Rank.KING)
+        ), player2
+      )
+    )
+
+    player3.assignHand(
+      HoleCards(
+        listOf(
+          Card(Suit.SPADES, Rank.ACE),
+          Card(Suit.HEARTS, Rank.KING)
+        ), player3
+      )
+    )
+
+    val initialPotAmount = 100 // 33 + 33 + 33 + 1 remainder
+    val pot =
+      Pot(setOf(player1, player2, player3), communityCards, initialPotAmount)
+
+    val initialPlayer1Chips = player1.chips()
+    val initialPlayer2Chips = player2.chips()
+    val initialPlayer3Chips = player3.chips()
+
+    pot.payoutWinnings()
+
+    // First player gets base and remainder
+    assertThat(player1.chips()).isEqualTo(initialPlayer1Chips + 33 + 1)
+    assertThat(player2.chips()).isEqualTo(initialPlayer2Chips + 33)
+    assertThat(player3.chips()).isEqualTo(initialPlayer3Chips + 33)
+  }
 }

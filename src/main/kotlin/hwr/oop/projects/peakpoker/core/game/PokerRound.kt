@@ -160,7 +160,7 @@ class PokerRound(
       return players.all { it.hasChecked() }
     }
 
-    return players.all { it.bet() == highestBet }
+    return players.all { it.isFolded() || it.isAllIn() || it.bet() == highestBet }
   }
 
   private fun initNextGamePhase() {

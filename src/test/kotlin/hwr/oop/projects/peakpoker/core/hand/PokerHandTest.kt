@@ -107,7 +107,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Royal flush is better than straight flush
+    // Royal flush is better than a straight flush
     assertThat(royalFlush.compareTo(straightFlush)).isGreaterThan(0)
   }
 
@@ -159,7 +159,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Four of a kind is better than full house
+    // Four of a kind is better than a full house
     assertThat(fourOfAKind.compareTo(fullHouse)).isGreaterThan(0)
   }
 
@@ -185,7 +185,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Full house is better than flush
+    // A full house is better than a flush
     assertThat(fullHouse.compareTo(flush)).isGreaterThan(0)
   }
 
@@ -289,7 +289,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Three of a kind is better than two pair
+    // Three of a kind is better than two pairs
     assertThat(threeOfAKind.compareTo(twoPair)).isGreaterThan(0)
   }
 
@@ -315,7 +315,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Two pair is better than one pair
+    // Two pairs are better than one pair
     assertThat(twoPair.compareTo(onePair)).isGreaterThan(0)
   }
 
@@ -367,7 +367,7 @@ class PokerHandTest : AnnotationSpec() {
       )
     )
 
-    // Ace-high is better than king-high
+    // Ace high is better than king-high
     assertThat(highCardAce.compareTo(highCardKing)).isGreaterThan(0)
   }
 
@@ -473,5 +473,130 @@ class PokerHandTest : AnnotationSpec() {
     )
 
     assertThat(hand1.compareTo(hand2)).isEqualTo(0)
+  }
+
+  @Test
+  fun `royal flush with isFlush condition negated should fail`() {
+    val notFlushRoyal = PokerHand(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, KING),
+        Card(HEARTS, QUEEN),
+        Card(HEARTS, JACK),
+        Card(HEARTS, TEN)
+      )
+    )
+
+    val fourOfAKind = PokerHand(
+      listOf(
+        Card(HEARTS, JACK),
+        Card(DIAMONDS, JACK),
+        Card(CLUBS, JACK),
+        Card(SPADES, JACK),
+        Card(HEARTS, KING)
+      )
+    )
+
+    assertThat(fourOfAKind.compareTo(notFlushRoyal)).isGreaterThan(0)
+  }
+
+  @Test
+  fun `logical AND replaced with OR should fail`() {
+    val regularFlush = PokerHand(
+      listOf(
+        Card(DIAMONDS, ACE),
+        Card(DIAMONDS, NINE),
+        Card(DIAMONDS, SEVEN),
+        Card(DIAMONDS, FIVE),
+        Card(DIAMONDS, THREE)
+      )
+    )
+
+    val straightFlush = PokerHand(
+      listOf(
+        Card(CLUBS, NINE),
+        Card(CLUBS, EIGHT),
+        Card(CLUBS, SEVEN),
+        Card(CLUBS, SIX),
+        Card(CLUBS, FIVE)
+      )
+    )
+
+    assertThat(straightFlush.compareTo(regularFlush)).isGreaterThan(0)
+  }
+
+  @Test
+  fun `condition order swapped should still work`() {
+    val royalFlush = PokerHand(
+      listOf(
+        Card(SPADES, ACE),
+        Card(SPADES, KING),
+        Card(SPADES, QUEEN),
+        Card(SPADES, JACK),
+        Card(SPADES, TEN)
+      )
+    )
+
+    val straightFlush = PokerHand(
+      listOf(
+        Card(HEARTS, NINE),
+        Card(HEARTS, EIGHT),
+        Card(HEARTS, SEVEN),
+        Card(HEARTS, SIX),
+        Card(HEARTS, FIVE)
+      )
+    )
+
+    assertThat(royalFlush.compareTo(straightFlush)).isGreaterThan(0)
+  }
+
+  @Test
+  fun `both conditions false should not be royal flush`() {
+    val highCard = PokerHand(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(SPADES, KING),
+        Card(DIAMONDS, QUEEN),
+        Card(CLUBS, JACK),
+        Card(HEARTS, NINE)
+      )
+    )
+
+    val onePair = PokerHand(
+      listOf(
+        Card(HEARTS, TWO),
+        Card(DIAMONDS, TWO),
+        Card(CLUBS, THREE),
+        Card(SPADES, FOUR),
+        Card(HEARTS, FIVE)
+      )
+    )
+
+    assertThat(onePair.compareTo(highCard)).isGreaterThan(0)
+  }
+
+  @Test
+  fun `royal condition boundary case`() {
+    val almostRoyal = PokerHand(
+      listOf(
+        Card(HEARTS, ACE),
+        Card(HEARTS, KING),
+        Card(HEARTS, QUEEN),
+        Card(HEARTS, JACK),
+        Card(HEARTS, NINE)
+      )
+    )
+
+    val fourOfAKind = PokerHand(
+      listOf(
+        Card(HEARTS, EIGHT),
+        Card(DIAMONDS, EIGHT),
+        Card(CLUBS, EIGHT),
+        Card(SPADES, EIGHT),
+        Card(HEARTS, KING)
+      )
+    )
+
+    assertThat(fourOfAKind.compareTo(almostRoyal)).isGreaterThan(0)
   }
 }

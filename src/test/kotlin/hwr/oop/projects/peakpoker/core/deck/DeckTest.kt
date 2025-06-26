@@ -1,6 +1,8 @@
 package hwr.oop.projects.peakpoker.core.deck
 
 import hwr.oop.projects.peakpoker.core.card.Card
+import hwr.oop.projects.peakpoker.core.card.Rank
+import hwr.oop.projects.peakpoker.core.card.Suit
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -125,5 +127,89 @@ class DeckTest : AnnotationSpec() {
     assertThatThrownBy { deck.draw(remainingCards + 1) }
       .isExactlyInstanceOf(Deck.InsufficientCardsException::class.java)
       .hasMessageContaining("Not enough cards left in the deck")
+  }
+
+  @Test
+  fun `deck should be shuffled on initialization`() {
+    // given - create multiple decks to check for randomness
+    val deck1 = Deck()
+    val deck2 = Deck()
+
+    // when
+    val cards1 = deck1.draw(10)
+    val cards2 = deck2.draw(10)
+
+    // then - decks should have different order (very high probability)
+    // This test may rarely fail due to randomness, but mutation of shuffle() removal would always fail
+    assertThat(cards1).isNotEqualTo(cards2)
+  }
+
+  @Test
+  fun `deck initialization creates mutable list`() {
+    // given
+    val deck = Deck()
+
+    // when - draw a card (this modifies the internal list)
+    val drawnCard = deck.draw(1)
+
+    // then
+    assertThat(drawnCard).hasSize(1)
+
+    val secondCard = deck.draw(1)
+    assertThat(secondCard).hasSize(1)
+    assertThat(drawnCard.first()).isNotEqualTo(secondCard.first())
+  }
+
+  @Test
+  fun `deck contains all 52 unique cards after initialization`() {
+    // given
+    val deck = Deck()
+
+    // when
+    val allCards = drawAllCards(deck)
+
+    // then - should have exactly 52 unique cards
+    assertThat(allCards).hasSize(52)
+    assertThat(allCards.distinct()).hasSize(52)
+
+    // and should contain all possible combinations
+    val expectedCards = Suit.entries.flatMap { suit ->
+      Rank.entries.map { rank ->
+        Card(suit, rank)
+      }
+    }
+    assertThat(allCards).containsExactlyInAnyOrderElementsOf(expectedCards)
+  }
+
+  @Test
+  fun `multiple deck instances have different card orders`() {
+    // given - create 5 decks to increase confidence in randomness
+    val decks = (1..5).map { Deck() }
+
+    // when - get first 5 cards from each deck
+    val cardSequences = decks.map { it.draw(5) }
+
+    // then - at least some sequences should be different
+    // If shuffle() is removed, all decks would have identical order
+    val uniqueSequences = cardSequences.distinct()
+    assertThat(uniqueSequences.size).isGreaterThan(1)
+  }
+
+  @Test
+  fun `deck shuffling affects card distribution`() {
+    // given - create many decks and track first card positions
+    val iterations = 20
+    val firstCards = mutableListOf<Card>()
+
+    // when
+    repeat(iterations) {
+      val deck = Deck()
+      firstCards.add(deck.draw(1).first())
+    }
+
+    // then - should see variety in first cards (shuffle working)
+    // Without shuffle, the first card would always be the same
+    val uniqueFirstCards = firstCards.distinct()
+    assertThat(uniqueFirstCards.size).isGreaterThan(1)
   }
 }
