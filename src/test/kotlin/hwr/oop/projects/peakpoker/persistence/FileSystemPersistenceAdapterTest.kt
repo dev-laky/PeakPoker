@@ -194,4 +194,34 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
       .isExactlyInstanceOf(IllegalStateException::class.java)
       .hasMessageContaining("Error loading storage")
   }
+
+  @Test
+  fun `saveGame outputs pretty printed json with proper formatting`() {
+    adapter.saveGame(testGame)
+
+    val content = tempFile.readText()
+    assertThat(content).contains("{\n")
+    assertThat(content).contains("  \"games\"")
+    assertThat(content).contains("\n}")
+  }
+
+  @Test
+  fun `saveGame includes default values in json output`() {
+    val gameWithDefaults = PokerGame(
+      smallBlindAmount = 10,
+      bigBlindAmount = 20,
+      players = listOf(
+        PokerPlayer("Alice", 1000),
+        PokerPlayer("Bob", 1000)
+      )
+    )
+
+    adapter.saveGame(gameWithDefaults)
+
+    val content = tempFile.readText()
+    val hasRequiredFields = content.contains("\"smallBlindAmount\"") &&
+        content.contains("\"bigBlindAmount\"") &&
+        content.contains("\"players\"")
+    assertThat(hasRequiredFields).isTrue()
+  }
 }

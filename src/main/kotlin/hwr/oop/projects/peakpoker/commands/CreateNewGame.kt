@@ -15,22 +15,17 @@ class CreateNewGame(private val saveGamePort: SaveGamePort) :
   CliktCommand(name = "new-game") {
   override fun help(context: Context) = "Create a new Game."
 
-  val players: List<String>? by option("--players")
+  val players: List<String> by option("--players")
     .convert { input -> input.split(":").map { it.trim() } }
     .required()
     .help("Colon-separated list of player names")
 
   override fun run() {
-    if (players.isNullOrEmpty()) {
-      echo("No players provided. Use --players=<player1:player2:...>")
-      return
-    }
-
     try {
       val game = PokerGame(
         smallBlindAmount = 10,
         bigBlindAmount = 20,
-        players = players!!.map { PokerPlayer(name = it, chips = 100) })
+        players = players.map { PokerPlayer(name = it, chips = 100) })
 
       val gameId = saveGamePort.saveGame(game)
 

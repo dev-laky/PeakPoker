@@ -410,4 +410,99 @@ class PokerPotsTest : AnnotationSpec() {
     assertThat(player2.bet()).isEqualTo(500)
     assertThat(player3.bet()).isEqualTo(300)
   }
+
+  @Test
+  fun `constructor uses empty list when pots parameter is empty`() {
+    val players = listOf(player1, player2, player3)
+    val emptyPots = mutableListOf<Pot>()
+
+    val pokerPots = PokerPots(players, communityCards, emptyPots)
+
+    assertThat(pokerPots.count()).isEqualTo(0)
+  }
+
+  @Test
+  fun `constructor uses provided pots list instead of default`() {
+    val players = listOf(player1, player2, player3)
+    val customPot1 = Pot(setOf(player1, player2), communityCards, 50)
+    val customPot2 = Pot(setOf(player3), communityCards, 100)
+    val customPots = mutableListOf(customPot1, customPot2)
+
+    val pokerPots = PokerPots(players, communityCards, customPots)
+
+    assertThat(pokerPots.count()).isEqualTo(2)
+    assertThat(pokerPots.first()).isEqualTo(customPot1)
+    assertThat(pokerPots.last()).isEqualTo(customPot2)
+  }
+
+  @Test
+  fun `constructor creates default main pot when pots parameter is omitted`() {
+    val players = listOf(player1, player2, player3)
+
+    val pokerPots = PokerPots(players, communityCards)
+
+    assertThat(pokerPots.count()).isEqualTo(1)
+    assertThat(pokerPots.first().eligiblePlayers).isEqualTo(players.toSet())
+    assertThat(pokerPots.first().amount()).isEqualTo(0)
+  }
+
+  @Test
+  fun `constructor with single custom pot`() {
+    val players = listOf(player1, player2)
+    val singlePot = Pot(setOf(player1), communityCards, 200)
+    val customPots = mutableListOf(singlePot)
+
+    val pokerPots = PokerPots(players, communityCards, customPots)
+
+    assertThat(pokerPots.count()).isEqualTo(1)
+    assertThat(pokerPots.first()).isEqualTo(singlePot)
+    assertThat(pokerPots.first().amount()).isEqualTo(200)
+  }
+
+  @Test
+  fun `constructor with multiple custom pots maintains order`() {
+    val players = listOf(player1, player2, player3)
+    val pot1 = Pot(setOf(player1), communityCards, 10)
+    val pot2 = Pot(setOf(player2), communityCards, 20)
+    val pot3 = Pot(setOf(player3), communityCards, 30)
+    val customPots = mutableListOf(pot1, pot2, pot3)
+
+    val pokerPots = PokerPots(players, communityCards, customPots)
+
+    assertThat(pokerPots.count()).isEqualTo(3)
+    assertThat(pokerPots.elementAt(0)).isEqualTo(pot1)
+    assertThat(pokerPots.elementAt(1)).isEqualTo(pot2)
+    assertThat(pokerPots.elementAt(2)).isEqualTo(pot3)
+  }
+
+  @Test
+  fun `constructor allows modification of pots after creation`() {
+    val players = listOf(player1, player2)
+    val initialPot = Pot(setOf(player1), communityCards, 100)
+    val customPots = mutableListOf(initialPot)
+
+    val pokerPots = PokerPots(players, communityCards, customPots)
+    val newPot = Pot(setOf(player2), communityCards, 50)
+    pokerPots.pots.add(newPot)
+
+    assertThat(pokerPots.count()).isEqualTo(2)
+    assertThat(pokerPots.last()).isEqualTo(newPot)
+  }
+
+  @Test
+  fun `constructor shares reference to provided pots list`() {
+    val players = listOf(player1, player2)
+    val originalPot = Pot(setOf(player1), communityCards, 75)
+    val originalPots = mutableListOf(originalPot)
+
+    val pokerPots = PokerPots(players, communityCards, originalPots)
+
+    // Modify an original list
+    val additionalPot = Pot(setOf(player2), communityCards, 25)
+    originalPots.add(additionalPot)
+
+    // PokerPots shares the same list reference
+    assertThat(pokerPots.count()).isEqualTo(2)
+    assertThat(originalPots.size).isEqualTo(2)
+  }
 }
