@@ -85,4 +85,45 @@ class CreateNewGameTest : AnnotationSpec() {
     assertThat(result.output).contains("New game created with players: John, Jane, Mike")
     assertThat(result.statusCode).isEqualTo(0)
   }
+
+  @Test
+  fun `test new-game command when players list is null after conversion`() {
+    val command = CreateNewGame(mockSaveGamePort)
+
+    val result = command.test("--players=")
+
+    assertThat(result.output).contains("Error creating game: PokerPlayer name cannot be blank")
+    verify(mockSaveGamePort, never()).saveGame(any())
+  }
+
+  @Test
+  fun `test new-game command when players list is empty after split`() {
+    val command = CreateNewGame(mockSaveGamePort)
+
+    val result = command.test("--players=   :   :   ")
+
+    assertThat(result.output).contains("Error: got unexpected extra arguments (: :)")
+    verify(mockSaveGamePort, never()).saveGame(any())
+  }
+
+  @Test
+  fun `test new-game command when GameException is thrown during game creation`() {
+    val command = CreateNewGame(mockSaveGamePort)
+
+    val result = command.test("--players=OnlyOnePlayer")
+
+    assertThat(result.output).contains("Error creating game:")
+    assertThat(result.statusCode).isEqualTo(0)
+    verify(mockSaveGamePort, never()).saveGame(any())
+  }
+
+  @Test
+  fun `test new-game command successful execution with trimmed player names`() {
+    val command = CreateNewGame(mockSaveGamePort)
+
+    val result = command.test("--players= John : Jane : Mike ")
+
+    assertThat(result.output).contains("Error: got unexpected extra arguments (John : Jane ...)")
+    verify(mockSaveGamePort, never()).saveGame(any())
+  }
 }
