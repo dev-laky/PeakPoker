@@ -16,7 +16,7 @@ class PokerPots(
 ) : Iterable<Pot> by pots {
   private val mainPot: Pot get() = pots.first()
 
-  fun addChipsToMainPot(chips: Int) {
+  fun addChipsToCurrentPot(chips: Int) {
     mainPot.addChips(chips)
   }
 
