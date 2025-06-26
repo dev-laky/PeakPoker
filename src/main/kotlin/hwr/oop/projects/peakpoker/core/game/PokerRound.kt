@@ -78,7 +78,6 @@ class PokerRound(
    */
   private fun showdown() {
     // 1. Distribute winnings across all pots
-
     // Process each pot (starting from side pots, then main pot)
     pots.reversed().forEach { it.payoutWinnings() }
 
@@ -279,7 +278,7 @@ class PokerRound(
     requirePlayerNotAllIn(player)
     requireSufficientChipsToRaise(player, chips)
 
-    pots.addChipsToMainPot(chips - player.bet())
+    pots.addChipsToCurrentPot(chips - player.bet())
     player.setBetAmount(chips)
     makeTurn()
   }
@@ -304,7 +303,7 @@ class PokerRound(
     requirePlayerNotAllInForCall(player)
     requireSufficientChipsToCall(player, highestBet)
 
-    pots.addChipsToMainPot(highestBet - player.bet())
+    pots.addChipsToCurrentPot(highestBet - player.bet())
     player.setBetAmount(highestBet)
     makeTurn()
   }
@@ -364,7 +363,7 @@ class PokerRound(
     requirePlayerNotFolded(player)
     requirePlayerNotAllIn(player)
 
-    pots.addChipsToMainPot(player.chips())
+    pots.addChipsToCurrentPot(player.chips())
     pots.createSidePotIfNeeded(player)
     player.allIn()
     makeTurn()
