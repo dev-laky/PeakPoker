@@ -1,10 +1,5 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +21,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, 50, 50) }
       .cause()
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
       .hasMessage("Bet must be higher than the current highest bet")
   }
 
@@ -44,7 +39,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, 60, 50) }
       .cause()
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
       .hasMessage("Bet must be higher than the current highest bet")
   }
 
@@ -61,7 +56,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, -10) }
       .cause()
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
       .hasMessage("Bet amount must be positive")
   }
 
@@ -83,7 +78,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     // Try to rise to 110, requiring 80 more chips (110-30) which exceeds the available 70
     assertThatThrownBy { requireMethod.invoke(round, player, 110) }
       .cause()
-      .isInstanceOf(InsufficientChipsException::class.java)
+      .isInstanceOf(PokerRound.InsufficientChipsForBettingException::class.java)
       .hasMessage("Not enough chips to raise bet")
   }
 
@@ -110,7 +105,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     // Try to call a bet of 50 (need 30 more chips but only have 10)
     assertThatThrownBy { requireMethod.invoke(round, player, 50) }
       .cause()
-      .isInstanceOf(InsufficientChipsException::class.java)
+      .isInstanceOf(PokerRound.InsufficientChipsForBettingException::class.java)
       .hasMessage("You do not have enough chips to call.")
   }
 
@@ -134,7 +129,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, player) }
       .cause()
-      .isInstanceOf(InvalidCheckException::class.java)
+      .isInstanceOf(PokerRound.InvalidCheckActionException::class.java)
       .hasMessage("You can not check if you are not at the highest bet")
   }
 
@@ -144,7 +139,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.raiseBetTo("Alice", -10) }
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
       .hasMessage("Bet amount must be positive")
   }
 
@@ -155,18 +150,18 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     // Bob is at the current highest bet (20)
     assertThatThrownBy { round.raiseBetTo("Alice", 20) }
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
       .hasMessage("Bet must be higher than the current highest bet")
   }
 
   @Test
-  fun `raiseBetTo throws InsufficientChipsException when player doesn't have enough chips`() {
+  fun `raiseBetTo throws InvalidBetAmountException when player doesn't have enough chips`() {
     val players = listOf(PokerPlayer("Alice", 100), PokerPlayer("Bob", 100))
     val round = PokerRound(players, 10, 20, 0)
 
     // Alice only has 90 chips remaining (100-10), trying to bet the total 150
     assertThatThrownBy { round.raiseBetTo("Alice", 150) }
-      .isInstanceOf(InsufficientChipsException::class.java)
+      .isInstanceOf(PokerRound.InsufficientChipsForBettingException::class.java)
       .hasMessage("Not enough chips to raise bet")
   }
 
@@ -177,7 +172,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     // Alice has bet 10, the highest bet is 20
     assertThatThrownBy { round.check("Alice") }
-      .isInstanceOf(InvalidCheckException::class.java)
+      .isInstanceOf(PokerRound.InvalidCheckActionException::class.java)
       .hasMessage("You can not check if you are not at the highest bet")
   }
 
@@ -326,7 +321,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, 50, 50) }
       .cause()
-      .isInstanceOf(InvalidBetAmountException::class.java)
+      .isInstanceOf(PokerRound.InvalidBetAmountException::class.java)
   }
 
   @Test
@@ -376,7 +371,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     // But should throw exception when trying to raise to 101 (101-30=71 > 70)
     assertThatThrownBy { requireMethod.invoke(round, player, 101) }
       .cause()
-      .isInstanceOf(InsufficientChipsException::class.java)
+      .isInstanceOf(PokerRound.InsufficientChipsForBettingException::class.java)
   }
 
   @Test
@@ -410,7 +405,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, player, 20) }
       .cause()
-      .isInstanceOf(InvalidCallException::class.java)
+      .isInstanceOf(PokerRound.InvalidCallActionException::class.java)
   }
 
   @Test
@@ -428,7 +423,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
 
     assertThatThrownBy { requireMethod.invoke(round, player) }
       .cause()
-      .isInstanceOf(InvalidCheckException::class.java)
+      .isInstanceOf(PokerRound.InvalidCheckActionException::class.java)
   }
 
   @Test
@@ -524,7 +519,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.raiseBetTo("Bob", 30) }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("It's not your turn to bet")
   }
 
@@ -538,7 +533,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.call("Bob") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("It's not your turn to bet")
   }
 
@@ -552,7 +547,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.check("Bob") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("It's not your turn to bet")
   }
 
@@ -566,7 +561,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.fold("Bob") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("It's not your turn to bet")
   }
 
@@ -580,7 +575,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     val round = PokerRound(players, 10, 20, 0)
 
     assertThatThrownBy { round.allIn("Bob") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("It's not your turn to bet")
   }
 
@@ -600,7 +595,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     currentPlayerIndexField.set(round, 0)
 
     assertThatThrownBy { round.raiseBetTo("Alice", 30) }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after folding")
   }
 
@@ -620,7 +615,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     currentPlayerIndexField.set(round, 0)
 
     assertThatThrownBy { round.call("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("You can not call after having folded")
   }
 
@@ -640,7 +635,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     currentPlayerIndexField.set(round, 0)
 
     assertThatThrownBy { round.check("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after folding")
   }
 
@@ -660,7 +655,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     currentPlayerIndexField.set(round, 0)
 
     assertThatThrownBy { round.fold("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after folding")
   }
 
@@ -680,7 +675,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     currentPlayerIndexField.set(round, 0)
 
     assertThatThrownBy { round.allIn("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after folding")
   }
 
@@ -697,7 +692,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     isAllInField.setBoolean(players[0], true)
 
     assertThatThrownBy { round.raiseBetTo("Alice", 30) }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after going all-in")
   }
 
@@ -714,7 +709,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     isAllInField.setBoolean(players[0], true)
 
     assertThatThrownBy { round.call("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("You can not call after having gone all-in")
   }
 
@@ -731,7 +726,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     isAllInField.setBoolean(players[0], true)
 
     assertThatThrownBy { round.check("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after going all-in")
   }
 
@@ -748,7 +743,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     isAllInField.setBoolean(players[0], true)
 
     assertThatThrownBy { round.fold("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after going all-in")
   }
 
@@ -765,7 +760,7 @@ class PokerRoundBettingTest : AnnotationSpec() {
     isAllInField.setBoolean(players[0], true)
 
     assertThatThrownBy { round.allIn("Alice") }
-      .isInstanceOf(InvalidPlayerStateException::class.java)
+      .isInstanceOf(PokerRound.InvalidPlayerStateException::class.java)
       .hasMessage("Cannot raise bet after going all-in")
   }
 }

@@ -6,7 +6,6 @@ import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
 import hwr.oop.projects.peakpoker.core.deck.Deck
 import hwr.oop.projects.peakpoker.core.game.RoundPhase
-
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -128,7 +127,7 @@ class CommunityCardsTest : AnnotationSpec() {
         deck
       )
     }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(CommunityCards.InvalidDealPhaseException::class.java)
       .hasMessageContaining("Cannot deal community cards before the flop")
   }
 
@@ -143,7 +142,7 @@ class CommunityCardsTest : AnnotationSpec() {
         deck
       )
     }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(CommunityCards.InvalidDealPhaseException::class.java)
       .hasMessageContaining("Cannot deal community cards after the showdown")
   }
 }
