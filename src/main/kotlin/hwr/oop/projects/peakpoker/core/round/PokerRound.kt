@@ -55,7 +55,6 @@ class PokerRound(
    */
   private fun showdown() {
     // 1. Distribute winnings across all pots
-
     // Process each pot (starting from side pots, then main pot)
     pots.reversed().forEach { it.payoutWinnings() }
 
