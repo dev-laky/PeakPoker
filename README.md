@@ -15,9 +15,9 @@ programming with Kotlin at HWR Berlin (summer term 2025).
 Installed:
 
 1. IDE of your choice (e.g. IntelliJ IDEA)
-2. JDK of choice installed (JDK 21 GraalVM recommended)
-3. Maven installed (e.g. through IntelliJ IDEA)
-4. Git installed
+2. JDK of choice (JDK 21 GraalVM recommended)
+3. Maven (e.g. through IntelliJ IDEA)
+4. Git
 
 ## Local Development
 
@@ -30,7 +30,7 @@ is executable:
 chmod +x ./mvnw
 ```
 
-I recommend not to dive into details about Maven at the beginning.
+I recommend not diving into details about Maven at the beginning.
 Instead, you can use [just][just] to build the project.
 It reads the repositories `justfile` which maps simplified commands to corresponding sensible Maven
 calls.
