@@ -50,6 +50,14 @@ class PokerGame(
     }
   }
 
+  fun getGameInfo(): GameInfo {
+    return GameInfo(
+      gameId = id.value,
+      hasEnded = hasEnded,
+      roundInfo = currentRound?.getRoundInfo()
+    )
+  }
+
   private fun checkForGameEnd(): Boolean {
     // Check if only one player has chips left
     val activePlayers = players.filter { it.chips() > 0 }

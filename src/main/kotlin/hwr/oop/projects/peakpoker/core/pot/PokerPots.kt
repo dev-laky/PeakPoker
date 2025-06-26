@@ -56,6 +56,18 @@ class PokerPots(
     )
   }
 
+  /**
+   * Calculates the excess amount of chips that should be moved to a side pot when a player goes all-in.
+   *
+   * This method:
+   * 1. Determines the total amount the all-in player can bet (current bet and remaining chips)
+   * 2. Identifies players who have bet more than this amount
+   * 3. Calculates the total excess chips from these players
+   * 4. Adjusts these players' bets to match the all-in amount
+   *
+   * @param allInPlayer The player who has gone all-in
+   * @return The total excess amount that should be moved to a side pot
+   */
   private fun calculateExcessAmount(allInPlayer: PokerPlayer): Int {
     // Get all-in amount (player's bet and remaining chips)
     val allInTotal = allInPlayer.bet() + allInPlayer.chips()

@@ -8,7 +8,7 @@ class PokerTest : AnnotationSpec() {
   @Test
   fun `test poker command`() {
     // given
-    val command = PokerCommand()
+    val command = Poker()
 
     // when
     val result = command.test()

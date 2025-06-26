@@ -36,8 +36,8 @@
     <pitest.version>1.19.1</pitest.version>
     <kotest-extensions-pitest.version>1.2.0</kotest-extensions-pitest.version>
     <serialization.version>1.8.1</serialization.version>
-    <!--<mockito.version>5.12.0</mockito.version>
-    <mockito-kotlin.version>5.3.1</mockito-kotlin.version>-->
+    <mockito.version>5.12.0</mockito.version>
+    <mockito-kotlin.version>5.3.1</mockito-kotlin.version>
   </properties>
 
   <repositories>
@@ -153,7 +153,7 @@
       <artifactId>kotlinx-serialization-json</artifactId>
       <version>${serialization.version}</version>
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>
@@ -164,7 +164,7 @@
       <artifactId>mockito-kotlin</artifactId>
       <version>${mockito-kotlin.version}</version>
       <scope>test</scope>
-    </dependency>-->
+    </dependency>
   </dependencies>
 
   <build>

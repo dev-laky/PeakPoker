@@ -8,8 +8,10 @@ import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
 import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
+import hwr.oop.projects.peakpoker.core.player.PlayerInfo
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.pot.PokerPots
+import hwr.oop.projects.peakpoker.core.pot.PotInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -64,6 +66,32 @@ class PokerRound(
     }
 
     isInitialized = true
+  }
+
+  fun getRoundInfo(): RoundInfo {
+    return RoundInfo(
+      smallBlindAmount = smallBlindAmount,
+      bigBlindAmount = bigBlindAmount,
+      players = players.map { player ->
+        PlayerInfo(
+          name = player.name,
+          chips = player.chips(),
+          bet = player.bet(),
+          isFolded = player.isFolded(),
+          isAllIn = player.isAllIn()
+        )
+      },
+      smallBlindPlayerName = players[smallBlindIndex].name,
+      roundPhase = roundPhase,
+      communityCards = communityCards.cards(),
+      pots = pots.pots.map { pot ->
+        PotInfo(
+          amount = pot.amount(),
+          eligiblePlayerNames = pot.eligiblePlayers.map { it.name },
+        )
+      },
+      currentPlayerName = getCurrentPlayer().name,
+    )
   }
 
   /**
