@@ -4,8 +4,6 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -34,7 +32,7 @@ class HoleCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { HoleCards(cards, testPlayer) }
-      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
+      .isExactlyInstanceOf(HoleCards.InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly two cards")
   }
 
@@ -47,7 +45,7 @@ class HoleCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { HoleCards(cards, testPlayer) }
-      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
+      .isExactlyInstanceOf(HoleCards.InvalidCardConfigurationException::class.java)
       .hasMessageContaining("exactly two cards")
   }
 
@@ -71,7 +69,7 @@ class HoleCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { HoleCards(cards, testPlayer) }
-      .isExactlyInstanceOf(DuplicateCardException::class.java)
+      .isExactlyInstanceOf(HoleCards.DuplicateCardException::class.java)
       .hasMessageContaining("duplicates")
   }
 

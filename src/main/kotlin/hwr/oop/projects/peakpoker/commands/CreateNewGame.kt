@@ -6,7 +6,6 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import hwr.oop.projects.peakpoker.core.exceptions.GameException
 import hwr.oop.projects.peakpoker.core.game.PokerGame
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.persistence.SaveGamePort
@@ -36,7 +35,7 @@ class CreateNewGame(private val saveGamePort: SaveGamePort) :
 
       echo("Game ID: ${gameId.value}")
       echo("New game created with players: ${game.players.joinToString(", ") { it.name }}")
-    } catch (e: GameException) {
+    } catch (e: IllegalStateException) {
       echo("Error creating game: ${e.message}")
     }
   }

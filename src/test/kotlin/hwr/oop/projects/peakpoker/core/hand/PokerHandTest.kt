@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class PokerHandTest : AnnotationSpec() {
-
   // Constructor tests
   @Test
   fun `creates valid poker hand with 5 cards`() {
@@ -50,7 +49,7 @@ class PokerHandTest : AnnotationSpec() {
           Card(CLUBS, JACK)
         )
       )
-    }.isInstanceOf(IllegalArgumentException::class.java)
+    }.isExactlyInstanceOf(PokerHand.InvalidHandSizeException::class.java)
   }
 
   @Test
@@ -66,7 +65,7 @@ class PokerHandTest : AnnotationSpec() {
           Card(SPADES, NINE)
         )
       )
-    }.isInstanceOf(IllegalArgumentException::class.java)
+    }.isExactlyInstanceOf(PokerHand.InvalidHandSizeException::class.java)
   }
 
   @Test
@@ -81,7 +80,7 @@ class PokerHandTest : AnnotationSpec() {
           Card(HEARTS, TEN)
         )
       )
-    }.isInstanceOf(IllegalArgumentException::class.java)
+    }.isExactlyInstanceOf(PokerHand.DuplicateCardException::class.java)
   }
 
   // Hand rank tests - Instead of checking the private rank property,

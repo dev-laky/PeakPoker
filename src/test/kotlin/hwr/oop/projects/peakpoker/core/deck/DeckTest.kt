@@ -1,13 +1,11 @@
 package hwr.oop.projects.peakpoker.core.deck
 
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientCardsException
 import hwr.oop.projects.peakpoker.core.card.Card
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class DeckTest : AnnotationSpec() {
-
   // Helper method to draw all remaining cards from the deck
   private fun drawAllCards(deck: Deck): List<Card> {
     val allCards = mutableListOf<Card>()
@@ -15,7 +13,7 @@ class DeckTest : AnnotationSpec() {
       while (true) {
         allCards.addAll(deck.draw())
       }
-    } catch (_: InsufficientCardsException) {
+    } catch (_: Deck.InsufficientCardsException) {
       // Expected when deck is empty
     }
     return allCards
@@ -112,7 +110,7 @@ class DeckTest : AnnotationSpec() {
 
     // when and then
     assertThatThrownBy { deck.draw() }
-      .isExactlyInstanceOf(InsufficientCardsException::class.java)
+      .isExactlyInstanceOf(Deck.InsufficientCardsException::class.java)
       .hasMessageContaining("Not enough cards left in the deck")
   }
 
@@ -125,7 +123,7 @@ class DeckTest : AnnotationSpec() {
 
     // when and then
     assertThatThrownBy { deck.draw(remainingCards + 1) }
-      .isExactlyInstanceOf(InsufficientCardsException::class.java)
+      .isExactlyInstanceOf(Deck.InsufficientCardsException::class.java)
       .hasMessageContaining("Not enough cards left in the deck")
   }
 }

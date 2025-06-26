@@ -1,9 +1,6 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
-import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -17,24 +14,24 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Hans"))
       )
     }
-      .isExactlyInstanceOf(DuplicatePlayerException::class.java)
+      .isExactlyInstanceOf(PokerGame.DuplicatePlayerException::class.java)
       .hasMessageContaining("All players must be unique")
   }
 
   @Test
-  fun `negative small blind amount throws exceptions`() {
+  fun `negative small blind amount throws exception`() {
     assertThatThrownBy {
       PokerGame(
         -10, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
-  fun `negative big blind amount throws exceptions`() {
+  fun `negative big blind amount throws exception`() {
     // negative big blind
     assertThatThrownBy {
       PokerGame(
@@ -42,7 +39,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -54,7 +51,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Small blind amount must be positive")
   }
 
@@ -66,7 +63,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -78,7 +75,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be exactly double")
   }
 
@@ -90,7 +87,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -102,7 +99,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be exactly double")
   }
 
@@ -126,7 +123,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         emptyList()
       )
     }
-      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .isExactlyInstanceOf(PokerGame.MinimumPlayersException::class.java)
       .hasMessageContaining("Minimum number of players is 2")
   }
 
@@ -138,7 +135,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"))
       )
     }
-      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .isExactlyInstanceOf(PokerGame.MinimumPlayersException::class.java)
       .hasMessageContaining("Minimum number of players is 2")
   }
 

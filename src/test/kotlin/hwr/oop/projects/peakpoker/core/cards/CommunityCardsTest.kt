@@ -4,8 +4,6 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -45,7 +43,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards) }
-      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
+      .isExactlyInstanceOf(CommunityCards.InvalidCardConfigurationException::class.java)
       .hasMessageContaining("contain exactly 3, 4, or 5 cards")
   }
 
@@ -57,7 +55,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards) }
-      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
+      .isExactlyInstanceOf(CommunityCards.InvalidCardConfigurationException::class.java)
       .hasMessageContaining("contain exactly 3, 4, or 5 cards")
   }
 
@@ -73,7 +71,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards) }
-      .isExactlyInstanceOf(InvalidCardConfigurationException::class.java)
+      .isExactlyInstanceOf(CommunityCards.InvalidCardConfigurationException::class.java)
       .hasMessageContaining("contain exactly 3, 4, or 5 cards")
   }
 
@@ -89,7 +87,7 @@ class CommunityCardsTest : AnnotationSpec() {
     )
 
     assertThatThrownBy { CommunityCards(cards) }
-      .isExactlyInstanceOf(DuplicateCardException::class.java)
+      .isExactlyInstanceOf(CommunityCards.DuplicateCardException::class.java)
       .hasMessageContaining("duplicates")
   }
 

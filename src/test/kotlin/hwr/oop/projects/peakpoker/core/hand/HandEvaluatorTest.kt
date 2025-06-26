@@ -305,14 +305,14 @@ class HandEvaluatorTest : AnnotationSpec() {
     val evaluator = HandEvaluator(community)
     assertThatThrownBy {
       evaluator.determineHighestHand(emptyList())
-    }.isInstanceOf(IllegalArgumentException::class.java)
+    }.isInstanceOf(HandEvaluator.EmptyPlayerListEvaluationException::class.java)
   }
 
   /**
    * Confirms the correct winner is determined out of four players.
    */
   @Test
-  fun `Gives the correct winner out of 4 players`() {
+  fun `gives the correct winner out of 4 players`() {
     val flushPlayer = PokerPlayer("Flush")
     val straightPlayer = PokerPlayer("Straight")
     val pairPlayer = PokerPlayer("Pair")

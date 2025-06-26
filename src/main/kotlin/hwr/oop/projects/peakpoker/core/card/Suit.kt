@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Suit {
-  HEARTS, DIAMONDS, CLUBS, SPADES
+    HEARTS, DIAMONDS, CLUBS, SPADES
 }

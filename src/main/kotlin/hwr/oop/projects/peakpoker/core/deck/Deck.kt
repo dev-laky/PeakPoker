@@ -3,12 +3,16 @@ package hwr.oop.projects.peakpoker.core.deck
 import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientCardsException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
 class Deck() {
+  /**
+   * Thrown when trying to draw more cards than are available in the deck
+   */
+  class InsufficientCardsException(message: String) : IllegalStateException(message)
+
   // Create a list of all possible cards and shuffle it right away
   @Transient
   private val cards: MutableList<Card> = Suit.entries.flatMap { suit ->

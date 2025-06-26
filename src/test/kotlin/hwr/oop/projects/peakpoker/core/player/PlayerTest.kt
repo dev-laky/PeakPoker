@@ -4,9 +4,6 @@ import hwr.oop.projects.peakpoker.core.card.Card
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.card.Rank
 import hwr.oop.projects.peakpoker.core.card.Suit
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -86,7 +83,7 @@ class PlayerTest : AnnotationSpec() {
     val player = PokerPlayer("Hans", 500)
 
     assertThatThrownBy { player.setBetAmount(-1) }
-      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidBetOperationException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
     assertThat(player.bet()).isEqualTo(0)
@@ -98,7 +95,7 @@ class PlayerTest : AnnotationSpec() {
     val player = PokerPlayer("Hans", 500)
 
     assertThatThrownBy { player.setBetAmount(0) }
-      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidBetOperationException::class.java)
       .hasMessageContaining("Chips amount must be greater than zero")
 
     assertThat(player.bet()).isEqualTo(0)
@@ -110,7 +107,7 @@ class PlayerTest : AnnotationSpec() {
     assertThatThrownBy {
       PokerPlayer("TestPlayer", -100)
     }
-      .isExactlyInstanceOf(InsufficientChipsException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidInitialChipsBalanceException::class.java)
       .hasMessageContaining("Chips amount must be non-negative")
   }
 
@@ -132,7 +129,7 @@ class PlayerTest : AnnotationSpec() {
     assertThatThrownBy {
       PokerPlayer("", 100)
     }
-      .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidPlayerNameException::class.java)
       .hasMessageContaining("PokerPlayer name cannot be blank")
   }
 
@@ -141,7 +138,7 @@ class PlayerTest : AnnotationSpec() {
     assertThatThrownBy {
       PokerPlayer("   ", 100)
     }
-      .isExactlyInstanceOf(InvalidPlayerStateException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidPlayerNameException::class.java)
       .hasMessageContaining("PokerPlayer name cannot be blank")
   }
 
@@ -240,7 +237,7 @@ class PlayerTest : AnnotationSpec() {
     val player = PokerPlayer("Hans", 100)
 
     assertThatThrownBy { player.addChips(-10) }
-      .isExactlyInstanceOf(InvalidBetAmountException::class.java)
+      .isExactlyInstanceOf(PokerPlayer.InvalidBetOperationException::class.java)
       .hasMessageContaining("Cannot add negative amount of chips")
 
     assertThat(player.chips()).isEqualTo(100)

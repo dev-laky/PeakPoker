@@ -9,22 +9,38 @@ import hwr.oop.projects.peakpoker.core.card.Card
  * @property cards The list of cards that make up the hand
  */
 class PokerHand(private val cards: List<Card>) : Iterable<Card> by cards {
+  /**
+   * Exception thrown when a poker hand does not contain exactly 5 cards
+   */
+  class InvalidHandSizeException(message: String) : Exception(message)
+
+  /**
+   * Exception thrown when a poker hand contains duplicate cards
+   */
+  class DuplicateCardException(message: String) : Exception(message)
 
   private val rank: HandRank
 
   init {
-    require(cards.size == 5) { "Hand must contain exactly 5 cards" }
-    require(cards.distinct().size == 5) { "Hand must contain 5 unique cards" }
+    if (cards.size != 5) {
+      throw InvalidHandSizeException("Hand must contain exactly 5 cards")
+    }
+
+    if (cards.distinct().size != 5) {
+      throw DuplicateCardException("Hand must contain 5 unique cards")
+    }
 
     // Evaluate the rank of the hand upon initialization
     rank = evaluate()
   }
 
   /**
-   * Evaluates the rank of this poker hand.
+   * Evaluates the rank of this poker hand based on standard poker hand rankings.
+   *
+   * Determines the poker hand rank by analyzing card patterns such as:
+   * Royal Flush, Straight Flush, Four of a Kind, Full House, etc.
    *
    * @return The [HandRank] of the evaluated hand
-   * @throws IllegalStateException if the hand doesn't meet validation criteria
    */
   private fun evaluate(): HandRank {
 

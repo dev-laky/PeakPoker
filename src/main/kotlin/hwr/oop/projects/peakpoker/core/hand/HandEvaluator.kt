@@ -11,15 +11,31 @@ class HandEvaluator(
   private val communityCards: CommunityCards,
 ) {
   /**
+   * Exception thrown when an empty player list is provided
+   */
+  class EmptyPlayerListEvaluationException(message: String) : IllegalArgumentException(message)
+
+  /**
+   * Exception thrown when an invalid number of cards is found
+   */
+  class InvalidCardCountException(message: String) : IllegalArgumentException(message)
+
+  /**
+   * Exception thrown when no valid hand can be found
+   */
+  class NoValidHandFoundException(message: String) : IllegalStateException(message)
+
+  /**
    * Determines all players with the highest hand among a list of players.
    * Returns all players who are tied for the best hand to properly support split pots.
    *
    * @return List of [HoleCards] of all players tied for the highest hand
-   * @throws IllegalArgumentException If the list of players is empty
+   * @throws EmptyPlayerListEvaluationException If the list of players is empty
    */
   fun determineHighestHand(holeCardsList: List<HoleCards>): List<HoleCards> {
-    require(holeCardsList.isNotEmpty()) { "Must provide at least one player" }
-
+    if (holeCardsList.isEmpty()) {
+      throw EmptyPlayerListEvaluationException("Must provide at least one player")
+    }
     // If only one player, they win by default
     if (holeCardsList.size == 1) return listOf(holeCardsList.first())
 
@@ -45,13 +61,15 @@ class HandEvaluator(
    *
    * @param hole The [HoleCards] of the player
    * @return The best [PokerHand] combination
-   * @throws IllegalArgumentException If the total number of cards is not 7
-   * @throws IllegalStateException If no valid hand could be found
+   * @throws InvalidCardCountException If the total number of cards is not 7
+   * @throws NoValidHandFoundException If no valid hand could be found
    */
   private fun getBestCombo(hole: HoleCards): PokerHand {
     val allCards = hole.cards + communityCards.cards()
 
-    require(allCards.size == 7) { "Total cards must be 7 (2 hole + 5 community)" }
+    if (allCards.size != 7) {
+      throw InvalidCardCountException("Total cards must be 7 (2 hole + 5 community)")
+    }
 
     var bestCombo: PokerHand? = null
     val cardCount = 7
@@ -71,7 +89,7 @@ class HandEvaluator(
       }
     }
 
-    return bestCombo ?: throw IllegalStateException("No valid hand found")
+    return bestCombo ?: throw NoValidHandFoundException("No valid hand found")
   }
 }
 

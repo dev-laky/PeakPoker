@@ -1,8 +1,6 @@
 package hwr.oop.projects.peakpoker.core.card
 
 import hwr.oop.projects.peakpoker.core.deck.Deck
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicateCardException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCardConfigurationException
 import hwr.oop.projects.peakpoker.core.game.RoundPhase
 import kotlinx.serialization.Serializable
 
@@ -10,6 +8,20 @@ import kotlinx.serialization.Serializable
 class CommunityCards(
   private val cards: MutableList<Card> = mutableListOf(),
 ) : Iterable<Card> by cards {
+  /**
+   * Exception thrown when duplicate cards are found in the community cards
+   */
+  class DuplicateCardException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when the number of community cards is invalid
+   */
+  class InvalidCardConfigurationException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when attempting to deal community cards in an invalid round phase
+   */
+  class InvalidDealPhaseException(message: String) : IllegalStateException(message)
 
   init {
     if (cards.isNotEmpty() && cards.size !in listOf(3, 4, 5)) {
@@ -22,7 +34,7 @@ class CommunityCards(
 
   fun dealCommunityCards(roundPhase: RoundPhase, deck: Deck) {
     when (roundPhase) {
-      RoundPhase.PRE_FLOP -> throw IllegalStateException("Cannot deal community cards before the flop")
+      RoundPhase.PRE_FLOP -> throw InvalidDealPhaseException("Cannot deal community cards before the flop")
       RoundPhase.FLOP -> {
         cards.addAll(deck.draw(3))
       }
@@ -35,7 +47,7 @@ class CommunityCards(
         cards.addAll(deck.draw(1))
       }
 
-      RoundPhase.SHOWDOWN -> throw IllegalStateException("Cannot deal community cards after the showdown")
+      RoundPhase.SHOWDOWN -> throw InvalidDealPhaseException("Cannot deal community cards after the showdown")
     }
   }
 

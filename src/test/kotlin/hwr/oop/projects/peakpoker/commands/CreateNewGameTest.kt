@@ -92,7 +92,7 @@ class CreateNewGameTest : AnnotationSpec() {
 
     val result = command.test("--players=")
 
-    assertThat(result.output).contains("Error creating game: PokerPlayer name cannot be blank")
+    assertThat(result.output).contains("PokerPlayer name cannot be blank")
     verify(mockSaveGamePort, never()).saveGame(any())
   }
 
