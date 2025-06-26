@@ -6,7 +6,6 @@ import hwr.oop.projects.peakpoker.core.card.HoleCards
 
 /**
  * Evaluates poker hands and determines winning players.
- * Replaces the singleton implementation with a class-based approach.
  */
 class HandEvaluator(
   private val communityCards: CommunityCards,
