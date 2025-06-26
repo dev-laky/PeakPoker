@@ -29,9 +29,6 @@
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
     <clikt.version>5.0.3</clikt.version>
-    <sqlite-jdbc>3.49.1.0</sqlite-jdbc>
-    <exposed.version>0.61.0</exposed.version>
-    <postgresql.version>42.7.2</postgresql.version>
     <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
     <pitest.version>1.19.1</pitest.version>
     <kotest-extensions-pitest.version>1.2.0</kotest-extensions-pitest.version>
@@ -75,61 +72,6 @@
       <groupId>com.github.ajalt.clikt</groupId>
       <artifactId>clikt-jvm</artifactId>
       <version>${clikt.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xerial</groupId>
-      <artifactId>sqlite-jdbc</artifactId>
-      <version>${sqlite-jdbc}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-core</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-dao</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-java-time</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-jdbc</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-jodatime</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-json</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-kotlin-datetime</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-money</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.exposed</groupId>
-      <artifactId>exposed-spring-boot-starter</artifactId>
-      <version>${exposed.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${postgresql.version}</version>
     </dependency>
     <dependency>
       <groupId>io.kotest.extensions</groupId>
@@ -234,7 +176,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
-          <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+          <argLine>
+            -Xshare:off
+            -XX:+EnableDynamicAgentLoading
+          </argLine>
           <systemPropertyVariables>
             <kotest.framework.classpath.scanning.autoscan.disable>true
             </kotest.framework.classpath.scanning.autoscan.disable>
@@ -244,26 +189,22 @@
       <plugin>
         <groupId>org.graalvm.buildtools</groupId>
         <artifactId>native-maven-plugin</artifactId>
-        <configuration>
-          <buildArgs>
-            <buildArg>-Dorg.sqlite.lib.exportPath=${project.build.directory}</buildArg>
-          </buildArgs>
-        </configuration>
+        <version>0.10.6</version>
       </plugin>
       <plugin>
         <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
         <version>${pitest.version}</version>
         <configuration>
+          <avoidCallsTo>
+            <avoidCallsTo>kotlin.jvm.internal</avoidCallsTo>
+          </avoidCallsTo>
+          <excludedMethods>
+            <param>deserialize</param>
+          </excludedMethods>
           <targetClasses>
             <param>hwr.oop.*</param>
           </targetClasses>
-          <excludedClasses>
-            <param>kotlinx.serialization.Serializable</param>
-          </excludedClasses>
-          <excludedTestClasses>
-            <param>kotlinx.serialization.Serializable</param>
-          </excludedTestClasses>
           <targetTests>
             <param>hwr.oop.*</param>
           </targetTests>
