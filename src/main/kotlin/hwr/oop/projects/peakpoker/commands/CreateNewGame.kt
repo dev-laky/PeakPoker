@@ -30,7 +30,7 @@ class CreateNewGame(private val saveGamePort: SaveGamePort) :
 
       echo("Game ID: ${gameId.value}")
       echo("New game created with players: ${game.players.joinToString(", ") { it.name }}")
-    } catch (e: IllegalStateException) {
+    } catch (e: Exception) {
       echo("Error creating game: ${e.message}")
     }
   }
