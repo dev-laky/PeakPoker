@@ -169,9 +169,6 @@ class GameBettingTest : AnnotationSpec() {
     game2.call("Charlie")
     game2.call("Alice")
 
-    val game1InitialInfo = game1.getGameInfo().roundInfo
-    val game2InitialInfo = game2.getGameInfo().roundInfo
-
     game1.check("Alice")
 
     val game1FinalInfo = game1.getGameInfo().roundInfo
