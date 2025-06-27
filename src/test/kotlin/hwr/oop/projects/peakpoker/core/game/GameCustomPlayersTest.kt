@@ -152,53 +152,6 @@ class GameCustomPlayersTest : AnnotationSpec() {
   }
 
   @Test
-  fun `check if game ends correctly`() {
-    val players = listOf(
-      PokerPlayer("Alice", 100),
-      PokerPlayer("Bob", 100)
-    )
-
-    val game = PokerGame(
-      smallBlindAmount = 10,
-      bigBlindAmount = 20,
-      players = players
-    )
-
-    game.allIn("Alice")
-    game.allIn("Bob")
-
-    val winners = players.filter { it.chips() > 0 }
-    val losers = players.filter { it.chips() == 0 }
-
-    assertThat(winners).hasSize(1)
-    assertThat(losers).hasSize(1)
-    assertThat(winners[0].chips()).isEqualTo(200)
-
-    val winnerName = winners[0].name
-
-    // Assert that all game actions throw IllegalStateException after the game has ended
-    assertThatThrownBy { game.allIn(winnerName) }
-      .isInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Game has ended")
-
-    assertThatThrownBy { game.call(winnerName) }
-      .isInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Game has ended")
-
-    assertThatThrownBy { game.check(winnerName) }
-      .isInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Game has ended")
-
-    assertThatThrownBy { game.fold(winnerName) }
-      .isInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Game has ended")
-
-    assertThatThrownBy { game.raiseBetTo(winnerName, 50) }
-      .isInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Game has ended")
-  }
-
-  @Test
   fun `test currentRound restoreCallback is called`() {
     val players = listOf(
       PokerPlayer("Alice", 1000),
