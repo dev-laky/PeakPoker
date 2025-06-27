@@ -20,37 +20,44 @@ class PokerRound(
   /**
    * Exception thrown when a player attempts a betting action without sufficient chips
    */
-  class InsufficientChipsForBettingException(message: String) : IllegalStateException(message)
+  class InsufficientChipsForBettingException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Thrown when an action is attempted on a player in an invalid state
    */
-  class InvalidPlayerStateException(message: String) : IllegalStateException(message)
+  class InvalidPlayerStateException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when a bet amount violates poker betting rules
    */
-  class InvalidBetAmountException(message: String) : IllegalStateException(message)
+  class InvalidBetAmountException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when a player attempts an invalid call action
    */
-  class InvalidCallActionException(message: String) : IllegalStateException(message)
+  class InvalidCallActionException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when a player attempts an invalid check action
    */
-  class InvalidCheckActionException(message: String) : IllegalStateException(message)
+  class InvalidCheckActionException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when a player with a specified name is not found in the game
    */
-  class PlayerNotFoundException(message: String) : IllegalStateException(message)
+  class PlayerNotFoundException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when an invalid operation is attempted for the current round phase
    */
-  class IllegalRoundPhaseException(message: String) : IllegalStateException(message)
+  class IllegalRoundPhaseException(message: String) :
+    IllegalStateException(message)
 
   @Transient
   private var onRoundComplete: () -> Unit =

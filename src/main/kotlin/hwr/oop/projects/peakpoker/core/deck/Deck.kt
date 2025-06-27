@@ -11,7 +11,8 @@ class Deck() {
   /**
    * Thrown when trying to draw more cards than are available in the deck
    */
-  class InsufficientCardsException(message: String) : IllegalStateException(message)
+  class InsufficientCardsException(message: String) :
+    IllegalStateException(message)
 
   // Create a list of all possible cards and shuffle it right away
   @Transient
