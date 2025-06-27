@@ -77,8 +77,8 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
     tempFile.delete()
 
     assertThatThrownBy { adapter.loadGame(testGame.id.value) }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
-      .hasMessageContaining("Error loading storage")
+      .isExactlyInstanceOf(FileSystemPersistenceAdapter.FileNotFoundException::class.java)
+      .hasMessageContaining("File does not exist")
   }
 
   @Test
@@ -87,7 +87,7 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
     val nonExistentId = GameId.generate()
 
     assertThatThrownBy { adapter.loadGame(nonExistentId.value) }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(FileSystemPersistenceAdapter.GameNotFoundException::class.java)
       .hasMessageContaining("Game not found: ${nonExistentId.value}")
   }
 
@@ -143,7 +143,7 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
     tempFile.writeText("invalid json content")
 
     assertThatThrownBy { adapter.loadGame(testGame.id.value) }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(FileSystemPersistenceAdapter.StorageLoadException::class.java)
       .hasMessageContaining("Error loading storage")
   }
 
@@ -182,7 +182,7 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
     tempFile.writeText("")
 
     assertThatThrownBy { adapter.loadGame(testGame.id.value) }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(FileSystemPersistenceAdapter.StorageLoadException::class.java)
       .hasMessageContaining("Error loading storage")
   }
 
@@ -191,7 +191,7 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
     tempFile.writeText("   \n  \t  ")
 
     assertThatThrownBy { adapter.loadGame(testGame.id.value) }
-      .isExactlyInstanceOf(IllegalStateException::class.java)
+      .isExactlyInstanceOf(FileSystemPersistenceAdapter.StorageLoadException::class.java)
       .hasMessageContaining("Error loading storage")
   }
 
