@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PotInfo(
-  val amount: Int,
-  val eligiblePlayerNames: List<String>,
+    val amount: Int,
+    val eligiblePlayerNames: List<String>,
 )

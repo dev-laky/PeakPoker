@@ -153,20 +153,20 @@ Start with free 10$ and try to climb up the wealth ladder.
 
 ### Betting Commands
 
-| Command                                          | Description           |
-|--------------------------------------------------|-----------------------|
-| `poker raise 10 --game=<gameID> --player=<name>` | Raise the bet by 10   |
-| `poker call --game=<gameID> --player=<name>`     | Call the current bet  |
-| `poker check --game=<gameID> --player=<name>`    | Check (pass the turn) |
-| `poker fold --game=<gameID> --player=<name>`     | Fold the hand         |
-| `poker all-in --game=<gameID> --player=<name>`   | Go all-in             |
+| Command                                            | Description           |
+|----------------------------------------------------|-----------------------|
+| `poker raise 10 --gameID=<gameID> --player=<name>` | Raise the bet by 10   |
+| `poker call --gameID=<gameID> --player=<name>`     | Call the current bet  |
+| `poker check --gameID=<gameID> --player=<name>`    | Check (pass the turn) |
+| `poker fold --gameID=<gameID> --player=<name>`     | Fold the hand         |
+| `poker all-in --gameID=<gameID> --player=<name>`   | Go all-in             |
 
 ### Info Commands
 
-| Command                                      | Description                   |
-|----------------------------------------------|-------------------------------|
-| `poker game-info --game=<gameID>`            | Show current game information |
-| `poker hand --game=<gameID> --player=<name>` | Show the hand of the player   |
+| Command                                        | Description                   |
+|------------------------------------------------|-------------------------------|
+| `poker game-info --gameID=<gameID>`            | Show current game information |
+| `poker hand --gameID=<gameID> --player=<name>` | Show the hand of the player   |
 
 [maven]: https://maven.apache.org/
 

@@ -3,11 +3,6 @@ package hwr.oop.projects.peakpoker.core.game
 import hwr.oop.projects.peakpoker.core.card.CommunityCards
 import hwr.oop.projects.peakpoker.core.card.HoleCards
 import hwr.oop.projects.peakpoker.core.deck.Deck
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCallException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidCheckException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import hwr.oop.projects.peakpoker.core.player.PlayerInfo
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import hwr.oop.projects.peakpoker.core.pot.PokerPots
@@ -22,6 +17,40 @@ class PokerRound(
   private val bigBlindAmount: Int,
   private val smallBlindIndex: Int,
 ) : GameActionable {
+  /**
+   * Exception thrown when a player attempts a betting action without sufficient chips
+   */
+  class InsufficientChipsForBettingException(message: String) : IllegalStateException(message)
+
+  /**
+   * Thrown when an action is attempted on a player in an invalid state
+   */
+  class InvalidPlayerStateException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when a bet amount violates poker betting rules
+   */
+  class InvalidBetAmountException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when a player attempts an invalid call action
+   */
+  class InvalidCallActionException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when a player attempts an invalid check action
+   */
+  class InvalidCheckActionException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when a player with a specified name is not found in the game
+   */
+  class PlayerNotFoundException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when an invalid operation is attempted for the current round phase
+   */
+  class IllegalRoundPhaseException(message: String) : IllegalStateException(message)
 
   @Transient
   private var onRoundComplete: () -> Unit =
@@ -140,7 +169,7 @@ class PokerRound(
       RoundPhase.FLOP -> RoundPhase.TURN
       RoundPhase.TURN -> RoundPhase.RIVER
       RoundPhase.RIVER -> RoundPhase.SHOWDOWN
-      RoundPhase.SHOWDOWN -> throw IllegalStateException("PokerGame is already in the SHOWDOWN phase")
+      RoundPhase.SHOWDOWN -> throw IllegalRoundPhaseException("PokerGame is already in the SHOWDOWN phase")
     }
 
     // Check for the Showdown phase
@@ -205,7 +234,7 @@ class PokerRound(
     players.forEach { player ->
       if (player.name == name) return player
     }
-    throw IllegalStateException("Player with name $name not found")
+    throw PlayerNotFoundException("Player with name $name not found")
   }
 
   private fun setBlinds() {
@@ -250,13 +279,13 @@ class PokerRound(
   }
 
   private fun requireSufficientChipsToRaise(player: PokerPlayer, chips: Int) {
-    if ((chips - player.bet()) > player.chips()) throw InsufficientChipsException(
+    if ((chips - player.bet()) > player.chips()) throw InsufficientChipsForBettingException(
       "Not enough chips to raise bet"
     )
   }
 
   private fun requireNotAtHighestBet(player: PokerPlayer, highestBet: Int) {
-    if (player.bet() == highestBet) throw InvalidCallException("You are already at the highest bet")
+    if (player.bet() == highestBet) throw InvalidCallActionException("You are already at the highest bet")
   }
 
   private fun requirePlayerNotFoldedForCall(player: PokerPlayer) {
@@ -271,13 +300,13 @@ class PokerRound(
     player: PokerPlayer,
     highestBet: Int,
   ) {
-    if (player.chips() < (highestBet - player.bet())) throw InsufficientChipsException(
+    if (player.chips() < (highestBet - player.bet())) throw InsufficientChipsForBettingException(
       "You do not have enough chips to call."
     )
   }
 
   private fun requirePlayerAtHighestBet(player: PokerPlayer) {
-    if (player.bet() != getHighestBet()) throw InvalidCheckException("You can not check if you are not at the highest bet")
+    if (player.bet() != getHighestBet()) throw InvalidCheckActionException("You can not check if you are not at the highest bet")
   }
 
   /**
@@ -292,7 +321,7 @@ class PokerRound(
    * @throws InvalidBetAmountException If the bet is not higher than the current highest bet
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
-   * @throws InsufficientChipsException If the player does not have enough chips
+   * @throws InsufficientChipsForBettingException If the player does not have enough chips
    */
   override fun raiseBetTo(playerName: String, chips: Int) {
     val player = getPlayerByName(playerName)
@@ -316,9 +345,9 @@ class PokerRound(
    *
    * @param playerName The player who is calling
    * @throws InvalidPlayerStateException If it is not the player's turn
-   * @throws InvalidCallException If the player is already at the highest bet
+   * @throws InvalidCallActionException If the player is already at the highest bet
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
-   * @throws InsufficientChipsException If the player does not have enough chips
+   * @throws InsufficientChipsForBettingException If the player does not have enough chips
    */
   override fun call(playerName: String) {
     val player = getPlayerByName(playerName)
@@ -342,7 +371,7 @@ class PokerRound(
    * @param playerName The player who is checking
    * @throws InvalidPlayerStateException If it is not the player's turn
    * @throws InvalidPlayerStateException If the player has already folded or gone all-in
-   * @throws InvalidCheckException If the player is not at the highest bet
+   * @throws InvalidCheckActionException If the player is not at the highest bet
    */
   override fun check(playerName: String) {
     val player = getPlayerByName(playerName)

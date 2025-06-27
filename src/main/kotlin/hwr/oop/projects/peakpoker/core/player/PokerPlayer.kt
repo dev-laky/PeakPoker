@@ -1,9 +1,6 @@
 package hwr.oop.projects.peakpoker.core.player
 
 import hwr.oop.projects.peakpoker.core.card.HoleCards
-import hwr.oop.projects.peakpoker.core.exceptions.InsufficientChipsException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBetAmountException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidPlayerStateException
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,13 +8,28 @@ class PokerPlayer(
   val name: String,
   private var chips: Int = 100,
 ) {
+  /**
+   * Exception thrown when attempting to create a player with negative chips balance
+   */
+  class InvalidInitialChipsBalanceException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when a player name is invalid
+   */
+  class InvalidPlayerNameException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when performing an invalid betting operation
+   */
+  class InvalidBetOperationException(message: String) : IllegalStateException(message)
+
 
   init {
     if (chips < 0) {
-      throw InsufficientChipsException("Chips amount must be non-negative")
+      throw InvalidInitialChipsBalanceException("Chips amount must be non-negative")
     }
     if (name.isBlank()) {
-      throw InvalidPlayerStateException("PokerPlayer name cannot be blank")
+      throw InvalidPlayerNameException("PokerPlayer name cannot be blank")
     }
   }
 
@@ -68,7 +80,7 @@ class PokerPlayer(
 
   fun setBetAmount(chips: Int) {
     if (chips <= 0) {
-      throw InvalidBetAmountException("Chips amount must be greater than zero")
+      throw InvalidBetOperationException("Chips amount must be greater than zero")
     }
 
     this.chips -= chips - bet
@@ -92,10 +104,10 @@ class PokerPlayer(
    * Adds the specified amount of chips to the player's stack.
    *
    * @param amount The amount of chips to add
-   * @throws InvalidBetAmountException If the amount is negative
+   * @throws InvalidBetOperationException If the amount is negative
    */
   fun addChips(amount: Int) {
-    if (amount < 0) throw InvalidBetAmountException("Cannot add negative amount of chips")
+    if (amount < 0) throw InvalidBetOperationException("Cannot add negative amount of chips")
     chips += amount
   }
 }

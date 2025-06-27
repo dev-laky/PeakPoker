@@ -123,7 +123,7 @@ class PotTest : AnnotationSpec() {
     val pot = Pot(setOf(player1, player2), communityCards, 50)
 
     assertThatThrownBy { pot.removeChips(75) }
-      .isExactlyInstanceOf(IllegalArgumentException::class.java)
+      .isExactlyInstanceOf(Pot.InsufficientPotAmountException::class.java)
       .hasMessageContaining("Cannot remove more chips than are in the pot")
   }
 

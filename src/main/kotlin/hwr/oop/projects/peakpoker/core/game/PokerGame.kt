@@ -1,8 +1,5 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
-import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import kotlinx.serialization.Serializable
 
@@ -13,6 +10,30 @@ class PokerGame(
   val players: List<PokerPlayer> = listOf(),
   val id: GameId = GameId.generate(),
 ) : GameActionable {
+  /**
+   * Exception thrown when duplicate player names are found
+   */
+  class DuplicatePlayerException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when blind configuration is invalid
+   */
+  class InvalidBlindConfigurationException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when there are not enough players
+   */
+  class MinimumPlayersException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when trying to access a round when none is active
+   */
+  class NoActiveRoundException(message: String) : IllegalStateException(message)
+
+  /**
+   * Exception thrown when trying to perform actions after the game has ended
+   */
+  class GameEndedException(message: String) : IllegalStateException(message)
 
   // Variable to track the index of the small blind player within players
   private var smallBlindIndex: Int = 0
@@ -20,7 +41,7 @@ class PokerGame(
   private var currentRound: PokerRound? = null
 
   private val round: GameActionable
-    get() = currentRound ?: throw IllegalStateException("No active round")
+    get() = currentRound ?: throw NoActiveRoundException("No active round")
 
   private var hasEnded: Boolean = false
 
@@ -66,7 +87,7 @@ class PokerGame(
 
   private inline fun <T> withGameEndCheck(action: () -> T): T {
     if (hasEnded) {
-      throw IllegalStateException("Game has ended - no more actions allowed")
+      throw GameEndedException("Game has ended - no more actions allowed")
     }
     return action()
   }

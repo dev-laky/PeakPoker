@@ -1,21 +1,18 @@
 package hwr.oop.projects.peakpoker.core.game
 
-import hwr.oop.projects.peakpoker.core.exceptions.DuplicatePlayerException
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
-import hwr.oop.projects.peakpoker.core.exceptions.InvalidBlindConfigurationException
-import hwr.oop.projects.peakpoker.core.exceptions.MinimumPlayersException
 import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
-class GameTestCustomPlayers : AnnotationSpec() {
+class GameCustomPlayersTest : AnnotationSpec() {
   private fun getPrivateField(obj: Any, fieldName: String): Any? {
     val field = obj.javaClass.getDeclaredField(fieldName)
     field.isAccessible = true
     return field.get(obj)
   }
 
-  private fun setPrivateField(obj: Any, fieldName: String, value: Any) {
+  private fun setPrivateField(obj: Any, fieldName: String, value: Any?) {
     val field = obj.javaClass.getDeclaredField(fieldName)
     field.isAccessible = true
     field.set(obj, value)
@@ -29,24 +26,24 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Hans"))
       )
     }
-      .isExactlyInstanceOf(DuplicatePlayerException::class.java)
+      .isExactlyInstanceOf(PokerGame.DuplicatePlayerException::class.java)
       .hasMessageContaining("All players must be unique")
   }
 
   @Test
-  fun `negative small blind amount throws exceptions`() {
+  fun `negative small blind amount throws exception`() {
     assertThatThrownBy {
       PokerGame(
         -10, 20,
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Small blind amount must be positive")
   }
 
   @Test
-  fun `negative big blind amount throws exceptions`() {
+  fun `negative big blind amount throws exception`() {
     // negative big blind
     assertThatThrownBy {
       PokerGame(
@@ -54,7 +51,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -66,7 +63,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Small blind amount must be positive")
   }
 
@@ -78,7 +75,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -90,7 +87,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be exactly double")
   }
 
@@ -102,7 +99,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be positive")
   }
 
@@ -114,7 +111,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"), PokerPlayer("Peter"), PokerPlayer("Max"))
       )
     }
-      .isExactlyInstanceOf(InvalidBlindConfigurationException::class.java)
+      .isExactlyInstanceOf(PokerGame.InvalidBlindConfigurationException::class.java)
       .hasMessageContaining("Big blind amount must be exactly double")
   }
 
@@ -138,7 +135,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         emptyList()
       )
     }
-      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .isExactlyInstanceOf(PokerGame.MinimumPlayersException::class.java)
       .hasMessageContaining("Minimum number of players is 2")
   }
 
@@ -150,7 +147,7 @@ class GameTestCustomPlayers : AnnotationSpec() {
         listOf(PokerPlayer("Hans"))
       )
     }
-      .isExactlyInstanceOf(MinimumPlayersException::class.java)
+      .isExactlyInstanceOf(PokerGame.MinimumPlayersException::class.java)
       .hasMessageContaining("Minimum number of players is 2")
   }
 
@@ -399,5 +396,69 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
     val hasEnded = getPrivateField(game, "hasEnded") as Boolean
     assertThat(hasEnded).isTrue()
+  }
+
+  @Test
+  fun `checkForGameEnd correctly filters players with chips greater than zero`() {
+    val players = listOf(
+      PokerPlayer("Alice", 100),
+      PokerPlayer("Bob", 0),
+      PokerPlayer("Charlie", 50)
+    )
+
+    val game = PokerGame(10, 20, players)
+
+    // Use reflection to call the private checkForGameEnd method
+    val checkForGameEndMethod =
+      game.javaClass.getDeclaredMethod("checkForGameEnd")
+    checkForGameEndMethod.isAccessible = true
+    val result = checkForGameEndMethod.invoke(game) as Boolean
+
+    // With 2 players having chips > 0, the game should not end
+    assertThat(result).isFalse()
+
+    val player = players[2]
+    val chipsField = player.javaClass.getDeclaredField("chips")
+    chipsField.isAccessible = true
+    chipsField.setInt(
+      player,
+      0 // Set Charlie's chips to 0
+    )
+
+    val resultAfterChange = checkForGameEndMethod.invoke(game) as Boolean
+
+    // With only 1 player having chips > 0, the game should end
+    assertThat(resultAfterChange).isTrue()
+  }
+
+  @Test
+  fun `filter condition distinguishes between zero and positive chips`() {
+    val playersWithMixedChips = listOf(
+      PokerPlayer("Alice", 30),     // Has chips
+      PokerPlayer("Bob", 0),       // No chips
+      PokerPlayer("Charlie", 100), // Has chips
+      PokerPlayer("David", 0)      // No chips
+    )
+
+    val game = PokerGame(10, 20, playersWithMixedChips)
+
+    val checkForGameEndMethod =
+      game.javaClass.getDeclaredMethod("checkForGameEnd")
+    checkForGameEndMethod.isAccessible = true
+    val result = checkForGameEndMethod.invoke(game) as Boolean
+
+    // Should not end because 2 players have chips > 0
+    assertThat(result).isFalse()
+
+    // Set Alice's chips to 0, leaving only Charlie with chips
+    val alice = playersWithMixedChips[0]
+    val aliceChipsField = alice.javaClass.getDeclaredField("chips")
+    aliceChipsField.isAccessible = true
+    aliceChipsField.setInt(alice, 0)
+
+    val resultAfterAliceOut = checkForGameEndMethod.invoke(game) as Boolean
+
+    // Should end because only 1 player has chips > 0
+    assertThat(resultAfterAliceOut).isTrue()
   }
 }

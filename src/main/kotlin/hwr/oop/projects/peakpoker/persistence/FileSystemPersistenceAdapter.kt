@@ -9,16 +9,32 @@ class FileSystemPersistenceAdapter(private val file: File) :
   SaveGamePort,
   LoadGamePort {
 
+  /**
+   * Custom exception thrown when the file does not exist
+   */
+  class FileNotFoundException(message: String) : IllegalStateException(message)
+
+  /**
+   * Custom exception thrown when the game is not found in the storage
+   */
+  class GameNotFoundException(message: String) : IllegalStateException(message)
+
+  /**
+   * Custom exception thrown when there is an error loading the storage
+   */
+  class StorageLoadException(message: String, cause: Throwable) :
+    IllegalStateException(message, cause)
+
   private val json = Json { prettyPrint = true; encodeDefaults = true }
 
   override fun loadGame(gameId: String): PokerGame {
     if (!file.exists()) {
-      throw IllegalStateException("Error loading storage: File does not exist")
+      throw FileNotFoundException("Error loading storage: File does not exist")
     }
 
     val storage = loadStorage()
     return storage.games[gameId]
-      ?: throw IllegalStateException("Game not found: $gameId")
+      ?: throw GameNotFoundException("Game not found: $gameId")
   }
 
   override fun saveGame(game: PokerGame): GameId {
@@ -36,7 +52,7 @@ class FileSystemPersistenceAdapter(private val file: File) :
     return try {
       json.decodeFromString<GameStorage>(file.readText())
     } catch (e: Exception) {
-      throw IllegalStateException("Error loading storage: ${e.message}", e)
+      throw StorageLoadException("Error loading storage: ${e.message}", e)
     }
   }
 }
