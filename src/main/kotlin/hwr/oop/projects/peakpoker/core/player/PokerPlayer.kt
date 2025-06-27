@@ -11,17 +11,20 @@ class PokerPlayer(
   /**
    * Exception thrown when attempting to create a player with negative chips balance
    */
-  class InvalidInitialChipsBalanceException(message: String) : IllegalStateException(message)
+  class InvalidInitialChipsBalanceException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when a player name is invalid
    */
-  class InvalidPlayerNameException(message: String) : IllegalStateException(message)
+  class InvalidPlayerNameException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when performing an invalid betting operation
    */
-  class InvalidBetOperationException(message: String) : IllegalStateException(message)
+  class InvalidBetOperationException(message: String) :
+    IllegalStateException(message)
 
 
   init {

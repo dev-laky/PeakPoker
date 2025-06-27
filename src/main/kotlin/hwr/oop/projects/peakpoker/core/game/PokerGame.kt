@@ -13,17 +13,20 @@ class PokerGame(
   /**
    * Exception thrown when duplicate player names are found
    */
-  class DuplicatePlayerException(message: String) : IllegalStateException(message)
+  class DuplicatePlayerException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when blind configuration is invalid
    */
-  class InvalidBlindConfigurationException(message: String) : IllegalStateException(message)
+  class InvalidBlindConfigurationException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when there are not enough players
    */
-  class MinimumPlayersException(message: String) : IllegalStateException(message)
+  class MinimumPlayersException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when trying to access a round when none is active

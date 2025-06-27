@@ -13,17 +13,20 @@ class HandEvaluator(
   /**
    * Exception thrown when an empty player list is provided
    */
-  class EmptyPlayerListEvaluationException(message: String) : IllegalArgumentException(message)
+  class EmptyPlayerListEvaluationException(message: String) :
+    IllegalArgumentException(message)
 
   /**
    * Exception thrown when an invalid number of cards is found
    */
-  class InvalidCardCountException(message: String) : IllegalArgumentException(message)
+  class InvalidCardCountException(message: String) :
+    IllegalArgumentException(message)
 
   /**
    * Exception thrown when no valid hand can be found
    */
-  class NoValidHandFoundException(message: String) : IllegalStateException(message)
+  class NoValidHandFoundException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Determines all players with the highest hand among a list of players.

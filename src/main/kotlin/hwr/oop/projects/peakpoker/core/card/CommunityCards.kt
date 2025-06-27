@@ -16,12 +16,14 @@ class CommunityCards(
   /**
    * Exception thrown when the number of community cards is invalid
    */
-  class InvalidCardConfigurationException(message: String) : IllegalStateException(message)
+  class InvalidCardConfigurationException(message: String) :
+    IllegalStateException(message)
 
   /**
    * Exception thrown when attempting to deal community cards in an invalid round phase
    */
-  class InvalidDealPhaseException(message: String) : IllegalStateException(message)
+  class InvalidDealPhaseException(message: String) :
+    IllegalStateException(message)
 
   init {
     if (cards.isNotEmpty() && cards.size !in listOf(3, 4, 5)) {
