@@ -5,14 +5,14 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 
-class GameTestCustomPlayers : AnnotationSpec() {
+class GameCustomPlayersTest : AnnotationSpec() {
   private fun getPrivateField(obj: Any, fieldName: String): Any? {
     val field = obj.javaClass.getDeclaredField(fieldName)
     field.isAccessible = true
     return field.get(obj)
   }
 
-  private fun setPrivateField(obj: Any, fieldName: String, value: Any) {
+  private fun setPrivateField(obj: Any, fieldName: String, value: Any?) {
     val field = obj.javaClass.getDeclaredField(fieldName)
     field.isAccessible = true
     field.set(obj, value)
@@ -396,5 +396,69 @@ class GameTestCustomPlayers : AnnotationSpec() {
 
     val hasEnded = getPrivateField(game, "hasEnded") as Boolean
     assertThat(hasEnded).isTrue()
+  }
+
+  @Test
+  fun `checkForGameEnd correctly filters players with chips greater than zero`() {
+    val players = listOf(
+      PokerPlayer("Alice", 100),
+      PokerPlayer("Bob", 0),
+      PokerPlayer("Charlie", 50)
+    )
+
+    val game = PokerGame(10, 20, players)
+
+    // Use reflection to call the private checkForGameEnd method
+    val checkForGameEndMethod =
+      game.javaClass.getDeclaredMethod("checkForGameEnd")
+    checkForGameEndMethod.isAccessible = true
+    val result = checkForGameEndMethod.invoke(game) as Boolean
+
+    // With 2 players having chips > 0, the game should not end
+    assertThat(result).isFalse()
+
+    val player = players[2]
+    val chipsField = player.javaClass.getDeclaredField("chips")
+    chipsField.isAccessible = true
+    chipsField.setInt(
+      player,
+      0 // Set Charlie's chips to 0
+    )
+
+    val resultAfterChange = checkForGameEndMethod.invoke(game) as Boolean
+
+    // With only 1 player having chips > 0, the game should end
+    assertThat(resultAfterChange).isTrue()
+  }
+
+  @Test
+  fun `filter condition distinguishes between zero and positive chips`() {
+    val playersWithMixedChips = listOf(
+      PokerPlayer("Alice", 30),     // Has chips
+      PokerPlayer("Bob", 0),       // No chips
+      PokerPlayer("Charlie", 100), // Has chips
+      PokerPlayer("David", 0)      // No chips
+    )
+
+    val game = PokerGame(10, 20, playersWithMixedChips)
+
+    val checkForGameEndMethod =
+      game.javaClass.getDeclaredMethod("checkForGameEnd")
+    checkForGameEndMethod.isAccessible = true
+    val result = checkForGameEndMethod.invoke(game) as Boolean
+
+    // Should not end because 2 players have chips > 0
+    assertThat(result).isFalse()
+
+    // Set Alice's chips to 0, leaving only Charlie with chips
+    val alice = playersWithMixedChips[0]
+    val aliceChipsField = alice.javaClass.getDeclaredField("chips")
+    aliceChipsField.isAccessible = true
+    aliceChipsField.setInt(alice, 0)
+
+    val resultAfterAliceOut = checkForGameEndMethod.invoke(game) as Boolean
+
+    // Should end because only 1 player has chips > 0
+    assertThat(resultAfterAliceOut).isTrue()
   }
 }

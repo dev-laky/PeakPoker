@@ -4,6 +4,7 @@ import hwr.oop.projects.peakpoker.core.game.GameId
 import hwr.oop.projects.peakpoker.core.game.PokerGame
 import hwr.oop.projects.peakpoker.core.player.PokerPlayer
 import io.kotest.core.spec.style.AnnotationSpec
+import kotlinx.serialization.json.Json
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import java.io.File
@@ -148,15 +149,6 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
   }
 
   @Test
-  fun `json output is pretty printed for readability`() {
-    adapter.saveGame(testGame)
-
-    val content = tempFile.readText()
-    assertThat(content).contains("\n")
-    assertThat(content).contains("  ")
-  }
-
-  @Test
   fun `multiple games can be stored and loaded independently`() {
     val games = (1..5).map { index ->
       PokerGame(
@@ -223,5 +215,81 @@ class FileSystemPersistenceAdapterTest : AnnotationSpec() {
         content.contains("\"bigBlindAmount\"") &&
         content.contains("\"players\"")
     assertThat(hasRequiredFields).isTrue()
+  }
+
+  @Test
+  fun `json configuration uses pretty print formatting`() {
+    adapter.saveGame(testGame)
+
+    val content = tempFile.readText()
+    assertThat(content).contains("{\n")
+    assertThat(content).contains("  ")
+    assertThat(content).doesNotContain("{\"games\":")
+  }
+
+  @Test
+  fun `json configuration encodes default values`() {
+    val gameWithDefaults = PokerGame(
+      smallBlindAmount = 10,
+      bigBlindAmount = 20,
+      players = listOf(
+        PokerPlayer("Alice", 1000),
+        PokerPlayer("Bob", 1000)
+      )
+    )
+
+    adapter.saveGame(gameWithDefaults)
+
+    val content = tempFile.readText()
+    assertThat(content).contains("\"smallBlindAmount\"")
+    assertThat(content).contains("\"bigBlindAmount\"")
+    assertThat(content).contains("\"players\"")
+  }
+
+  @Test
+  fun `json field is properly initialized with correct configuration`() {
+    val jsonField =
+      FileSystemPersistenceAdapter::class.java.getDeclaredField("json")
+    jsonField.isAccessible = true
+    val jsonInstance = jsonField.get(adapter) as Json
+
+    assertThat(jsonInstance).isNotNull
+
+    val configurationField = Json::class.java.getDeclaredField("configuration")
+    configurationField.isAccessible = true
+    val configuration = configurationField.get(jsonInstance)
+
+    assertThat(configuration).isNotNull
+  }
+
+  @Test
+  fun `json configuration enables pretty printing through builder`() {
+    adapter.saveGame(testGame)
+
+    val content = tempFile.readText()
+    val lines = content.split("\n")
+
+    assertThat(lines.size).isGreaterThan(1)
+    assertThat(lines.any { it.startsWith("  ") }).isTrue()
+  }
+
+  @Test
+  fun `json configuration enables default encoding through builder`() {
+    val minimalGame = PokerGame(
+      smallBlindAmount = 10,
+      bigBlindAmount = 20,
+      players = listOf(
+        PokerPlayer("Alice", 1000),
+        PokerPlayer("Bob", 1000)
+      )
+    )
+
+    adapter.saveGame(minimalGame)
+
+    val content = tempFile.readText()
+    assertThat(content).contains("\"smallBlindAmount\": 10")
+    assertThat(content).contains("\"bigBlindAmount\": 20")
+    assertThat(content).contains("\"name\": \"Alice\"")
+    assertThat(content).contains("\"name\": \"Bob\"")
   }
 }

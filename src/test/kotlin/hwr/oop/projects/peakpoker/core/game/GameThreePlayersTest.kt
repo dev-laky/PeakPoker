@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.AnnotationSpec
 import org.assertj.core.api.Assertions.assertThat
 
 
-class GameTestThreePlayers : AnnotationSpec() {
+class GameThreePlayersTest : AnnotationSpec() {
   private lateinit var player1: PokerPlayer
   private lateinit var player2: PokerPlayer
   private lateinit var player3: PokerPlayer
